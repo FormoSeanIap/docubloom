@@ -20,19 +20,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API routes
-// app.use(
-  //     '/api/' + API_VERSION,
-  //     /*rateLimiterRoute,*/ [
-    //         './server/routes/user_route',
-    //     ]
-    // );
-    
-    
 import { router as userRoute } from './server/routes/user_route.js';
-app.use('/api/' + API_VERSION, userRoute);
-
-// import { router as usersRouter } from './server/routes/user_route';
-// app.use('/api/' + API_VERSION + usersRouter);
+app.use('/api/' + API_VERSION, /*rateLimiterRoute,*/ [userRoute]);
 
 
 // Page not found

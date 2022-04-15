@@ -1,5 +1,5 @@
-require('dotenv').config();
-const mysql = require('mysql2/promise');
+import 'dotenv/config';
+import mysql from 'mysql2/promise';
 const env = process.env.NODE_ENV || 'production';
 const multipleStatements = process.env.NODE_ENV === 'test';
 const { MYSQL_HOST, MYSQL_USERNAME, MYSQL_PASSWORD, MYSQL_DATABASE, MYSQL_DATABASE_TEST } = process.env;
@@ -34,7 +34,4 @@ mysqlEnv.connectionLimit = 20;
 
 const pool = mysql.createPool(mysqlEnv, { multipleStatements });
 
-module.exports = {
-    mysql,
-    pool,
-};
+export { mysql, pool };

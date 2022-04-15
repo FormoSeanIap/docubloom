@@ -1,6 +1,6 @@
-require('dotenv').config();
+import 'dotenv/config';
 const { MONGO_DB_URL, MONGO_DB_NAME, MONGO_DB_COLLECTION } = process.env;
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
 // Connection URL
 const url = MONGO_DB_URL;
@@ -22,7 +22,4 @@ main();
 
 const collection = db.collection(MONGO_DB_COLLECTION);
 
-module.exports = {
-  main,
-  collection,
-}
+export { main, collection };

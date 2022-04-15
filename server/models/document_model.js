@@ -1,4 +1,4 @@
-const { collection } = require('./mongodb');
+import { collection } from './mongodb.js';
 
 const getDoc = async () => {
   const findResult = await collection.find({}).toArray();
@@ -6,6 +6,4 @@ const getDoc = async () => {
   // console.log('Found documents =>', findResult);
 }
 
-module.exports = {
-  getDoc,
-}
+export { getDoc };

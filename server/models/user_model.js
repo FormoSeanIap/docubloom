@@ -1,9 +1,9 @@
-require('dotenv').config();
+import 'dotenv/config';
 const { TOKEN_EXPIRE, TOKEN_SECRET } = process.env; // 30 days by seconds
-const { pool } = require('./mysqlcon');
-const argon2 = require('argon2');
-const jwt = require('jsonwebtoken');
-const dayjs = require('dayjs');
+import { pool } from './mysqlcon.js';
+import argon2 from 'argon2';
+import jwt from 'jsonwebtoken';
+import dayjs from 'dayjs';
 
 const signUp = async (name, email, password) => {
   const conn = await pool.getConnection();
@@ -21,7 +21,7 @@ const signUp = async (name, email, password) => {
 
       const user = {
           email,
-          //TODO: password: bcrypt.hashSync(password, salt),
+          password: 'test',
           name,
           login_at: loginAt,
           signup_at: signupAt,
@@ -50,8 +50,4 @@ const signUp = async (name, email, password) => {
   }
 };
 
-module.exports = {
-  signUp,
-}
-
-// export { signUp };
+export { signUp };
