@@ -2,6 +2,19 @@
 ## React
 - 同樣跟據不同狀況改變，如果是網頁載入時就已經決定的，用prop；如果是載入後，會跟據使用者行為而改變，就用state
 - 用className取代class
+- 如果發現有引用component，但畫面上沒有東西，可能是沒有return，如
+```js
+const Title = ( { path, requestType, summary, security } ) => {
+  //沒有return，畫面就不會顯示
+  <div className="card-header">
+    <h3 className="card-title"></h3>
+    <div className="card-tools">
+      <button type="button" className="btn btn-tool" data-card-widget="collapse"><i className="fas fa-plus"></i>      
+      </button>
+    </div>
+  </div>
+}
+```
 - 在使用component接上一層傳下來的props的時候，可以用{}來接個別的prop，但要記得包在{}裡面，如
 ```js
 const Title = ( { path, requestType, summary, security } ) => {
