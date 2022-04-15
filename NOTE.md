@@ -1,4 +1,26 @@
-# 雷
+# 技術選擇
+## 選jwt而非session來做使用者登入
+- 之後壓力測試的時候，會讓伺服器自動擴展
+- jwt裡面只會有信箱等資料，遺失的話還好
+- 為了自動擴展，願意承擔管理較麻煩的結果
+[認識Cookie、Session、Token與JWT | Yang Yang (yyisyou.tw)](https://blog.yyisyou.tw/5d272c64/)
+[淺談 Session 與 JWT 差異. 介紹 Session 與 JWT 的使用時機等等 | by 集點送紅利 / Hiro | Medium](https://medium.com/@jedy05097952/%E6%B7%BA%E8%AB%87-session-%E8%88%87-jwt-%E5%B7%AE%E7%95%B0-8d00b2396115)
+## 使用mongoDB來處理JSON檔
+- MongoDB比較適合處理JSON檔案，其中最重要的在於可以只存取該JSON檔案的片段內容
+- 餘下的內容仍使用MySQL，盡量以關聯式資料庫保持資料的嚴僅
+## 選bcrypt或是argon2
+
+# 學習筆記
+## 資料庫
+- varchar的長度不影響效能，因此信箱還是可以用varchar(255)
+- 在使用權限的設計上，可以在DB裡面用role: CHAR(1)，其值只有O、E、V，在伺服器中則是
+```js
+let roleMap = {
+	"O": "owner",
+	"E": "editor",
+	"V": "viewer"
+}
+```
 ## React
 - 同樣跟據不同狀況改變，如果是網頁載入時就已經決定的，用prop；如果是載入後，會跟據使用者行為而改變，就用state
 - 用className取代class
