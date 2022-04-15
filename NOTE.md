@@ -12,6 +12,7 @@
 - 贏得大賽
 - 效率比較好
 https://ithelp.ithome.com.tw/articles/10213964
+- p.s. BCrypt長度固定為60，Argon2長度固定為95
 
 # 學習筆記
 ## 資料庫
