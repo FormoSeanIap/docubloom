@@ -9,6 +9,6 @@ function asyncHandler(cb) {
   };
 }
 
-module.exports = {
+export {
   asyncHandler,
 }
