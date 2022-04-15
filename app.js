@@ -14,18 +14,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// // API routes
-// app.use('/api/' + API_VERSION + '/admin', rateLimiterRoute, require('./server/routes/admin_route'));
-// app.use(
-//     '/api/' + API_VERSION,
-//     /*rateLimiterRoute,*/ [
-//         require('./server/routes/product_route'),
-//         require('./server/routes/marketing_route'),
-//         require('./server/routes/user_route'),
-//         require('./server/routes/order_route'),
-//         require('./server/routes/report'),
-//     ]
-// );
+// API routes
+app.use(
+    '/api/' + API_VERSION,
+    /*rateLimiterRoute,*/ [
+        require('./server/routes/user_route'),
+    ]
+);
 
 app.use('/api/' + API_VERSION, require('./server/routes/user_route'));
 
