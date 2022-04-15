@@ -8,7 +8,10 @@
 ## 使用mongoDB來處理JSON檔
 - MongoDB比較適合處理JSON檔案，其中最重要的在於可以只存取該JSON檔案的片段內容
 - 餘下的內容仍使用MySQL，盡量以關聯式資料庫保持資料的嚴僅
-## 選bcrypt或是argon2
+## 選argon2而非bcrypt
+- 贏得大賽
+- 效率比較好
+https://ithelp.ithome.com.tw/articles/10213964
 
 # 學習筆記
 ## 資料庫
@@ -24,6 +27,7 @@ let roleMap = {
 ## React
 - 同樣跟據不同狀況改變，如果是網頁載入時就已經決定的，用prop；如果是載入後，會跟據使用者行為而改變，就用state
 - 用className取代class
+- 如果不要一層一層傳props，可以使用useContext，比如https://medium.com/hannah-lin/react-hook-%E7%AD%86%E8%A8%98-usecontext-4bc289976847
 - 如果發現有引用component，但畫面上沒有東西，可能是沒有return，如
 ```js
 const Title = ( { path, requestType, summary, security } ) => {
