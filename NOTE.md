@@ -25,6 +25,23 @@ let roleMap = {
 	"V": "viewer"
 }
 ```
+- 多對多的表格可以有兩個以上的primary key，比如三個表格，teacher、profession、teacher-profession，在teacher-profession表格中，可以用PK(teacher-id, profession-id)
+- 常常使用where搜尋的對象，可以設定index。可以使用Explain來協助處理
+- DB是1對1還是1對多，在需求訪談時就要問清楚
+```
+blob存binary string
+blob 可以儲存圖片,text不行
+blob跟text都沒有預設值 (不像varchar可以自訂最大值)
+text最大長度是2的16次方-1 (跟varchar一樣)
+MEDIUMTEXT最多可存16 MB，而LONGTEXT最多可存4 GB字串
+```
+```
+1. 經常變化的字段用varchar
+2. 知道固定長度的用char
+3. 盡量用varchar
+4. 超過255字符的只能用varchar或者text
+5. 能用varchar的地方不用text
+```
 ## React
 - 同樣跟據不同狀況改變，如果是網頁載入時就已經決定的，用prop；如果是載入後，會跟據使用者行為而改變，就用state
 - 用className取代class
