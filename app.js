@@ -9,6 +9,8 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import http from 'http';
 
+// API routes
+import { router as userRoute } from './server/routes/user_route.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -19,9 +21,7 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// API routes
-import { router as userRoute } from './server/routes/user_route.js';
-app.use('/api/' + API_VERSION, /*rateLimiterRoute,*/ [userRoute]);
+app.use('/api/' + API_VERSION + '/user', /*rateLimiterRoute,*/ [userRoute]);
 
 
 // Page not found
