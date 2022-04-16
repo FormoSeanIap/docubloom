@@ -15,6 +15,25 @@ https://ithelp.ithome.com.tw/articles/10213964
 - p.s. BCrypt長度固定為60，Argon2長度固定為95
 
 # 學習筆記
+## 伺服器
+- 在map結合async await的時候，因為我們要await一個array裡面的所有promise，因此要使用Promise.all，比如
+```js
+const getUserDocs = async (userId) => {
+    try {
+        const [rawDocs] = await pool.query('SELECT doc_id, role FROM user_doc WHERE user_id = ?', [userId]);
+        const docs = await Promise.all(rawDocs.map(async (doc) => {
+            const [[{user_id: ownerId}]] = await pool.query('SELECT user_id FROM user_doc WHERE doc_id = ? AND role = ?', [doc.doc_id, DocRole.Owner]);
+            const [[{name: ownerName}]] = await pool.query('SELECT name FROM user WHERE id = ?', [ownerId]);
+            doc.owner = ownerName
+            return doc;
+        }));
+        return docs;
+    } catch (e) {
+        return null;
+    }
+};
+return docs;
+```
 ## 資料庫
 - varchar的長度不影響效能，因此信箱還是可以用varchar(255)
 - 讓 mysql 自動記錄資料建立和更新的時間

@@ -100,10 +100,35 @@ const getUserDetail = async (email) => {
     try {
         const [[user]] = await pool.query('SELECT * FROM user WHERE email = ?', [email]);
         return user;
-    } catch (e) {
+    } catch (err) {
+        console.log('get user details error:', err);
+        return null;
+    }
+};
+
+// TODO: user_doc role map
+
+const DocRole = {
+    Owner: 'O',
+    Editor: 'E',
+    Viewer: 'V',
+}
+
+const getUserDocs = async (userId) => {
+    try {
+        const [rawDocs] = await pool.query('SELECT doc_id, role FROM user_doc WHERE user_id = ?', [userId]);
+        const docs = await Promise.all(rawDocs.map(async (doc) => {
+            const [[{user_id: ownerId}]] = await pool.query('SELECT user_id FROM user_doc WHERE doc_id = ? AND role = ?', [doc.doc_id, DocRole.Owner]);
+            const [[{name: ownerName}]] = await pool.query('SELECT name FROM user WHERE id = ?', [ownerId]);
+            doc.owner = ownerName
+            return doc;
+        }));
+        return docs;
+    } catch (err) {
+        console.log('get user docs error:', err);
         return null;
     }
 };
 
 
-export { signUp, nativeSignIn, getUserDetail };
+export { signUp, nativeSignIn, getUserDetail, getUserDocs };

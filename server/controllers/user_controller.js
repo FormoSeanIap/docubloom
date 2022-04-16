@@ -104,12 +104,15 @@ const getProfile = async (req, res) => {
         return;
     }
     
+    const userDocs = await User.getUserDocs(userDetail.id)
+
     res.status(200).send({
         data: {
             id: userDetail.id, 
             provider: userDetail.provider,
             name: userDetail.name,
             email: userDetail.email,
+            docs: userDocs
         },
     });
     return;
