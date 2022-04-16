@@ -17,6 +17,14 @@ https://ithelp.ithome.com.tw/articles/10213964
 # 學習筆記
 ## 資料庫
 - varchar的長度不影響效能，因此信箱還是可以用varchar(255)
+- 讓 mysql 自動記錄資料建立和更新的時間
+```sql
+CREATE TABLE
+  create_dt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  update_dt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+-- 在mysql workbench裡面修改的話，直接在Default/Expression裡面貼上即可
+```
+要記得注意時區的一致性，比如ec2/rds上面會是預設UTC+0。
 - 在使用權限的設計上，可以在DB裡面用role: CHAR(1)，其值只有O、E、V，在伺服器中則是
 ```js
 let roleMap = {
