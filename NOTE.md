@@ -34,7 +34,35 @@ const getUserDocs = async (userId) => {
 };
 return docs;
 ```
-## 資料庫
+## MongoDB
+- 如果MongoDB使用mongodb extended json，如
+```json
+{
+  "_id": {
+    "$oid": "6258ffdf36c9c4a9bdbfccea"
+  }
+}
+```
+從nodeJS裡面撈的時候就會需要用ObjectId，如
+```js
+import { collection } from './mongodb.js';
+import { ObjectId } from 'mongodb';
+
+const getDoc = async (doc_id) => {
+  try {
+    const [doc] = await collection.find ({"_id": ObjectId(doc_id)}).toArray();
+    return doc;
+  } catch (err) {
+    console.error(err.message);
+  }
+}
+```
+- 撈東西出來的時候，不要用太細節的方式去抓，如
+```js
+const [{data: doc}] = await collection.find ({"_id": ObjectId(doc_id)}).toArray();
+```
+這種抓法會導致沒有資料(撈出來是空值)的時候，出現```data is undefined```的錯誤
+## MySQL
 - varchar的長度不影響效能，因此信箱還是可以用varchar(255)
 - 讓 mysql 自動記錄資料建立和更新的時間
 ```sql

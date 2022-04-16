@@ -1,6 +1,5 @@
 import * as User from '../models/user_model.js';
-import { main } from '../models/mongodb.js';
-import * as document from '../models/document_model.js';
+import * as Doc from '../models/document_model.js';
 
 const signUp = async (req, res, next) => {
   
@@ -118,14 +117,37 @@ const getProfile = async (req, res) => {
     return;
 }
 
-// const getDoc = async (req, res, next) => {
-//   const result = await document.getDoc();
-//   // const { name, age } = req.body;
-//   // const doc = { name, age };
-//   // const result = await db.collection('users').insertOne(doc);
-//   // res.send(result);
-//   res.send(result);
-// }
+const getDoc = async (req, res, next) => {
+    const userDetail = await User.getUserDetail(req.user.email)
+    if (!userDetail) {
+        res.status(403).send({ error: 'Forbidden' });
+        return;
+    }
+
+    const doc_id = req.query.id;
+    if (!doc_id) {
+        res.status(400).send({ error: 'Request Error: id is required.' });
+        return;
+    }
+
+    const result = await Doc.getDoc(doc_id);
+    if (result.error) {
+        const status_code = result.status ? result.status : 403;
+        res.status(status_code).send({ error: result.error });
+        return;
+    }
+    if (result.length===0) {
+        res.status(200).send({
+            data: []
+        });
+        return;
+    }
+    const doc = result[0].data;
+    res.status(200).send({
+        data: doc
+    })
+    return;
+}
 
 
 // const createDoc = async (req, res, next) => {
@@ -137,4 +159,9 @@ const getProfile = async (req, res) => {
 // }
 
 
-export { signUp, signIn, getProfile };
+export { 
+    signUp, 
+    signIn, 
+    getProfile,
+    getDoc 
+};

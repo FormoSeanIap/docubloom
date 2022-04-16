@@ -22,4 +22,4 @@ main();
 
 const collection = db.collection(MONGO_DB_COLLECTION);
 
-export { main, collection };
+export { collection };
