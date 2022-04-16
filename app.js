@@ -15,7 +15,7 @@ const server = http.createServer(app);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-app.use(express.static(__dirname + 'public'));
+app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

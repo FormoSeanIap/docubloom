@@ -20,12 +20,17 @@ const signUp = async (name, email, password) => {
       const signupAt = dayjs().format();
 
       const user = {
+          provider: 'native',
           email,
-          password: 'test',
+          password: 'test', //TODO:
           name,
           login_at: loginAt,
           signup_at: signupAt,
       };
+
+      const queryStr = 'INSERT INTO user SET ?';
+      const [result] = await conn.query(queryStr, user);
+
       const accessToken = jwt.sign(
           {
               name: user.name,
@@ -34,9 +39,6 @@ const signUp = async (name, email, password) => {
           TOKEN_SECRET
       );
       user.access_token = accessToken;
-
-      const queryStr = 'INSERT INTO user SET ?';
-      const [result] = await conn.query(queryStr, user);
 
       user.id = result.insertId;
       await conn.query('COMMIT');
