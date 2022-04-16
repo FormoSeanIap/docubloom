@@ -1,5 +1,4 @@
 import * as User from '../models/user_model.js';
-import * as Doc from '../models/document_model.js';
 
 const signUp = async (req, res, next) => {
   
@@ -97,20 +96,14 @@ const nativeSignIn = async (email, password) => {
 
 const getProfile = async (req, res) => {
     
-    const userDetail = await User.getUserDetail(req.user.email)
-    if (!userDetail) {
-        res.status(403).send({ error: 'Forbidden' });
-        return;
-    }
-    
-    const userDocs = await User.getUserDocs(userDetail.id)
+    const userDocs = await User.getUserDocs(req.user.id)
 
     res.status(200).send({
         data: {
-            id: userDetail.id, 
-            provider: userDetail.provider,
-            name: userDetail.name,
-            email: userDetail.email,
+            id: req.user.id, 
+            provider: req.user.provider,
+            name: req.user.name,
+            email: req.user.email,
             docs: userDocs
         },
     });
@@ -118,11 +111,6 @@ const getProfile = async (req, res) => {
 }
 
 const getDoc = async (req, res, next) => {
-    const userDetail = await User.getUserDetail(req.user.email)
-    if (!userDetail) {
-        res.status(403).send({ error: 'Forbidden' });
-        return;
-    }
 
     const doc_id = req.query.id;
     if (!doc_id) {
@@ -130,7 +118,7 @@ const getDoc = async (req, res, next) => {
         return;
     }
 
-    const result = await Doc.getDoc(doc_id);
+    const result = await User.getDoc(doc_id);
     if (result.error) {
         const status_code = result.status ? result.status : 403;
         res.status(status_code).send({ error: result.error });
@@ -149,19 +137,38 @@ const getDoc = async (req, res, next) => {
     return;
 }
 
+// TODO: refactor detail
+const createDoc = async (req, res, next) => {
+    
+    const doc = req.body.data;
+    if (!doc) {
+        res.status(400).send({ error: 'Request Error: document data is required.' });
+        return;
+    }
+    
+    const result = await User.createDoc(doc);
+    if (result.error) {
+        const status_code = result.status ? result.status : 403;
+        res.status(status_code).send({ error: result.error });
+        return;
+    }
+    const docId = result.insertedId.toString();
 
-// const createDoc = async (req, res, next) => {
-//   // const { name, age } = req.body;
-//   // const doc = { name, age };
-//   // const result = await db.collection('users').insertOne(doc);
-//   // res.send(result);
-//   res.send('done.');
-// }
+    // TODO: insert doc_id and user_id into user_doc in MySQL. 
+    // TODO: Make sure MongoDB and MySQL succeed
+
+    res.status(200).send({
+        data: {
+            id: docId,
+        }
+    })
+}
 
 
 export { 
     signUp, 
     signIn, 
     getProfile,
-    getDoc 
+    getDoc,
+    createDoc, 
 };

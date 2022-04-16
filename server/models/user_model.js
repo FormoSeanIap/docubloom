@@ -1,9 +1,17 @@
 import 'dotenv/config';
 const { TOKEN_EXPIRE, TOKEN_SECRET } = process.env; // 30 days by seconds
 import { pool } from './mysqlcon.js';
+import { collection } from './mongodb.js';
+import { ObjectId } from 'mongodb';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
+
+const DocRole = {
+    Owner: 'O',
+    Editor: 'E',
+    Viewer: 'V',
+}
 
 const signUp = async (name, email, password) => {
   const conn = await pool.getConnection();
@@ -98,21 +106,13 @@ const nativeSignIn = async (email, password) => {
 
 const getUserDetail = async (email) => {
     try {
-        const [[user]] = await pool.query('SELECT * FROM user WHERE email = ?', [email]);
-        return user;
+        const [user] = await pool.query('SELECT * FROM user WHERE email = ?', [email]);
+        return user[0];
     } catch (err) {
         console.log('get user details error:', err);
         return null;
     }
 };
-
-// TODO: user_doc role map
-
-const DocRole = {
-    Owner: 'O',
-    Editor: 'E',
-    Viewer: 'V',
-}
 
 const getUserDocs = async (userId) => {
     try {
@@ -131,4 +131,31 @@ const getUserDocs = async (userId) => {
 };
 
 
-export { signUp, nativeSignIn, getUserDetail, getUserDocs };
+const getDoc = async (doc_id) => {
+    try {
+      const doc = await collection.find({"_id": ObjectId(doc_id)}).toArray();
+      return doc;
+    } catch (err) {
+      console.error('get doc error:', err.message);
+      return { error: err.message };
+    }
+  }
+
+const createDoc = async (doc) => {
+    try {
+      const result = await collection.insertOne({data: doc});
+      return result;
+    } catch (err) {
+      console.error('create doc error:', err.message);
+      return { error: err.message };
+    }
+  }
+
+export { 
+    signUp, 
+    nativeSignIn, 
+    getUserDetail, 
+    getUserDocs, 
+    getDoc,
+    createDoc, 
+};

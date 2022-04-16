@@ -2,6 +2,8 @@ import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 import { promisify } from 'util'; 
 
+import * as User from '../server/models/user_model.js';
+
 const { TOKEN_SECRET } = process.env;
 
 function asyncHandler(cb) {
@@ -30,9 +32,17 @@ function authentication() {
       }
 
       try {
-          const user = await promisify(jwt.verify)(accessToken, TOKEN_SECRET);
-          req.user = user;
-          next();
+        const user = await promisify(jwt.verify)(accessToken, TOKEN_SECRET);
+        req.user = user;
+        
+        const userDetail = await User.getUserDetail(user.email);
+          if (!userDetail) {
+            res.status(403).send({ error: 'Forbidden' });
+          } else {
+              req.user.id = userDetail.id;
+              req.user.role_id = userDetail.role_id;
+              next();
+          }
           return;
       } catch (err) {
           res.status(403).send({ error: 'Forbidden' });
