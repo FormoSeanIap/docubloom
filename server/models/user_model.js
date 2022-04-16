@@ -133,21 +133,39 @@ const getUserDocs = async (userId) => {
 
 const getDoc = async (doc_id) => {
     try {
-      const doc = await collection.find({"_id": ObjectId(doc_id)}).toArray();
-      return doc;
+        const doc = await collection.find({"_id": ObjectId(doc_id)}).toArray();
+        return doc;
     } catch (err) {
-      console.error('get doc error:', err.message);
-      return { error: err.message };
+        console.error('get doc error:', err.message);
+        return { error: err.message };
     }
   }
 
-const createDoc = async (doc) => {
+const createDoc = async (userId, doc) => {
+    const conn = await pool.getConnection();
     try {
-      const result = await collection.insertOne({data: doc});
-      return result;
+        const result = await collection.insertOne({data: doc});
+    
+        await conn.query('START TRANSACTION');
+
+        const user = {
+            user_id: userId,
+            doc_id: result.insertedId.toString(),
+            role: 'O',
+        };
+        const queryStr = 'INSERT INTO user_doc SET ?';
+        await conn.query(queryStr, user);
+        await conn.query('COMMIT');
+    // TODO: Make sure MongoDB and MySQL will both succeed or fail
+    // https://hevodata.com/learn/mongodb-transactions-on-nodejs/#Step2
+    // https://www.mongodb.com/docs/manual/reference/method/Mongo.startSession/
+        return result;
     } catch (err) {
-      console.error('create doc error:', err.message);
-      return { error: err.message };
+        await conn.query('ROLLBACK');
+        console.error('create doc error:', err.message);
+        return { error: err.message };
+    } finally {
+        await conn.release();
     }
   }
 

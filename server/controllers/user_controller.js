@@ -137,7 +137,6 @@ const getDoc = async (req, res, next) => {
     return;
 }
 
-// TODO: refactor detail
 const createDoc = async (req, res, next) => {
     
     const doc = req.body.data;
@@ -146,16 +145,13 @@ const createDoc = async (req, res, next) => {
         return;
     }
     
-    const result = await User.createDoc(doc);
+    const result = await User.createDoc(req.user.id, doc);
     if (result.error) {
         const status_code = result.status ? result.status : 403;
         res.status(status_code).send({ error: result.error });
         return;
     }
     const docId = result.insertedId.toString();
-
-    // TODO: insert doc_id and user_id into user_doc in MySQL. 
-    // TODO: Make sure MongoDB and MySQL succeed
 
     res.status(200).send({
         data: {
