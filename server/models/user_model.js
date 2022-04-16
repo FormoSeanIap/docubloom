@@ -16,16 +16,16 @@ const signUp = async (name, email, password) => {
           return { error: 'Email Already Exists' };
       }
 
+      const hashedPwd = await argon2.hash(password);
+
       const loginAt = dayjs().format();
-      const signupAt = dayjs().format();
 
       const user = {
           provider: 'native',
           email,
-          password: 'test', //TODO:
+          password: hashedPwd,
           name,
-          login_at: loginAt,
-          signup_at: signupAt,
+          last_login_at: loginAt,
       };
 
       const queryStr = 'INSERT INTO user SET ?';
@@ -36,9 +36,11 @@ const signUp = async (name, email, password) => {
               name: user.name,
               email: user.email,
           },
-          TOKEN_SECRET
+          TOKEN_SECRET,
+          { expiresIn: TOKEN_EXPIRE },
       );
       user.access_token = accessToken;
+      user.access_expired = TOKEN_EXPIRE;
 
       user.id = result.insertId;
       await conn.query('COMMIT');
@@ -52,4 +54,56 @@ const signUp = async (name, email, password) => {
   }
 };
 
-export { signUp };
+const nativeSignIn = async (email, password) => {
+    const conn = await pool.getConnection();
+    try {
+        await conn.query('START TRANSACTION');
+
+        const [[user]] = await conn.query('SELECT * FROM user WHERE email = ?', [email]);
+
+        if (!await argon2.verify(user.password, password)) {
+            await conn.query('COMMIT');
+            return { error: 'Password is wrong' };
+        }
+
+        const loginAt = dayjs().format();
+        
+        const accessToken = jwt.sign(
+            {
+                provider: user.provider,
+                name: user.name,
+                email: user.email,
+            },
+            TOKEN_SECRET,
+            { expiresIn: TOKEN_EXPIRE },
+        );
+
+        const queryStr = 'UPDATE user SET last_login_at = ? WHERE id = ?';
+        await conn.query(queryStr, [loginAt, user.id]);
+
+        await conn.query('COMMIT');
+
+        user.access_token = accessToken;
+        user.access_expired = TOKEN_EXPIRE;
+        user.login_at = loginAt;
+
+        return { user };
+    } catch (error) {
+        await conn.query('ROLLBACK');
+        return { error };
+    } finally {
+        await conn.release();
+    }
+};
+
+const getUserDetail = async (email) => {
+    try {
+        const [[user]] = await pool.query('SELECT * FROM user WHERE email = ?', [email]);
+        return user;
+    } catch (e) {
+        return null;
+    }
+};
+
+
+export { signUp, nativeSignIn, getUserDetail };

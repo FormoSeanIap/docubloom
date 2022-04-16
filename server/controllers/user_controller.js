@@ -26,6 +26,7 @@ const signUp = async (req, res, next) => {
   res.status(200).send({
       data: {
           access_token: user.access_token,
+          access_expired: user.access_expired,
           login_at: user.login_at,
           user: {
               id: user.id,
@@ -36,6 +37,83 @@ const signUp = async (req, res, next) => {
   });
 }
 
+const signIn = async (req, res) => {
+    const data = req.body;
+
+    let result;
+    switch (data.provider) {
+        case 'native':
+            result = await nativeSignIn(data.email, data.password);
+            break;
+        case 'facebook':
+            result = { error: 'Facebook signIn is currently under construction' };
+            // result = await facebookSignIn(data.access_token);
+            break;
+        case 'google':
+            result = { error: 'Google signIn is currently under construction' };
+            // result = await googleSignIn(data.access_token);
+            break;
+        default:
+            result = { error: 'Wrong Request' };
+    }
+
+    if (result.error) {
+        const status_code = result.status ? result.status : 403;
+        res.status(status_code).send({ error: result.error });
+        return;
+    }
+
+    const user = result.user;
+    if (!user) {
+        res.status(500).send({ error: 'Database Query Error' });
+        return;
+    }
+
+    res.status(200).send({
+        data: {
+            access_token: user.access_token,
+            access_expired: user.access_expired,
+            login_at: user.login_at,
+            user: {
+                id: user.id,
+                provider: user.provider,
+                name: user.name,
+                email: user.email,
+            },
+        },
+    });
+};
+
+const nativeSignIn = async (email, password) => {
+    if (!email || !password) {
+        return { error: 'Request Error: email and password are required.', status: 400 };
+    }
+
+    try {
+        return await User.nativeSignIn(email, password);
+    } catch (error) {
+        return { error };
+    }
+};
+
+const getProfile = async (req, res) => {
+    
+    const userDetail = await User.getUserDetail(req.user.email)
+    if (!userDetail) {
+        res.status(403).send({ error: 'Forbidden' });
+        return;
+    }
+    
+    res.status(200).send({
+        data: {
+            id: userDetail.id, 
+            provider: userDetail.provider,
+            name: userDetail.name,
+            email: userDetail.email,
+        },
+    });
+    return;
+}
 
 // const getDoc = async (req, res, next) => {
 //   const result = await document.getDoc();
@@ -56,4 +134,4 @@ const signUp = async (req, res, next) => {
 // }
 
 
-export { signUp };
+export { signUp, signIn, getProfile };

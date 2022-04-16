@@ -2,13 +2,13 @@ import express from 'express';
 
 const router = express.Router();
 
-import { asyncHandler } from '../../utils/main.js';
+import { asyncHandler, authentication } from '../../utils/main.js';
 
-import { signUp } from '../controllers/user_controller.js';
+import { signUp, signIn, getProfile } from '../controllers/user_controller.js';
 
 router.route('/signup/').post(asyncHandler(signUp));
-// router.route('/signin/').post(asyncHandler(getDoc));
-// router.route('/profile/').get(asyncHandler(getDoc));
+router.route('/signin/').post(asyncHandler(signIn));
+router.route('/profile/').get(authentication(), asyncHandler(getProfile));
 // router.route('/docs/').get(asyncHandler(getDoc));
 // router.route('/docs/').post(asyncHandler(createDoc));
 
