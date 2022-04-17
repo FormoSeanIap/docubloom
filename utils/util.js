@@ -51,7 +51,7 @@ function authentication() {
   };
 };
 
-function authenticationDoc(roleId) {
+function authorizationDoc(roleId) {
   return async function (req, res, next) {
 
       const docId = req.query.id;
@@ -82,5 +82,5 @@ function authenticationDoc(roleId) {
 export {
   asyncHandler,
   authentication,
-  authenticationDoc,
+  authorizationDoc,
 }
