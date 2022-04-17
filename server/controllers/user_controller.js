@@ -169,25 +169,17 @@ const editDoc = async (req, res, next) => {
 
 const deleteDoc = async (req, res, next) => {
     
-    // const doc = req.body.data;
-    // if (!doc) {
-    //     res.status(400).send({ error: 'Request Error: document data is required.' });
-    //     return;
-    // }
-    
-    // const result = await User.createDoc(req.user.id, doc);
-    // if (result.error) {
-    //     const status_code = result.status ? result.status : 403;
-    //     res.status(status_code).send({ error: result.error });
-    //     return;
-    // }
-    // const docId = result.insertedId.toString();
+    const docId = req.query.id;
+    const userId = req.user.id;
 
-    // res.status(200).send({
-    //     data: {
-    //         id: docId,
-    //     }
-    // })
+    const result = await User.deleteDoc(docId);
+    if (result.error) {
+        const status_code = result.status ? result.status : 403;
+        res.status(status_code).send({ error: result.error });
+        return;
+    }
+
+    res.status(200).send({message: 'delete success'});
 }
 
 export { 

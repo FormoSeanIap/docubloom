@@ -195,6 +195,33 @@ const editDoc = async (docId, doc) => {
     } 
 }
 
+const deleteDoc = async (docId) => {
+    const conn = await pool.getConnection();
+    const session = client.startSession();
+    try {
+        session.startTransaction();
+        const result = await collection.deleteOne({"_id": ObjectId(docId)}, {session});
+        
+        await conn.query('START TRANSACTION');
+        await conn.query('DELETE FROM user_doc WHERE doc_id = ?', [docId]);
+
+        await conn.query('COMMIT');
+        await session.commitTransaction();
+
+        return result;
+    } catch (err) {
+        await conn.query('ROLLBACK');
+        await session.abortTransaction();
+
+        console.log(err)
+        console.error('delete doc error:', err.message);
+        return { error: err.message };
+    } finally {
+        await conn.release();
+        await session.endSession();
+    }
+  }
+
 export { 
     DOC_ROLE,
     signUp, 
@@ -205,4 +232,5 @@ export {
     getDoc,
     createDoc, 
     editDoc,
+    deleteDoc,
 };

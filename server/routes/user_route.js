@@ -13,6 +13,6 @@ router.route('/profile/').get(authentication(), asyncHandler(getProfile));
 router.route('/docs/').get(authentication(), authorizationDoc(DOC_ROLE.VIEWER), asyncHandler(getDoc));
 router.route('/docs/').post(authentication(), asyncHandler(createDoc));
 router.route('/docs/').put(authentication(), authorizationDoc(DOC_ROLE.EDITOR), asyncHandler(editDoc));
-// router.route('/docs/').delete(authentication(), authorizationDoc(DOC_ROLE.EDITOR), asyncHandler(deleteDoc));
+router.route('/docs/').delete(authentication(), authorizationDoc(DOC_ROLE.EDITOR), asyncHandler(deleteDoc));
 
 export { router };
