@@ -117,14 +117,19 @@ const getUserDetail = async (email) => {
 
 const getUserDocs = async (userId) => {
     try {
-        const [rawDocs] = await pool.query('SELECT doc_id, role FROM user_doc WHERE user_id = ?', [userId]);
-        const docs = await Promise.all(rawDocs.map(async (doc) => {
-            const [[{user_id: ownerId}]] = await pool.query('SELECT user_id FROM user_doc WHERE doc_id = ? AND role = ?', [doc.doc_id, DOC_ROLE.OWNER]);
-            const [[{name: ownerName}]] = await pool.query('SELECT name FROM user WHERE id = ?', [ownerId]);
-            doc.owner = ownerName
-            return doc;
-        }));
-        return docs;
+        const rawDocInfos = await collection.find({[`users.${userId}`]: {"$exists": true}}).project({data: 0}).toArray();
+
+        const docInfos = rawDocInfos.map(info => {
+            info['id'] = info._id.toHexString();
+            delete info._id;
+
+            info['role'] = Object.keys(DOC_ROLE).find(key => DOC_ROLE[key] === info.users[userId]).toLowerCase();
+            delete info.users;
+
+            return info;
+        })
+
+        return docInfos;
     } catch (err) {
         console.log('get user docs error:', err);
         return null;
@@ -133,8 +138,8 @@ const getUserDocs = async (userId) => {
 
 const getDocRole = async (userId, docId) => {
     try {
-        const [results] = await pool.query('SELECT role FROM user_doc WHERE user_id = ? AND doc_id = ?', [userId, docId]);
-        return results[0];
+        const result = await collection.findOne({"_id": ObjectId(docId)}, {projection: {[`users.${userId}`]: 1, _id: 0}});
+        return result.users[userId];
     } catch (err) {
         return null;
     }
@@ -142,8 +147,8 @@ const getDocRole = async (userId, docId) => {
 
 const getDoc = async (doc_id) => {
     try {
-        const results = await collection.find({"_id": ObjectId(doc_id)}).toArray();
-        return results[0];
+        const doc = await collection.findOne({"_id": ObjectId(doc_id)}, {projection: {data: 1, _id: 0}});
+        return doc;
     } catch (err) {
         console.error('get doc error:', err.message);
         return { error: err.message };
@@ -151,35 +156,16 @@ const getDoc = async (doc_id) => {
   }
 
 const createDoc = async (userId, doc) => {
-    const conn = await pool.getConnection();
-    const session = client.startSession();
     try {
-        session.startTransaction();
-        const result = await collection.insertOne({data: doc}, {session});
-        
-        await conn.query('START TRANSACTION');
-        const user = {
-            user_id: userId,
-            doc_id: result.insertedId.toString(),
-            role: 'O',
-        };
-        const queryStr = 'INSERT INTO user_doc SET ?';
-        await conn.query(queryStr, user);
-
-        await session.commitTransaction();
-        await conn.query('COMMIT');
-
+        const result = await collection.insertOne({
+            users: {[userId]: DOC_ROLE.OWNER},
+            data: doc,
+        });
         return result;
     } catch (err) {
-        await conn.query('ROLLBACK');
-        await session.abortTransaction();
-
         console.error('create doc error:', err.message);
         return { error: err.message };
-    } finally {
-        await conn.release();
-        await session.endSession();
-    }
+    } 
   }
 
 const editDoc = async (docId, doc) => {
@@ -196,30 +182,13 @@ const editDoc = async (docId, doc) => {
 }
 
 const deleteDoc = async (docId) => {
-    const conn = await pool.getConnection();
-    const session = client.startSession();
     try {
-        session.startTransaction();
-        const result = await collection.deleteOne({"_id": ObjectId(docId)}, {session});
-        
-        await conn.query('START TRANSACTION');
-        await conn.query('DELETE FROM user_doc WHERE doc_id = ?', [docId]);
-
-        await conn.query('COMMIT');
-        await session.commitTransaction();
-
+        const result = await collection.deleteOne({"_id": ObjectId(docId)});
         return result;
     } catch (err) {
-        await conn.query('ROLLBACK');
-        await session.abortTransaction();
-
-        console.log(err)
         console.error('delete doc error:', err.message);
         return { error: err.message };
-    } finally {
-        await conn.release();
-        await session.endSession();
-    }
+    } 
   }
 
 export { 

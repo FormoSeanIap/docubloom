@@ -35,6 +35,22 @@ const getUserDocs = async (userId) => {
 return docs;
 ```
 ## MongoDB
+- 拿到資料ID的時候，可以用```.toHexString()```來把ID轉成文字。因為編碼的關係，不需要用到```toString()```
+- 想要透過Object key來找資料的時候，可以用```{"$exists": true}```來處理，比如
+```js
+onst results = await collection.find({[`users.${userId}`]: {"$exists": true}}).project({data: 0}).toArray();
+```
+- 如果只想要找到一部份的值，可以用```projection```或是```distinct```，比如
+```js
+const users = await collection.distinct("users", {"_id": ObjectId(docId)});
+const targetUser = await collection.find({"_id": ObjectId(docId)}).project({users: 1}).toArray();
+const doc = await collection.findOne({"_id": ObjectId(doc_id)}, {projection: {data: 1, _id: 0}});
+```
+此外，如果想要在nested object裡面找到想要對value，可以用在projection裡面使用key.key來方式來找到值，比如
+```js
+const userRole = await collection.findOne({"_id": ObjectId(docId)}, {projection: {[`users.${userId}`]: 1, _id: 0}});
+// 把[]放在obj key，就可以用parameter來命名obj key
+```
 - 想要做write lock(```SELECT FOR UPDATE```)的話，用```findOneAndUpdate()```，比如
 ```js
 await collection.findOneAndUpdate(

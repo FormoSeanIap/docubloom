@@ -51,7 +51,7 @@ function authentication() {
   };
 };
 
-function authorizationDoc(roleId) {
+function authorizationDoc(roleType) {
   return async function (req, res, next) {
 
       const docId = req.query.id;
@@ -68,9 +68,9 @@ function authorizationDoc(roleId) {
         return;
       }
 
-      if (roleId === User.DOC_ROLE.VIEWER) {
+      if (roleType === User.DOC_ROLE.VIEWER) {
         next();
-      } else if (roleId === User.DOC_ROLE.EDITOR && result.role === User.DOC_ROLE.VIEWER) {
+      } else if (roleType === User.DOC_ROLE.EDITOR && result.role === User.DOC_ROLE.VIEWER) {
         res.status(403).send({ error: 'Forbidden' });
         return;
         } else {
