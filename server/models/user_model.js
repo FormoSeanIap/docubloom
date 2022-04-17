@@ -142,8 +142,8 @@ const getDocRole = async (userId, docId) => {
 
 const getDoc = async (doc_id) => {
     try {
-        const doc = await collection.find({"_id": ObjectId(doc_id)}).toArray();
-        return doc;
+        const results = await collection.find({"_id": ObjectId(doc_id)}).toArray();
+        return results[0];
     } catch (err) {
         console.error('get doc error:', err.message);
         return { error: err.message };

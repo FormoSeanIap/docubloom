@@ -112,25 +112,15 @@ const getProfile = async (req, res) => {
 
 const getDoc = async (req, res, next) => {
 
-    const doc_id = req.query.id;
-    if (!doc_id) {
-        res.status(400).send({ error: 'Request Error: id is required.' });
-        return;
-    }
+    const docId = req.query.id;
 
-    const result = await User.getDoc(doc_id);
+    const result = await User.getDoc(docId);
     if (result.error) {
         const status_code = result.status ? result.status : 403;
         res.status(status_code).send({ error: result.error });
         return;
     }
-    if (result.length===0) {
-        res.status(200).send({
-            data: []
-        });
-        return;
-    }
-    const doc = result[0].data;
+    const doc = result.data;
     res.status(200).send({
         data: doc
     })
@@ -167,17 +157,38 @@ const editDoc = async (req, res, next) => {
 
     const result = await User.editDoc(docId, doc);
 
-    console.log('result:', result);
-    
     if (result.error) {
         const status_code = result.status ? result.status : 403;
         res.status(status_code).send({ error: result.error });
         return;
     }
 
-    res.status(200).send('update success');
+    res.status(200).send({message: 'update success'});
 }
 
+
+const deleteDoc = async (req, res, next) => {
+    
+    // const doc = req.body.data;
+    // if (!doc) {
+    //     res.status(400).send({ error: 'Request Error: document data is required.' });
+    //     return;
+    // }
+    
+    // const result = await User.createDoc(req.user.id, doc);
+    // if (result.error) {
+    //     const status_code = result.status ? result.status : 403;
+    //     res.status(status_code).send({ error: result.error });
+    //     return;
+    // }
+    // const docId = result.insertedId.toString();
+
+    // res.status(200).send({
+    //     data: {
+    //         id: docId,
+    //     }
+    // })
+}
 
 export { 
     signUp, 
@@ -186,4 +197,5 @@ export {
     getDoc,
     createDoc,
     editDoc, 
+    deleteDoc,
 };

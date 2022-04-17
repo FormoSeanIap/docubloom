@@ -60,21 +60,24 @@ function authenticationDoc(roleId) {
           return;
       }
 
+      const userId = req.user.id;
+      const result = await User.getDocRole(userId, docId);
+
+      if (!result) {
+        res.status(403).send({ error: 'Forbidden' });
+        return;
+      }
+
       if (roleId === User.DOC_ROLE.VIEWER) {
         next();
-      } else if (roleId === User.DOC_ROLE.EDITOR) {
-        const userId = req.user.id;
-        const result = await User.getDocRole(userId, docId);
-        
-        if (!result || result.role === User.DOC_ROLE.VIEWER) {
-          res.status(403).send({ error: 'Forbidden' });
-          return;
+      } else if (roleId === User.DOC_ROLE.EDITOR && result.role === User.DOC_ROLE.VIEWER) {
+        res.status(403).send({ error: 'Forbidden' });
+        return;
         } else {
           next();
         }
       }
   };
-};
 
 export {
   asyncHandler,
