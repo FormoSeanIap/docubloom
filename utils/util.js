@@ -61,16 +61,16 @@ function authorizationDoc(roleType) {
       }
 
       const userId = req.user.id;
-      const result = await User.getDocRole(userId, docId);
+      const userRole = await User.getDocRole(userId, docId);
 
-      if (!result) {
+      if (!userRole) {
         res.status(403).send({ error: 'Forbidden' });
         return;
       }
 
       if (roleType === User.DOC_ROLE.VIEWER) {
         next();
-      } else if (roleType === User.DOC_ROLE.EDITOR && result.role === User.DOC_ROLE.VIEWER) {
+      } else if (roleType === User.DOC_ROLE.EDITOR && userRole === User.DOC_ROLE.VIEWER) {
         res.status(403).send({ error: 'Forbidden' });
         return;
         } else {
