@@ -35,6 +35,113 @@ const getUserDocs = async (userId) => {
 return docs;
 ```
 ## MongoDB
+- local replicas
+想要使用transaction時一定要有replica，否則會跳```Transaction numbers are only allowed on a replica set member or mongos```   
+在local端想要使用replica的話，可以直接使用 run-rs 套件   
+1. ```npm install run-rs -g```
+2. 已經安裝好mongoDB的話，就```run-rs --mongod```   
+會看到```Started replica set on "mongodb://DESKTOP-<電腦名字>:27017,DESKTOP-<電腦名字>:27018,DESKTOP-<電腦名字>:27019?replicaSet=rs"```
+3. 上面那一串代表開啟了三個新的mongo伺服器，因此   
+   - .env中的mongoDB url要重新設定為```"mongodb://DESKTOP-<電腦名字>:27017,DESKTOP-<電腦名字>:27018,DESKTOP-<電腦名字>:27019?replicaSet=rs```
+   - 進入mongoDB的GUI介面，連上```mongodb://DESKTOP-<電腦名字>:27017```之後，重新增加新的DB和collection，就如同第一次使用mongoDB那樣
+4. 之後每次想要使用replica的時候，都需要```run-rs --mongod```
+https://www.npmjs.com/package/run-rs
+https://stackoverflow.com/questions/51461952/mongodb-v4-0-transaction-mongoerror-transaction-numbers-are-only-allowed-on-a
+http://thecodebarbarian.com/introducing-run-rs-zero-config-mongodb-runner
+- error handling
+```js
+const { MongoError, MongoClient } = require('mongodb');
+catch (error) {
+    if (error instanceof MongoError && error.hasErrorLabel('UnknownTransactionCommitResult')) {
+      // add your logic to retry or handle the error
+    }
+    else if (error instanceof MongoError && error.hasErrorLabel('TransientTransactionError')) {
+      // add your logic to retry or handle the error
+    } else {
+      console.log('An error occured in the transaction, performing a data rollback:' + error);
+    }
+```
+- transaction做法範例
+1. ```client.startSession();```
+2. 定義好```transactionOptions```
+3. ```session.startTransaction(transactionOptions)``` (也可以用```session.withTransaction()```做callback)
+4. 每個行動都要有```{ session }```做為第二個parameter
+5. ```await session.commitTransaction();``` 或是 ```await session.abortTransaction();```
+6. (finally) ```await session.endSession();```
+範例：
+```js
+async function placeOrder(client, cart, payment) {
+  const transactionOptions = {
+    readConcern: { level: 'snapshot' },
+    writeConcern: { w: 'majority' },
+    readPreference: 'primary'
+  };
+
+  const session = client.startSession();
+  try {
+    session.startTransaction(transactionOptions);
+
+    const ordersCollection = client.db('testdb').collection('orders');
+    const orderResult = await ordersCollection.insertOne(
+      {
+        customer: payment.customer,
+        items: cart,
+        total: payment.total,
+      },
+      { session }
+    );
+
+    const inventoryCollection = client.db('testdb').collection('inventory');
+    for (let i=0; i<cart.length; i++) {
+      const item = cart[i];
+
+      // Cancel the transaction when you have insufficient inventory
+      const checkInventory = await inventoryCollection.findOne(
+        {
+          sku: item.sku,
+          qty: { $gte: item.qty }
+        },
+        { session }
+      )
+      if (checkInventory === null) {
+        throw new Error('Insufficient quantity or SKU not found.');
+      }
+
+      await inventoryCollection.updateOne(
+        { sku: item.sku },
+        { $inc: { 'qty': -item.qty }},
+        { session }
+      );
+    }
+
+    const customerCollection = client.db('testdb').collection('customers');
+    await customerCollection.updateOne(
+      { _id: payment.customer },
+      { $push:  { orders: orderResult.insertedId }},
+      { session }
+    );
+    await session.commitTransaction();
+    console.log('Transaction successfully committed.');
+
+  } catch (error) {
+    if (error instanceof MongoError && error.hasErrorLabel('UnknownTransactionCommitResult')) {
+      // add your logic to retry or handle the error
+    }
+    else if (error instanceof MongoError && error.hasErrorLabel('TransientTransactionError')) {
+      // add your logic to retry or handle the error
+    } else {
+      console.log('An error occured in the transaction, performing a data rollback:' + error);
+    }
+    await session.abortTransaction();
+  } finally {
+    await session.endSession();
+  }
+}
+```
+https://www.mongodb.com/docs/drivers/node/current/fundamentals/transactions/#std-label-nodejs-transaction-core-api-example
+https://hevodata.com/learn/mongodb-transactions-on-nodejs/#Step2
+https://www.mongodb.com/docs/drivers/node/current/fundamentals/transactions/
+https://www.mongodb.com/docs/manual/reference/method/Mongo.startSession/
 - 如果MongoDB使用mongodb extended json，如
 ```json
 {
@@ -61,7 +168,7 @@ const getDoc = async (doc_id) => {
 ```js
 const [{data: doc}] = await collection.find ({"_id": ObjectId(doc_id)}).toArray();
 ```
-這種抓法會導致沒有資料(撈出來是空值)的時候，出現```data is undefined```的錯誤
+這種抓法會導致沒有資料(撈出來是空值)的時候，出現```data is undefined```的錯誤，改用```const [doc] ```比較好
 ## MySQL
 - varchar的長度不影響效能，因此信箱還是可以用varchar(255)
 - 讓 mysql 自動記錄資料建立和更新的時間

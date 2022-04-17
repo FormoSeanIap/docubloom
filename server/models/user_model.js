@@ -1,7 +1,7 @@
 import 'dotenv/config';
 const { TOKEN_EXPIRE, TOKEN_SECRET } = process.env; // 30 days by seconds
 import { pool } from './mysqlcon.js';
-import { collection } from './mongodb.js';
+import { client, collection } from './mongodb.js';
 import { ObjectId } from 'mongodb';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
@@ -143,11 +143,12 @@ const getDoc = async (doc_id) => {
 
 const createDoc = async (userId, doc) => {
     const conn = await pool.getConnection();
+    const session = client.startSession();
     try {
-        const result = await collection.insertOne({data: doc});
-    
+        session.startTransaction();
+        const result = await collection.insertOne({data: doc}, {session});
+        
         await conn.query('START TRANSACTION');
-
         const user = {
             user_id: userId,
             doc_id: result.insertedId.toString(),
@@ -155,17 +156,20 @@ const createDoc = async (userId, doc) => {
         };
         const queryStr = 'INSERT INTO user_doc SET ?';
         await conn.query(queryStr, user);
+
+        await session.commitTransaction();
         await conn.query('COMMIT');
-    // TODO: Make sure MongoDB and MySQL will both succeed or fail
-    // https://hevodata.com/learn/mongodb-transactions-on-nodejs/#Step2
-    // https://www.mongodb.com/docs/manual/reference/method/Mongo.startSession/
+
         return result;
     } catch (err) {
         await conn.query('ROLLBACK');
+        await session.abortTransaction();
+
         console.error('create doc error:', err.message);
         return { error: err.message };
     } finally {
         await conn.release();
+        await session.endSession();
     }
   }
 

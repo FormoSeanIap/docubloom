@@ -2,7 +2,7 @@ import express from 'express';
 
 const router = express.Router();
 
-import { asyncHandler, authentication } from '../../utils/main.js';
+import { asyncHandler, authentication } from '../../utils/util.js';
 
 import { signUp, signIn, getProfile, getDoc, createDoc } from '../controllers/user_controller.js';
 
