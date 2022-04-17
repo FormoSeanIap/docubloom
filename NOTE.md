@@ -35,6 +35,16 @@ const getUserDocs = async (userId) => {
 return docs;
 ```
 ## MongoDB
+- 想要做write lock(```SELECT FOR UPDATE```)的話，用```findOneAndUpdate()```，比如
+```js
+await collection.findOneAndUpdate(
+    {"_id": ObjectId(docId)},
+    {$set: {data: doc}},
+);
+```
+https://www.mongodb.com/blog/post/how-to-select--for-update-inside-mongodb-transactions
+https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/compound-operations/
+
 - local replicas
 想要使用transaction時一定要有replica，否則會跳```Transaction numbers are only allowed on a replica set member or mongos```   
 在local端想要使用replica的話，可以直接使用 run-rs 套件   

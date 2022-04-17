@@ -51,7 +51,33 @@ function authentication() {
   };
 };
 
+function authenticationDoc(roleId) {
+  return async function (req, res, next) {
+
+      const docId = req.query.id;
+      if (!docId) {
+          res.status(400).send({ error: 'doc id is required' });
+          return;
+      }
+
+      if (roleId === User.DOC_ROLE.VIEWER) {
+        next();
+      } else if (roleId === User.DOC_ROLE.EDITOR) {
+        const userId = req.user.id;
+        const result = await User.getDocRole(userId, docId);
+        
+        if (!result || result.role === User.DOC_ROLE.VIEWER) {
+          res.status(403).send({ error: 'Forbidden' });
+          return;
+        } else {
+          next();
+        }
+      }
+  };
+};
+
 export {
   asyncHandler,
   authentication,
+  authenticationDoc,
 }

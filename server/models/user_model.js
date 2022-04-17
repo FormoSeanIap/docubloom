@@ -1,5 +1,4 @@
 import 'dotenv/config';
-const { TOKEN_EXPIRE, TOKEN_SECRET } = process.env; // 30 days by seconds
 import { pool } from './mysqlcon.js';
 import { client, collection } from './mongodb.js';
 import { ObjectId } from 'mongodb';
@@ -7,10 +6,12 @@ import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
 
-const DocRole = {
-    Owner: 'O',
-    Editor: 'E',
-    Viewer: 'V',
+const { TOKEN_EXPIRE, TOKEN_SECRET } = process.env; // 30 days by seconds
+
+const DOC_ROLE = {
+    OWNER: 'O',
+    EDITOR: 'E',
+    VIEWER: 'V',
 }
 
 const signUp = async (name, email, password) => {
@@ -118,7 +119,7 @@ const getUserDocs = async (userId) => {
     try {
         const [rawDocs] = await pool.query('SELECT doc_id, role FROM user_doc WHERE user_id = ?', [userId]);
         const docs = await Promise.all(rawDocs.map(async (doc) => {
-            const [[{user_id: ownerId}]] = await pool.query('SELECT user_id FROM user_doc WHERE doc_id = ? AND role = ?', [doc.doc_id, DocRole.Owner]);
+            const [[{user_id: ownerId}]] = await pool.query('SELECT user_id FROM user_doc WHERE doc_id = ? AND role = ?', [doc.doc_id, DOC_ROLE.OWNER]);
             const [[{name: ownerName}]] = await pool.query('SELECT name FROM user WHERE id = ?', [ownerId]);
             doc.owner = ownerName
             return doc;
@@ -130,6 +131,14 @@ const getUserDocs = async (userId) => {
     }
 };
 
+const getDocRole = async (userId, docId) => {
+    try {
+        const [results] = await pool.query('SELECT role FROM user_doc WHERE user_id = ? AND doc_id = ?', [userId, docId]);
+        return results[0];
+    } catch (err) {
+        return null;
+    }
+};
 
 const getDoc = async (doc_id) => {
     try {
@@ -173,11 +182,27 @@ const createDoc = async (userId, doc) => {
     }
   }
 
+const editDoc = async (docId, doc) => {
+    try {
+        const result = await collection.findOneAndUpdate(
+                {"_id": ObjectId(docId)},
+                {$set: {data: doc}},
+            );
+        return result;
+    } catch (err) {
+        console.error('edit doc error:', err.message);
+        return { error: err.message };
+    } 
+}
+
 export { 
+    DOC_ROLE,
     signUp, 
     nativeSignIn, 
     getUserDetail, 
     getUserDocs, 
+    getDocRole,
     getDoc,
     createDoc, 
+    editDoc,
 };

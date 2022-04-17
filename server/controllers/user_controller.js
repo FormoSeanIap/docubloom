@@ -160,11 +160,30 @@ const createDoc = async (req, res, next) => {
     })
 }
 
+const editDoc = async (req, res, next) => {
+    
+    const docId = req.query.id;
+    const doc = req.body.data;
+
+    const result = await User.editDoc(docId, doc);
+
+    console.log('result:', result);
+    
+    if (result.error) {
+        const status_code = result.status ? result.status : 403;
+        res.status(status_code).send({ error: result.error });
+        return;
+    }
+
+    res.status(200).send('update success');
+}
+
 
 export { 
     signUp, 
     signIn, 
     getProfile,
     getDoc,
-    createDoc, 
+    createDoc,
+    editDoc, 
 };
