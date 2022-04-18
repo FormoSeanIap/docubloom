@@ -119,7 +119,7 @@ const getUserDocs = async (userId) => {
     try {
         // const rawDocInfos = await collection.find({[`users.${userId}`]: {"$exists": true}}).project({data: 0}).toArray();
 
-        const rawDocInfos = await collection.find({[`users.${userId}`]: {"$exists": true}}).project({users: 1, 'data.info.description': 1}).toArray();
+        const rawDocInfos = await collection.find({[`users.${userId}`]: {"$exists": true}}).project({users: 1, 'data.info': 1}).toArray();
 
         const docInfos = rawDocInfos.map(info => {
             info['id'] = info._id.toHexString();
@@ -128,10 +128,10 @@ const getUserDocs = async (userId) => {
             info['role'] = Object.keys(DOC_ROLE).find(key => DOC_ROLE[key] === info.users[userId]).toLowerCase();
             delete info.users;
 
-            if (info.data && info.data.info && info.data.info.description) {
-                info['description'] = info.data.info.description;    
+            if (info.data && info.data.info) {
+                info['info'] = info.data.info;    
             } else {
-                info['description'] = '';
+                info['info'] = '';
             }
             delete info.data;
 

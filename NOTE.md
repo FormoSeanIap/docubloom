@@ -231,7 +231,18 @@ MEDIUMTEXT最多可存16 MB，而LONGTEXT最多可存4 GB字串
 5. 能用varchar的地方不用text
 ```
 ## React
-- 同樣跟據不同狀況改變，如果是網頁載入時就已經決定的，用prop；如果是載入後，會跟據使用者行為而改變，就用state
+- 同樣跟據不同狀況改變，如果是網頁載入時就已經決定的，用prop；如果是載入後，會跟據使用者行為而改變，就用state；
+- 如果是網頁載入時就要發ajax請求，就一定要用useState搭配useEffect，比如
+```js
+async function fetchUserData(setUserData) {
+  const res = await axios.get('url');
+  setUserData(res.data.data);
+}
+const [userData, setUserData] = useState(null);
+useEffect(() => {
+  fetchUserData(setUserData);
+}, []);
+```
 - 用className取代class
 - 如果不要一層一層傳props，可以使用useContext，比如https://medium.com/hannah-lin/react-hook-%E7%AD%86%E8%A8%98-usecontext-4bc289976847
 - 如果發現有引用component，但畫面上沒有東西，可能是沒有return，如
