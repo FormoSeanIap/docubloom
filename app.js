@@ -8,6 +8,7 @@ import express from 'express';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import http from 'http';
+import cors from 'cors';
 
 // API routes
 import { router as userRoute } from './server/routes/user_route.js';
@@ -20,6 +21,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(cors());
 
 app.use('/api/' + API_VERSION + '/user', /*rateLimiterRoute,*/ [userRoute]);
 
