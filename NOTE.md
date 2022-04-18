@@ -244,7 +244,32 @@ useEffect(() => {
 }, []);
 ```
 - 用className取代class
-- 如果不要一層一層傳props，可以使用useContext，比如https://medium.com/hannah-lin/react-hook-%E7%AD%86%E8%A8%98-usecontext-4bc289976847
+- 如果不要一層一層傳props，可以使用useContext，比如
+```js
+// App.js
+import { createContext } from 'react';
+export const SwitchContainerFunc = createContext(null);
+
+const App = () => {
+  return (
+    function switchToContainer() {
+      // ...
+    }
+    <SwitchContainerFunc.Provider value={switchToContainer}>
+      <Sign />
+    </SwitchContainerFunc.Provider>
+  )
+}
+// 接下來在Sign以及Sign的所有child components都可以存取switchToContainer這個function(也可以是任何其它東西)
+
+// Sign.js
+import { SwitchContainerFunc } from '../containers/App';
+const Sign = () => {
+    const switchToContainer = useContext(SwitchContainerFunc);
+    // 接下來，switchToContainer就會完全等同於App component裡面的switchToContainer function
+}
+```
+https://medium.com/hannah-lin/react-hook-%E7%AD%86%E8%A8%98-usecontext-4bc289976847
 - 如果發現有引用component，但畫面上沒有東西，可能是沒有return，如
 ```js
 const Title = ( { path, requestType, summary, security } ) => {
