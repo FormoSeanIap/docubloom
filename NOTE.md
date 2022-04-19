@@ -232,6 +232,34 @@ MEDIUMTEXT最多可存16 MB，而LONGTEXT最多可存4 GB字串
 ```
 ## React
 - 同樣跟據不同狀況改變，如果是網頁載入時就已經決定的，用prop；如果是載入後，會跟據使用者行為而改變，就用state；
+- 如果要刪除清單列表中的某一個清單，要使用```setXXX((prev) => prev.filter(item => item.id !== id ))```，比如
+```js
+const App = () => {
+  const [data, setData] = useState([]);
+
+  data.map((item) => {
+    const { id } = item;
+    return {
+      <Item key={id} id={id} deleteItem={setData}/>
+    }
+  })
+}
+
+const Item = ({ id, deleteItem }) => {
+
+  function deleteItem() {
+    deleteData(function(prev) {
+      return prev.filter(item => item.id !== id)
+    })
+  }
+
+  return (
+    <div>
+      <button onClick={deleteItem} className="remove">刪除</button>
+    </div>
+  );
+}
+```
 - 如果是網頁載入時就要發ajax請求，就一定要用useState搭配useEffect，比如
 ```js
 async function fetchUserData(setUserData) {
