@@ -83,12 +83,10 @@ const nativeSignIn = async (email, password) => {
 
         await collection_users.findOneAndUpdate(
             {email},
-            {
-                $set: {
-                    last_login_at: loginAt,
-                    updated_dt: updatedDt,
-                }
-            },
+            {$set: {
+                last_login_at: loginAt,
+                updated_dt: updatedDt,
+            }},
         );
 
         user.access_token = accessToken;
