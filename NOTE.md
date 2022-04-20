@@ -443,7 +443,7 @@ const ParamBody = ({ detail }) => {
 ```
 
 ## code mirror
-透過code mirror處理過後的textarea，其value會永遠維持成網頁開啟時的樣子。   
+- 透過code mirror處理過後的textarea，其value會永遠維持成網頁開啟時的樣子。   
 如果想要拿到使用者改變後的value，不能透過```document.querySelector("textarea").value```來取值。   
 要透過```CodeMirror.fromTextArea(document.querySelector("textarea").getValue()```來取值。   
 比如
@@ -463,4 +463,20 @@ viewButton.addEventListener('click', () => {
   const viewerWindow = window.open('./viewer.html');
   viewerWindow.doc = docValue;
 })
+```
+- 一開始寫在CodeMirror textarea裡面的東西是string，要讓string變得比較好看的話，可以使用```js_beautify```這樣子的套件，比如
+```js
+import { js_beautify } from 'js-beautify';
+
+<CodeMirror
+  value={js_beautify(exampleValue, { indent_size: 2 })}
+  height="80vh"
+  minHeight="200px"
+  theme={oneDark}
+  extensions={extensions}
+  onChange={(value, viewUpdate) => {
+    setDoc(value);
+  }}
+/>
+
 ```
