@@ -156,52 +156,6 @@ const getDocRole = async (userId, docId) => {
     }
 };
 
-const getDoc = async (doc_id) => {
-    try {
-        const doc = await collection_docs.findOne({"_id": ObjectId(doc_id)}, {projection: {data: 1, _id: 0}});
-        return doc;
-    } catch (err) {
-        console.error('get doc error:', err.message);
-        return { error: err.message };
-    }
-  }
-
-const createDoc = async (userId, doc) => {
-    try {
-        const result = await collection_docs.insertOne({
-            users: {[userId]: DOC_ROLE.OWNER},
-            data: doc,
-        });
-        return result;
-    } catch (err) {
-        console.error('create doc error:', err.message);
-        return { error: err.message };
-    } 
-  }
-
-const editDoc = async (docId, doc) => {
-    try {
-        const result = await collection_docs.findOneAndUpdate(
-                {"_id": ObjectId(docId)},
-                {$set: {data: doc}},
-            );
-        return result;
-    } catch (err) {
-        console.error('edit doc error:', err.message);
-        return { error: err.message };
-    } 
-}
-
-const deleteDoc = async (docId) => {
-    try {
-        const result = await collection_docs.deleteOne({"_id": ObjectId(docId)});
-        return result;
-    } catch (err) {
-        console.error('delete doc error:', err.message);
-        return { error: err.message };
-    } 
-  }
-
 export { 
     DOC_ROLE,
     signUp, 
@@ -209,8 +163,4 @@ export {
     getUserDetail, 
     getUserDocs, 
     getDocRole,
-    getDoc,
-    createDoc, 
-    editDoc,
-    deleteDoc,
 };

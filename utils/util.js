@@ -54,7 +54,7 @@ function authentication() {
 function authorizationDoc(roleType) {
   return async function (req, res, next) {
 
-      const docId = req.query.id;
+    const { docId } = req.params;
       if (!docId) {
           res.status(400).send({ error: 'doc id is required' });
           return;
@@ -78,40 +78,9 @@ function authorizationDoc(roleType) {
         }
       }
   };
-
-function authorizationDoc2(roleType) {
-  return async function (req, res, next) {
-
-      const { docId } = req.params;
-
-      if (!docId) {
-          res.status(400).send({ error: 'doc id is required' });
-          return;
-      }
-
-      const userId = req.user.id;
-      const userRole = await User.getDocRole(userId, docId);
-
-      if (!userRole) {
-        res.status(403).send({ error: 'Forbidden' });
-        return;
-      }
-
-      if (roleType === User.DOC_ROLE.VIEWER) {
-        next();
-      } else if (roleType === User.DOC_ROLE.EDITOR && userRole === User.DOC_ROLE.VIEWER) {
-        res.status(403).send({ error: 'Forbidden' });
-        return;
-        } else {
-          next();
-        }
-      }
-  };
-
 
 export {
   asyncHandler,
   authentication,
   authorizationDoc,
-  authorizationDoc2,
 }
