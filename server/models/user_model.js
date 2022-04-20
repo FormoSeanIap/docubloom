@@ -147,20 +147,9 @@ const getUserDocs = async (userId) => {
     }
 };
 
-const getDocRole = async (userId, docId) => {
-    try {
-        const result = await collection_docs.findOne({"_id": ObjectId(docId)}, {projection: {[`users.${userId}`]: 1, _id: 0}});
-        return result.users[userId];
-    } catch (err) {
-        return null;
-    }
-};
-
 export { 
-    DOC_ROLE,
     signUp, 
     nativeSignIn, 
     getUserDetail, 
     getUserDocs, 
-    getDocRole,
 };

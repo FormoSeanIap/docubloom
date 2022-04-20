@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { promisify } from 'util'; 
 
 import * as User from '../server/models/user_model.js';
+import * as Doc from '../server/models/doc_model.js';
 
 const { TOKEN_SECRET } = process.env;
 
@@ -61,16 +62,16 @@ function authorizationDoc(roleType) {
       }
 
       const userId = req.user.id;
-      const userRole = await User.getDocRole(userId, docId);
+      const userRole = await Doc.getDocRole(userId, docId);
 
       if (!userRole) {
         res.status(403).send({ error: 'Forbidden' });
         return;
       }
 
-      if (roleType === User.DOC_ROLE.VIEWER) {
+      if (roleType === Doc.DOC_ROLE.VIEWER) {
         next();
-      } else if (roleType === User.DOC_ROLE.EDITOR && userRole === User.DOC_ROLE.VIEWER) {
+      } else if (roleType === Doc.DOC_ROLE.EDITOR && userRole === Doc.DOC_ROLE.VIEWER) {
         res.status(403).send({ error: 'Forbidden' });
         return;
         } else {
