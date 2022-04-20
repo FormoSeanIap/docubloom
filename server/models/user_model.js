@@ -81,6 +81,7 @@ const nativeSignIn = async (email, password) => {
             { expiresIn: TOKEN_EXPIRE },
         );
 
+<<<<<<< HEAD
         await collection_users.findOneAndUpdate(
             {email},
             {
@@ -90,6 +91,20 @@ const nativeSignIn = async (email, password) => {
                 }
             },
         );
+||||||| 66f4cfd
+        const queryStr = 'UPDATE user SET last_login_at = ? WHERE id = ?';
+        await conn.query(queryStr, [loginAt, user.id]);
+
+        await conn.query('COMMIT');
+=======
+        await collection_users.findOneAndUpdate(
+            {email},
+            {$set: {
+                last_login_at: loginAt,
+                updated_dt: updatedDt,
+            }},
+        );
+>>>>>>> 8b625154c56744e89c33b3242e538e8273a866ec
 
         user.access_token = accessToken;
         user.access_expired = TOKEN_EXPIRE;
@@ -103,10 +118,18 @@ const nativeSignIn = async (email, password) => {
 
 const getUserDetail = async (email) => {
     try {
+<<<<<<< HEAD
         const user = await collection_users.findOne({email});
         user['id'] = user['_id'].toHexString();
         delete user['_id'];
         return user;
+||||||| 66f4cfd
+        const [user] = await pool.query('SELECT * FROM user WHERE email = ?', [email]);
+        return user[0];
+=======
+        const user = await collection_users.findOne({email});
+        return user;
+>>>>>>> 8b625154c56744e89c33b3242e538e8273a866ec
     } catch (err) {
         console.error('get user detail error:', err);
         return null;
