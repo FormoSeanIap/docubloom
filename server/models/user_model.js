@@ -1,6 +1,5 @@
 import 'dotenv/config';
-import { pool } from './mysqlcon.js';
-import { client, collection_docs } from './mongodb.js';
+import { client, collection_docs, collection_users } from './mongodb.js';
 import { ObjectId } from 'mongodb';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
@@ -15,68 +14,63 @@ const DOC_ROLE = {
 }
 
 const signUp = async (name, email, password) => {
-  const conn = await pool.getConnection();
-  try {
-      await conn.query('START TRANSACTION');
+    try {
+        const emails = await collection_users.find({email}).project({ _id: 0, email: 1}).toArray();        
+        if (emails.length > 0) {
+            return { error: 'Email Already Exists' };
+        }
 
-      const emails = await conn.query('SELECT email FROM user WHERE email = ? FOR UPDATE', [email]);
-      if (emails[0].length > 0) {
-          await conn.query('COMMIT');
-          return { error: 'Email Already Exists' };
-      }
+        const hashedPwd = await argon2.hash(password);
 
-      const hashedPwd = await argon2.hash(password);
+        const loginAt = dayjs().format();
+        const createdDt = dayjs().format();
+        const updatedDt = dayjs().format();
 
-      const loginAt = dayjs().format();
+        const user = {
+            provider: 'native',
+            email,
+            password: hashedPwd,
+            name,
+            last_login_at: loginAt,
+            created_dt: createdDt,
+            updated_dt: updatedDt,
+        };
 
-      const user = {
-          provider: 'native',
-          email,
-          password: hashedPwd,
-          name,
-          last_login_at: loginAt,
-      };
+        const result = await collection_users.insertOne(user);
+        
+        const accessToken = jwt.sign(
+            {
+                name: user.name,
+                email: user.email,
+            },
+            TOKEN_SECRET,
+            { expiresIn: TOKEN_EXPIRE },
+        );
+        user.access_token = accessToken;
+        user.access_expired = TOKEN_EXPIRE;
 
-      const queryStr = 'INSERT INTO user SET ?';
-      const [result] = await conn.query(queryStr, user);
-
-      const accessToken = jwt.sign(
-          {
-              name: user.name,
-              email: user.email,
-          },
-          TOKEN_SECRET,
-          { expiresIn: TOKEN_EXPIRE },
-      );
-      user.access_token = accessToken;
-      user.access_expired = TOKEN_EXPIRE;
-
-      user.id = result.insertId;
-      await conn.query('COMMIT');
-      return { user };
-  } catch (error) {
-      console.log(error);
-      await conn.query('ROLLBACK');
-      return { error };
-  } finally {
-      await conn.release();
-  }
-};
+        user.id = result['insertedId'].toHexString();
+        return { user };
+    } catch (err) {
+        console.log(err);
+        return { err };
+    }
+}
 
 const nativeSignIn = async (email, password) => {
-    const conn = await pool.getConnection();
     try {
-        await conn.query('START TRANSACTION');
-
-        const [[user]] = await conn.query('SELECT * FROM user WHERE email = ?', [email]);
+        const user = await collection_users.findOne({email});
+        if (!user) {
+            return { error: 'Email Not Found' };
+        }
 
         if (!await argon2.verify(user.password, password)) {
-            await conn.query('COMMIT');
             return { error: 'Password is wrong' };
         }
 
         const loginAt = dayjs().format();
-        
+        const updatedDt = dayjs().format();
+
         const accessToken = jwt.sign(
             {
                 provider: user.provider,
@@ -87,33 +81,37 @@ const nativeSignIn = async (email, password) => {
             { expiresIn: TOKEN_EXPIRE },
         );
 
-        const queryStr = 'UPDATE user SET last_login_at = ? WHERE id = ?';
-        await conn.query(queryStr, [loginAt, user.id]);
-
-        await conn.query('COMMIT');
+        await collection_users.findOneAndUpdate(
+            {email},
+            {
+                $set: {
+                    last_login_at: loginAt,
+                    updated_dt: updatedDt,
+                }
+            },
+        );
 
         user.access_token = accessToken;
         user.access_expired = TOKEN_EXPIRE;
         user.login_at = loginAt;
 
         return { user };
-    } catch (error) {
-        await conn.query('ROLLBACK');
-        return { error };
-    } finally {
-        await conn.release();
+    } catch (err) {
+        return { err };
     }
 };
 
 const getUserDetail = async (email) => {
     try {
-        const [user] = await pool.query('SELECT * FROM user WHERE email = ?', [email]);
-        return user[0];
+        const user = await collection_users.findOne({email});
+        user['id'] = user['_id'].toHexString();
+        delete user['_id'];
+        return user;
     } catch (err) {
-        console.log('get user details error:', err);
+        console.error('get user detail error:', err);
         return null;
     }
-};
+}
 
 const getUserDocs = async (userId) => {
     try {
