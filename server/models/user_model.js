@@ -11,11 +11,11 @@ const DOC_ROLE = {
     OWNER: 'O',
     EDITOR: 'E',
     VIEWER: 'V',
-}
+};
 
 const signUp = async (name, email, password) => {
     try {
-        const emails = await collection_users.find({email}).project({ _id: 0, email: 1}).toArray();        
+        const emails = await collection_users.find({email}).project({ _id: 0, email: 1}).toArray();
         if (emails.length > 0) {
             return { error: 'Email Already Exists' };
         }
@@ -37,7 +37,7 @@ const signUp = async (name, email, password) => {
         };
 
         const result = await collection_users.insertOne(user);
-        
+
         const accessToken = jwt.sign(
             {
                 name: user.name,
@@ -55,7 +55,7 @@ const signUp = async (name, email, password) => {
         console.log(err);
         return { err };
     }
-}
+};
 
 const nativeSignIn = async (email, password) => {
     try {
@@ -109,13 +109,13 @@ const getUserDetail = async (email) => {
         console.error('get user detail error:', err);
         return null;
     }
-}
+};
 
 const getUserDocs = async (userId) => {
     try {
         // const rawDocInfos = await collection.find({[`users.${userId}`]: {"$exists": true}}).project({data: 0}).toArray();
 
-        const rawDocInfos = await collection_docs.find({[`users.${userId}`]: {"$exists": true}}).project({users: 1, 'data.info': 1, 'data.openapi': 1}).toArray();
+        const rawDocInfos = await collection_docs.find({[`users.${userId}`]: {'$exists': true}}).project({users: 1, 'data.info': 1, 'data.openapi': 1}).toArray();
 
         const docInfos = rawDocInfos.map(info => {
             info['id'] = info._id.toHexString();
@@ -125,11 +125,11 @@ const getUserDocs = async (userId) => {
             delete info.users;
 
             if (info.data && info.data.info) {
-                info['info'] = info.data.info;    
+                info['info'] = info.data.info;
             } else {
                 info['info'] = '';
             }
-            
+
             if (info.data && info.data.openapi) {
                 info['openapi'] = info.data.openapi;
             } else {
@@ -138,7 +138,7 @@ const getUserDocs = async (userId) => {
             delete info.data;
 
             return info;
-        })
+        });
 
         return docInfos;
     } catch (err) {
@@ -147,9 +147,9 @@ const getUserDocs = async (userId) => {
     }
 };
 
-export { 
-    signUp, 
-    nativeSignIn, 
-    getUserDetail, 
-    getUserDocs, 
+export {
+    signUp,
+    nativeSignIn,
+    getUserDetail,
+    getUserDocs,
 };
