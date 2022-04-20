@@ -1,5 +1,5 @@
 import 'dotenv/config';
-const { MONGO_DB_URL, MONGO_DB_NAME, MONGO_DB_COLLECTION_DOCS } = process.env;
+const { MONGO_DB_URL, MONGO_DB_NAME, MONGO_DB_COLLECTION_DOCS, MONGO_DB_COLLECTION_USERS } = process.env;
 import { MongoClient } from 'mongodb';
 
 // Connection URL
@@ -18,5 +18,6 @@ try {
 }
 
 const collection_docs = db.collection(MONGO_DB_COLLECTION_DOCS);
+const collection_users = db.collection(MONGO_DB_COLLECTION_USERS);
 
-export { client, collection_docs };
+export { client, collection_docs, collection_users };
