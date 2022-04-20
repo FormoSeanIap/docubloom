@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { pool } from './mysqlcon.js';
-import { client, collection } from './mongodb.js';
+import { client, collection_docs } from './mongodb.js';
 import { ObjectId } from 'mongodb';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
@@ -119,7 +119,7 @@ const getUserDocs = async (userId) => {
     try {
         // const rawDocInfos = await collection.find({[`users.${userId}`]: {"$exists": true}}).project({data: 0}).toArray();
 
-        const rawDocInfos = await collection.find({[`users.${userId}`]: {"$exists": true}}).project({users: 1, 'data.info': 1, 'data.openapi': 1}).toArray();
+        const rawDocInfos = await collection_docs.find({[`users.${userId}`]: {"$exists": true}}).project({users: 1, 'data.info': 1, 'data.openapi': 1}).toArray();
 
         const docInfos = rawDocInfos.map(info => {
             info['id'] = info._id.toHexString();
@@ -153,7 +153,7 @@ const getUserDocs = async (userId) => {
 
 const getDocRole = async (userId, docId) => {
     try {
-        const result = await collection.findOne({"_id": ObjectId(docId)}, {projection: {[`users.${userId}`]: 1, _id: 0}});
+        const result = await collection_docs.findOne({"_id": ObjectId(docId)}, {projection: {[`users.${userId}`]: 1, _id: 0}});
         return result.users[userId];
     } catch (err) {
         return null;
@@ -162,7 +162,7 @@ const getDocRole = async (userId, docId) => {
 
 const getDoc = async (doc_id) => {
     try {
-        const doc = await collection.findOne({"_id": ObjectId(doc_id)}, {projection: {data: 1, _id: 0}});
+        const doc = await collection_docs.findOne({"_id": ObjectId(doc_id)}, {projection: {data: 1, _id: 0}});
         return doc;
     } catch (err) {
         console.error('get doc error:', err.message);
@@ -172,7 +172,7 @@ const getDoc = async (doc_id) => {
 
 const createDoc = async (userId, doc) => {
     try {
-        const result = await collection.insertOne({
+        const result = await collection_docs.insertOne({
             users: {[userId]: DOC_ROLE.OWNER},
             data: doc,
         });
@@ -185,7 +185,7 @@ const createDoc = async (userId, doc) => {
 
 const editDoc = async (docId, doc) => {
     try {
-        const result = await collection.findOneAndUpdate(
+        const result = await collection_docs.findOneAndUpdate(
                 {"_id": ObjectId(docId)},
                 {$set: {data: doc}},
             );
@@ -198,7 +198,7 @@ const editDoc = async (docId, doc) => {
 
 const deleteDoc = async (docId) => {
     try {
-        const result = await collection.deleteOne({"_id": ObjectId(docId)});
+        const result = await collection_docs.deleteOne({"_id": ObjectId(docId)});
         return result;
     } catch (err) {
         console.error('delete doc error:', err.message);
