@@ -12,7 +12,7 @@ import cors from 'cors';
 
 // API routes
 import { router as userRoute } from './server/routes/user_route.js';
-import { router as docRoute } from './server/routes/doc_route.js';
+import { router as docRoute } from './server/routes/docs_route.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 app.use('/api/' + API_VERSION + '/user', /*rateLimiterRoute,*/ [userRoute]);
-app.use('/api/' + API_VERSION + '/doc', /*rateLimiterRoute,*/ [docRoute]);
+app.use('/api/' + API_VERSION + '/docs', /*rateLimiterRoute,*/ [docRoute]);
 
 
 // Page not found
