@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
-import { promisify } from 'util'; 
+import { promisify } from 'util';
 
 import * as User from '../server/models/user_model.js';
 import * as Doc from '../server/models/doc_model.js';
@@ -35,7 +35,7 @@ function authentication() {
       try {
         const user = await promisify(jwt.verify)(accessToken, TOKEN_SECRET);
         req.user = user;
-        
+
         const userDetail = await User.getUserDetail(user.email);
           if (!userDetail) {
             res.status(403).send({ error: 'Forbidden' });
@@ -50,7 +50,7 @@ function authentication() {
           return;
       }
   };
-};
+}
 
 function authorizationDoc(roleType) {
   return async function (req, res, next) {
@@ -77,11 +77,11 @@ function authorizationDoc(roleType) {
         } else {
           next();
         }
-      }
-  };
+      };
+  }
 
 export {
   asyncHandler,
   authentication,
   authorizationDoc,
-}
+};

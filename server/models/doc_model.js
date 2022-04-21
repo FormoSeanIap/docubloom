@@ -8,6 +8,10 @@ const DOC_ROLE = {
   VIEWER: 'V',
 };
 
+function getDBDocRole(role) {
+  return DOC_ROLE[role.toUpperCase()];
+}
+
 const getUsers = async (docId) => {
   try {
     const users = await collection_docs.findOne({'_id': ObjectId(docId)}, {projection: { _id: 0, users: 1}});
@@ -38,6 +42,21 @@ const getUsers = async (docId) => {
 };
 
 const addUser = async (docId, userId, role) => {
+
+  const DBRole = getDBDocRole(role);
+  if (!DBRole) {
+    return {
+      status: 400,
+      error: 'invalid role',
+    };
+  }
+  if (DBRole === DOC_ROLE.OWNER) {
+    return {
+      status: 400,
+      error: 'cannot add owner to document',
+    };
+  }
+
   try {
     const user = await collection_docs.findOne(
       {
@@ -63,6 +82,51 @@ const addUser = async (docId, userId, role) => {
     return result;
   } catch (err) {
     console.error('add user error:', err.message);
+    return { error: err.message };
+  }
+};
+
+const updateUser = async (docId, userId, role) => {
+
+  const DBRole = getDBDocRole(role);
+  if (!DBRole) {
+    return {
+      status: 400,
+      error: 'invalid role',
+    };
+  }
+  if (DBRole === DOC_ROLE.OWNER) {
+    return {
+      status: 400,
+      error: 'cannot set user an owner to document',
+    };
+  }
+
+  try {
+    const user = await collection_docs.findOne(
+      {
+        $and: [
+          {'_id': ObjectId(docId)},
+          {[`users.${userId}`]: { $exists: true }}
+        ]
+      },
+      {projection: {[`users.${userId}`]: 1, _id: 0}}
+    );
+    if (!user) {
+      return {
+        status: 400,
+        error: 'user does not exist in this document',
+      };
+    }
+
+    const result = await collection_docs.findOneAndUpdate(
+        {'_id': ObjectId(docId)},
+        {$set: {[`users.${userId}`]: DOC_ROLE[role.toUpperCase()]}},
+        {returnOriginal: false, 'returnDocument' : 'after'}
+    );
+    return result;
+  } catch (err) {
+    console.error('update user error:', err.message);
     return { error: err.message };
   }
 };
@@ -142,6 +206,7 @@ export {
   getDoc,
   createDoc,
   editDoc,
+  updateUser,
   deleteDoc,
   getUsers,
   addUser,
