@@ -2,11 +2,7 @@ import 'dotenv/config';
 import { collection_docs, collection_users } from './mongodb.js';
 import { ObjectId } from 'mongodb';
 
-const DOC_ROLE = {
-  OWNER: 'O',
-  EDITOR: 'E',
-  VIEWER: 'V',
-};
+import { DOC_ROLE } from '../../utils/constants.js';
 
 function getDBDocRole(role) {
   return DOC_ROLE[role.toUpperCase()];
@@ -15,29 +11,40 @@ function getDBDocRole(role) {
 const getUsers = async (docId) => {
   try {
     const users = await collection_docs.findOne({'_id': ObjectId(docId)}, {projection: { _id: 0, users: 1}});
-    const [ownerId] = getKeysByValue(users.users, DOC_ROLE.OWNER);
-    const editorIds = getKeysByValue(users.users, DOC_ROLE.EDITOR);
-    const viewerIds = getKeysByValue(users.users, DOC_ROLE.VIEWER);
-
-    const owner = await collection_users.findOne({'_id': ObjectId(ownerId)}, {projection: { _id: 0, name: 1, email: 1}});
-    owner.id = ownerId;
-
-    const editors = await Promise.all(editorIds.map(async (id) => {
-      const user = await collection_users.findOne({'_id': ObjectId(id)}, {projection: { _id: 0, name: 1, email: 1}});
-      user.id = id;
-      return user;
-    }));
-
-    const viewers = await Promise.all(viewerIds.map(async (id) => {
-      const user = await collection_users.findOne({'_id': ObjectId(id)}, {projection: { _id: 0, name: 1, email: 1}});
-      user.id = id;
-      return user;
-    }));
-
-    return { owner, editors, viewers };
+    return users.users;
   } catch (err) {
     console.log(err);
     return { err };
+  }
+};
+
+const getOwner = async (ownerId) => {
+  try {
+    const owner = await collection_users.findOne({'_id': ObjectId(ownerId)}, {projection: { _id: 0, name: 1, email: 1}});
+    return owner;
+  } catch (err) {
+    console.error('get owner error:', err.message);
+    return { error: err.message };
+  }
+};
+
+const getEditor = async (editorId) => {
+  try {
+      const editor = await collection_users.findOne({'_id': ObjectId(editorId)}, {projection: { name: 1, email: 1, _id: 0}});
+      return editor;
+  } catch (err) {
+      console.error('get editor error:', err.message);
+      return { error: err.message };
+  }
+};
+
+const getViewer = async (viewerId) => {
+  try {
+      const viewer = await collection_users.findOne({'_id': ObjectId(viewerId)}, {projection: { name: 1, email: 1, _id: 0}});
+      return viewer;
+  } catch (err) {
+      console.error('get viewer error:', err.message);
+      return { error: err.message };
   }
 };
 
@@ -211,6 +218,9 @@ export {
   getUsers,
   addUser,
   deleteUser,
+  getOwner,
+  getEditor,
+  getViewer,
 };
 
 function getKeysByValue(object, value) {
