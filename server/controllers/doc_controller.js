@@ -44,6 +44,31 @@ const addUser = async (req, res, next) => {
   });
 };
 
+const updateUser = async (req, res, next) => {
+  const { docId, userId } = req.params;
+  const { role: userRole } = req.body;
+  if (!userRole) {
+    res.status(400).send({ error: 'Request Error: user role is required.' });
+    return;
+  }
+
+  const result = await Doc.updateUser(docId, userId, userRole);
+  if (result.error) {
+      const status_code = result.status ? result.status : 403;
+      res.status(status_code).send({ error: result.error });
+      return;
+  }
+
+  res.status(200).send({
+    message: 'update success',
+    data: {
+      docId,
+      userId,
+      userRole,
+    }
+  });
+};
+
 const deleteUser = async (req, res, next) => {
 
   const { docId, userId } = req.params;
@@ -143,5 +168,6 @@ export {
   deleteDoc,
   getUsers,
   addUser,
+  updateUser,
   deleteUser,
 };
