@@ -13,7 +13,56 @@ const getUsers = async (req, res) => {
   res.status(200).send({
     data: result
   });
-}
+};
+
+const addUser = async (req, res, next) => {
+  const { docId } = req.params;
+  const { id: userId, role: userRole } = req.body;
+
+  if (!userId) {
+    res.status(400).send({ error: 'Request Error: user id is required.' });
+    return;
+  }
+  if (!userRole) {
+    res.status(400).send({ error: 'Request Error: user role is required.' });
+    return;
+  }
+
+  const result = await Doc.addUser(docId, userId, userRole);
+  if (result.error) {
+      const status_code = result.status ? result.status : 403;
+      res.status(status_code).send({ error: result.error });
+      return;
+  }
+
+  res.status(200).send({
+    message: 'update success',
+    data: {
+      docId,
+      userId,
+    }
+  });
+};
+
+const deleteUser = async (req, res, next) => {
+
+  const { docId, userId } = req.params;
+
+  const result = await Doc.deleteUser(docId, userId);
+  if (result.error) {
+      const status_code = result.status ? result.status : 403;
+      res.status(status_code).send({ error: result.error });
+      return;
+  }
+
+  res.status(200).send({
+    message: 'delete success',
+    data: {
+      docId,
+      userId,
+    }
+  });
+};
 
 const getDoc = async (req, res, next) => {
 
@@ -28,18 +77,18 @@ const getDoc = async (req, res, next) => {
   const doc = result.data;
   res.status(200).send({
       data: doc
-  })
+  });
   return;
-}
+};
 
 const createDoc = async (req, res, next) => {
-  
+
   const doc = req.body.data;
   if (!doc) {
       res.status(400).send({ error: 'Request Error: document data is required.' });
       return;
   }
-  
+
   const result = await Doc.createDoc(req.user.id, doc);
   if (result.error) {
       const status_code = result.status ? result.status : 403;
@@ -52,11 +101,11 @@ const createDoc = async (req, res, next) => {
       data: {
           id: docId,
       }
-  })
-}
+  });
+};
 
 const editDoc = async (req, res, next) => {
-  
+
   const { docId } = req.params;
   const doc = req.body.data;
 
@@ -69,11 +118,11 @@ const editDoc = async (req, res, next) => {
   }
 
   res.status(200).send({message: 'update success'});
-}
+};
 
 
 const deleteDoc = async (req, res, next) => {
-  
+
   const { docId } = req.params;
   const userId = req.user.id;
 
@@ -85,12 +134,14 @@ const deleteDoc = async (req, res, next) => {
   }
 
   res.status(200).send({message: 'delete success'});
-}
+};
 
-export { 
+export {
   getDoc,
   createDoc,
-  editDoc, 
+  editDoc,
   deleteDoc,
-  getUsers ,
+  getUsers,
+  addUser,
+  deleteUser,
 };
