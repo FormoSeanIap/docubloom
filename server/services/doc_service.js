@@ -62,7 +62,21 @@ const addUser = async (docId, userId, userRole) => {
     };
   }
 
-  const result = await Doc.addUser(docId, userId, userRole);
+  const DBRole = getDBDocRole(userRole);
+  if (!DBRole) {
+    return {
+      status: 400,
+      error: 'invalid role',
+    };
+  }
+  if (DBRole === DOC_ROLE.OWNER) {
+    return {
+      status: 400,
+      error: 'cannot add owner to document',
+    };
+  }
+
+  const result = await Doc.addUser(docId, userId, DBRole);
 
   return result;
 };
@@ -82,7 +96,21 @@ const updateUser = async (docId, userId, userRole) => {
       };
     }
 
-    const result = await Doc.updateUser(docId, userId, userRole);
+    const DBRole = getDBDocRole(userRole);
+    if (!DBRole) {
+      return {
+        status: 400,
+        error: 'invalid role',
+      };
+    }
+    if (DBRole === DOC_ROLE.OWNER) {
+      return {
+        status: 400,
+        error: 'cannot set user an owner to document',
+      };
+    }
+
+    const result = await Doc.updateUser(docId, userId, DBRole);
 
     return result;
 };

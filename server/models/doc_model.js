@@ -4,10 +4,6 @@ import { ObjectId } from 'mongodb';
 
 import { DOC_ROLE } from '../../utils/constants.js';
 
-function getDBDocRole(role) {
-  return DOC_ROLE[role.toUpperCase()];
-}
-
 const getUsers = async (docId) => {
   try {
     const users = await collection_docs.findOne({'_id': ObjectId(docId)}, {projection: { _id: 0, users: 1}});
@@ -50,20 +46,6 @@ const getViewer = async (viewerId) => {
 
 const addUser = async (docId, userId, role) => {
 
-  const DBRole = getDBDocRole(role);
-  if (!DBRole) {
-    return {
-      status: 400,
-      error: 'invalid role',
-    };
-  }
-  if (DBRole === DOC_ROLE.OWNER) {
-    return {
-      status: 400,
-      error: 'cannot add owner to document',
-    };
-  }
-
   try {
     const user = await collection_docs.findOne(
       {
@@ -83,7 +65,7 @@ const addUser = async (docId, userId, role) => {
 
     const result = await collection_docs.findOneAndUpdate(
       {'_id': ObjectId(docId)},
-      {$set: {[`users.${userId}`]: DOC_ROLE[role.toUpperCase()]}},
+      {$set: {[`users.${userId}`]: role}},
       {returnOriginal: false, 'returnDocument' : 'after'}
     );
     return result;
@@ -94,20 +76,6 @@ const addUser = async (docId, userId, role) => {
 };
 
 const updateUser = async (docId, userId, role) => {
-
-  const DBRole = getDBDocRole(role);
-  if (!DBRole) {
-    return {
-      status: 400,
-      error: 'invalid role',
-    };
-  }
-  if (DBRole === DOC_ROLE.OWNER) {
-    return {
-      status: 400,
-      error: 'cannot set user an owner to document',
-    };
-  }
 
   try {
     const user = await collection_docs.findOne(
@@ -128,7 +96,7 @@ const updateUser = async (docId, userId, role) => {
 
     const result = await collection_docs.findOneAndUpdate(
         {'_id': ObjectId(docId)},
-        {$set: {[`users.${userId}`]: DOC_ROLE[role.toUpperCase()]}},
+        {$set: {[`users.${userId}`]: role}},
         {returnOriginal: false, 'returnDocument' : 'after'}
     );
     return result;
@@ -222,7 +190,3 @@ export {
   getEditor,
   getViewer,
 };
-
-function getKeysByValue(object, value) {
-  return Object.keys(object).filter(key => object[key] === value);
-}
