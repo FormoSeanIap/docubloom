@@ -151,6 +151,12 @@ const deleteUser = async (docId, userId) => {
 
     const result = await Doc.deleteUser(docId, userId);
 
+    // Delete document if there is no user left
+    const users = await Doc.getUsers(docId);
+    if (Object.keys(users).length === 0) {
+      await Doc.deleteDoc(docId);
+    }
+
     return result;
 };
 

@@ -9,6 +9,6 @@ const router = express.Router();
 router.route('/signup/').post(asyncHandler(signUp));
 router.route('/signin/').post(asyncHandler(signIn));
 router.route('/profile/').get(authentication(), asyncHandler(getProfile));
-router.route('/leave-doc/:docId').delete(authentication(), asyncHandler(leaveDoc));
+router.route('/self/docs/:docId').delete(authentication(), asyncHandler(leaveDoc));
 
 export { router };
