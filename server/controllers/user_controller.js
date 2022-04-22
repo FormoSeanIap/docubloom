@@ -1,7 +1,8 @@
 import * as User from '../models/user_model.js';
+import * as DocService from '../services/doc_service.js';
 
 const signUp = async (req, res, next) => {
-  
+
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -33,7 +34,7 @@ const signUp = async (req, res, next) => {
           },
       },
   });
-}
+};
 
 const signIn = async (req, res) => {
     const data = req.body;
@@ -95,12 +96,12 @@ const nativeSignIn = async (email, password) => {
 };
 
 const getProfile = async (req, res) => {
-    
-    const userDocs = await User.getUserDocs(req.user.id)
+
+    const userDocs = await User.getUserDocs(req.user.id);
 
     res.status(200).send({
         data: {
-            id: req.user.id, 
+            id: req.user.id,
             provider: req.user.provider,
             name: req.user.name,
             email: req.user.email,
@@ -108,10 +109,31 @@ const getProfile = async (req, res) => {
         },
     });
     return;
-}
+};
 
-export { 
-    signUp, 
-    signIn, 
+const leaveDoc = async (req, res) => {
+    const userId = req.user.id;
+    const docId = req.params.docId;
+
+    const result = await DocService.deleteUser(docId, userId);
+    if (result.error) {
+        const status_code = result.status ? result.status : 403;
+        res.status(status_code).send({ error: result.error });
+        return;
+    }
+
+    res.status(200).send({
+        message: 'Successfully left the document',
+        data: {
+            userId,
+            docId,
+        }
+    });
+};
+
+export {
+    signUp,
+    signIn,
     getProfile,
+    leaveDoc,
 };
