@@ -1,4 +1,5 @@
 import * as Doc from '../models/doc_model.js';
+import * as User from '../models/user_model.js';
 
 import { DOC_ROLE } from '../../utils/constants.js';
 
@@ -47,18 +48,34 @@ const getUsers = async (docId) => {
   }
 };
 
-const addUser = async (docId, userId, userRole) => {
+const addUser = async (docId, userEmail, userRole) => {
 
-  if (!userId) {
+  if (!userEmail) {
     return {
       status: 400,
-      error: 'Request Error: user id is required'
+      error: 'Request Error: user email is required'
     };
   }
   if (!userRole) {
     return {
       status: 400,
       error: 'Request Error: user role is required'
+    };
+  }
+
+  const user = await User.getUserDetail(userEmail);
+  if (!user) {
+    return {
+      status: 400,
+      error: 'Request Error: user does not exist',
+    };
+  }
+
+  const userId = user.id;
+  if (!userId) {
+    return {
+      status: 500,
+      error: 'Database Query Error'
     };
   }
 

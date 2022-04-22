@@ -17,9 +17,9 @@ const getUsers = async (req, res) => {
 
 const addUser = async (req, res, next) => {
   const { docId } = req.params;
-  const { id: userId, role: userRole } = req.body;
+  const { email: userEmail, role: userRole } = req.body;
 
-  const result = await DocService.addUser(docId, userId, userRole);
+  const result = await DocService.addUser(docId, userEmail, userRole);
 
   if (result.error) {
       const status_code = result.status ? result.status : 403;
@@ -31,7 +31,7 @@ const addUser = async (req, res, next) => {
     message: 'add new user success',
     data: {
       docId,
-      userId,
+      userEmail,
     }
   });
 };
