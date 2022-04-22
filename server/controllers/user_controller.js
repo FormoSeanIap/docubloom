@@ -1,27 +1,18 @@
-import * as User from '../models/user_model.js';
 import * as DocService from '../services/doc_service.js';
+import * as UserService from '../services/user_service.js';
 
 const signUp = async (req, res, next) => {
 
   const { name, email, password } = req.body;
 
-  if (!name || !email || !password) {
-      res.status(400).send({ error: 'Request Error: name, email and password are required.' });
-      return;
-  }
+  const result = await UserService.signUp(name, email, password);
 
-  const result = await User.signUp(name, email, password);
   if (result.error) {
-      res.status(403).send({ error: result.error });
-      return;
+    const status_code = result.status ? result.status : 403;
+    res.status(status_code).send({ error: result.error });
+    return;
   }
-
   const user = result.user;
-  if (!user) {
-      res.status(500).send({ error: 'Database Query Error' });
-      return;
-  }
-
   res.status(200).send({
       data: {
           access_token: user.access_token,
@@ -42,7 +33,7 @@ const signIn = async (req, res) => {
     let result;
     switch (data.provider) {
         case 'native':
-            result = await nativeSignIn(data.email, data.password);
+            result = await UserService.nativeSignIn(data.email, data.password);
             break;
         case 'facebook':
             result = { error: 'Facebook signIn is currently under construction' };
@@ -63,10 +54,6 @@ const signIn = async (req, res) => {
     }
 
     const user = result.user;
-    if (!user) {
-        res.status(500).send({ error: 'Database Query Error' });
-        return;
-    }
 
     res.status(200).send({
         data: {
@@ -83,21 +70,15 @@ const signIn = async (req, res) => {
     });
 };
 
-const nativeSignIn = async (email, password) => {
-    if (!email || !password) {
-        return { error: 'Request Error: email and password are required.', status: 400 };
-    }
-
-    try {
-        return await User.nativeSignIn(email, password);
-    } catch (error) {
-        return { error };
-    }
-};
-
 const getProfile = async (req, res) => {
 
-    const userDocs = await User.getUserDocs(req.user.id);
+    const userDocs = await UserService.getDocs(req.user.id);
+
+    if (userDocs.error) {
+        const status_code = userDocs.status ? userDocs.status : 403;
+        res.status(status_code).send({ error: userDocs.error });
+        return;
+    }
 
     res.status(200).send({
         data: {

@@ -51,9 +51,9 @@ const signUp = async (name, email, password) => {
 
         user.id = result['insertedId'].toHexString();
         return { user };
-    } catch (err) {
-        console.log(err);
-        return { err };
+    } catch (error) {
+        console.log(error);
+        return { error };
     }
 };
 
@@ -94,8 +94,8 @@ const nativeSignIn = async (email, password) => {
         user.login_at = loginAt;
 
         return { user };
-    } catch (err) {
-        return { err };
+    } catch (error ) {
+        return { error };
     }
 };
 
