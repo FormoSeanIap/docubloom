@@ -5,6 +5,8 @@ import { promisify } from 'util';
 import * as User from '../server/models/user_model.js';
 import * as Doc from '../server/models/doc_model.js';
 
+import { DOC_ROLE } from './constants.js';
+
 const { TOKEN_SECRET } = process.env;
 
 function asyncHandler(cb) {
@@ -69,16 +71,32 @@ function authorizationDoc(roleType) {
         return;
       }
 
-      if (roleType === Doc.DOC_ROLE.VIEWER) {
-        next();
-      } else if (roleType === Doc.DOC_ROLE.EDITOR && userRole === Doc.DOC_ROLE.VIEWER) {
-        res.status(403).send({ error: 'Forbidden' });
-        return;
-        } else {
+      switch (roleType) {
+        case DOC_ROLE.VIEWER:
           next();
-        }
-      };
-  }
+          break;
+        case DOC_ROLE.EDITOR:
+          if (userRole === DOC_ROLE.VIEWER) {
+            res.status(403).send({ error: 'Forbidden' });
+            return;
+          } else {
+            next();
+          }
+          break;
+        case DOC_ROLE.OWNER:
+          if (userRole !== DOC_ROLE.OWNER) {
+            res.status(403).send({ error: 'Forbidden' });
+            return;
+          } else {
+            next();
+          }
+          break;
+        default:
+          res.status(400).send({ error: 'invalid role' });
+          break;
+      }
+  };
+}
 
 export {
   asyncHandler,
