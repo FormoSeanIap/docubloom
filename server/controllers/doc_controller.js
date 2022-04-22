@@ -1,4 +1,5 @@
 import * as DocService from '../services/doc_service.js';
+import * as UserService from '../services/user_service.js';
 
 const getUsers = async (req, res) => {
   const { docId } = req.params;
@@ -27,11 +28,17 @@ const addUser = async (req, res, next) => {
       return;
   }
 
+  const user = await UserService.getUserDetail(userEmail);
+
   res.status(200).send({
     message: 'add new user success',
     data: {
       docId,
-      userEmail,
+      user: {
+        email: user.email,
+        name: user.name,
+        id: user.id
+      }
     }
   });
 };
