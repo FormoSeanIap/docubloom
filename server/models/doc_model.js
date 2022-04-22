@@ -4,6 +4,24 @@ import { ObjectId } from 'mongodb';
 
 import { DOC_ROLE } from '../../utils/constants.js';
 
+const getUser = async (docId, userId) => {
+  try {
+    const user = await collection_docs.findOne(
+        {
+            $and: [
+                {'_id': ObjectId(docId)},
+                {[`users.${userId}`]: { $exists: true }}
+            ]
+        },
+        {projection: {[`users.${userId}`]: 1, _id: 0}}
+    );
+    return user.users;
+  } catch (err) {
+    console.error('get user error:', err.message);
+    return null;
+  }
+};
+
 const getUsers = async (docId) => {
   try {
     const users = await collection_docs.findOne({'_id': ObjectId(docId)}, {projection: { _id: 0, users: 1}});
@@ -183,6 +201,7 @@ export {
   editDoc,
   updateUser,
   deleteDoc,
+  getUser,
   getUsers,
   addUser,
   deleteUser,

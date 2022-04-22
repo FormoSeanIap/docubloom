@@ -124,6 +124,14 @@ const deleteUser = async (docId, userId) => {
       };
     }
 
+    const user = await Doc.getUser(docId, userId);
+    if (!user) {
+      return {
+        status: 400,
+        error: 'Request Error: user is not in document',
+      };
+    }
+
     const result = await Doc.deleteUser(docId, userId);
 
     return result;
