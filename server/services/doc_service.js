@@ -148,6 +148,12 @@ const deleteUser = async (docId, userId) => {
         error: 'Request Error: user is not in document',
       };
     }
+    if (user[userId] === DOC_ROLE.OWNER) {
+      return {
+        status: 400,
+        error: 'Request Error: cannot delete owner',
+      };
+    }
 
     const result = await Doc.deleteUser(docId, userId);
 
