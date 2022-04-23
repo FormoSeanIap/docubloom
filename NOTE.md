@@ -16,6 +16,7 @@ https://ithelp.ithome.com.tw/articles/10213964
 
 # 學習筆記
 ## 伺服器
+- 在設計API的時候，如果是自己無法掌握內容的值，就不要放在path parameter裡面，因為可能使用者填入的值包含特殊符號(比如```/```)，導致404 not found
 - 在map結合async await的時候，因為我們要await一個array裡面的所有promise，因此要使用Promise.all，比如
 ```js
 const getUserDocs = async (userId) => {

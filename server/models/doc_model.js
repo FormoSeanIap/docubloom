@@ -144,7 +144,7 @@ const getDoc = async (docId) => {
       return doc;
   } catch (err) {
       console.error('get doc error:', err.message);
-      return { error: err.message };
+      return null;
   }
 };
 

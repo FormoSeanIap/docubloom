@@ -13,6 +13,7 @@ import cors from 'cors';
 // API routes
 import { router as userRoute } from './server/routes/user_route.js';
 import { router as docRoute } from './server/routes/docs_route.js';
+import { router as mockServerRoute } from './server/routes/mockServer_route.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -27,6 +28,7 @@ app.use(cors());
 
 app.use('/api/' + API_VERSION + '/user', /*rateLimiterRoute,*/ [userRoute]);
 app.use('/api/' + API_VERSION + '/docs', /*rateLimiterRoute,*/ [docRoute]);
+app.use('/api/' + API_VERSION + '/mock-server', /*rateLimiterRoute,*/ [mockServerRoute]);
 
 
 // Page not found
