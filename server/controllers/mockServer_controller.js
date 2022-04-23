@@ -14,7 +14,16 @@ const getExample = async (req, res) => {
 };
 
 const getExampleFromExamples = async (req, res) => {
+  const { docId } = req.params;
+  const { path, method, statusCode, contentType, exampleName } = req.query;
+  const result = await MockServerService.getExampleFromExamples(docId, path, method, statusCode, contentType, exampleName);
 
+  if (result.error) {
+    const status_code = result.status ? result.status : 403;
+    res.status(status_code).send({ error: result.error });
+    return;
+  }
+  res.status(statusCode).send(result);
 };
 
 export {

@@ -1,6 +1,6 @@
 import * as Doc from '../models/doc_model.js';
 
-const getExample = async (docId, path, method, statusCode, contentType) => {
+async function checkDocBasicInfo(docId, path, method, statusCode, contentType) {
   const doc = await Doc.getDoc(docId);
   if (!doc) {
     return {
@@ -36,7 +36,38 @@ const getExample = async (docId, path, method, statusCode, contentType) => {
       error: 'Request Error: content type is not found.',
     };
   }
+  return targetContentTypeData;
+}
+
+const getExample = async (docId, path, method, statusCode, contentType) => {
+  const targetContentTypeData = await checkDocBasicInfo(docId, path, method, statusCode, contentType);
+  if (targetContentTypeData.error) {
+    return targetContentTypeData;
+  }
+
   const result = targetContentTypeData.example;
+  if (!result) {
+    return {
+      status: 400,
+      error: 'Request Error: example is not found.',
+    };
+  }
+  return result;
+};
+
+const getExampleFromExamples = async (docId, path, method, statusCode, contentType, exampleName) => {
+  const targetContentTypeData = await checkDocBasicInfo(docId, path, method, statusCode, contentType);
+  if (targetContentTypeData.error) {
+    return targetContentTypeData;
+  }
+  const targetExamplesData = targetContentTypeData.examples;
+  if (!targetExamplesData) {
+    return {
+      status: 400,
+      error: 'Request Error: examples is not found.',
+    };
+  }
+  const result = targetExamplesData[exampleName];
   if (!result) {
     return {
       status: 400,
@@ -48,4 +79,5 @@ const getExample = async (docId, path, method, statusCode, contentType) => {
 
 export {
   getExample,
+  getExampleFromExamples,
 };
