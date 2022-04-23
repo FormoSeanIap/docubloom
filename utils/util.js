@@ -70,6 +70,7 @@ function authorizationDoc(roleType) {
         res.status(403).send({ error: 'Forbidden' });
         return;
       }
+      req.user.role= userRole;
 
       switch (roleType) {
         case DOC_ROLE.VIEWER:

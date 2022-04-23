@@ -98,7 +98,7 @@ const addUser = async (docId, userEmail, userRole) => {
   return result;
 };
 
-const updateUser = async (docId, userId, userRole) => {
+const updateUser = async (docId, userId, collaboratorRole, userRole) => {
 
     if (!userId) {
       return {
@@ -106,28 +106,52 @@ const updateUser = async (docId, userId, userRole) => {
         error: 'Request Error: user id is required'
       };
     }
-    if (!userRole) {
+    if (!collaboratorRole) {
       return {
         status: 400,
         error: 'Request Error: user role is required'
       };
     }
 
-    const DBRole = getDBDocRole(userRole);
-    if (!DBRole) {
+    const DBCollaboratorRole = getDBDocRole(collaboratorRole);
+    if (!DBCollaboratorRole) {
       return {
         status: 400,
         error: 'invalid role',
       };
     }
-    if (DBRole === DOC_ROLE.OWNER) {
+
+    if (DBCollaboratorRole === DOC_ROLE.OWNER && userRole !== DOC_ROLE.OWNER) {
+      /*============ Only owners can change others' role to owner ============*/
       return {
-        status: 400,
-        error: 'cannot set user an owner to document',
+        status: 403,
+        error: 'only the owner can set a user as an owner to document',
       };
+    } else if (DBCollaboratorRole === DOC_ROLE.EDITOR || DBCollaboratorRole === DOC_ROLE.VIEWER) {
+      const collaboratorOrigin = await Doc.getUser(docId, userId);
+      const collaboratorRoleOrigin = collaboratorOrigin[userId];
+      if (collaboratorRoleOrigin === DOC_ROLE.OWNER) {
+        if (userRole !== DOC_ROLE.OWNER) {
+          /*============ Only owners can change others' role to owner ============*/
+          return {
+            status: 403,
+            error: 'only the owner can set another user as an owner to document',
+          };
+        } else {
+          const currentDocUsers = await Doc.getUsers(docId);
+          const currentDocOwners = getKeysByValue(currentDocUsers, DOC_ROLE.OWNER);
+          if (currentDocOwners.length === 1) {
+            /*============ There must be at least one owner to a document ============*/
+            return {
+              status: 400,
+              error: 'only one owner left, needs to assign another user as an owner first',
+            };
+          }
+        }
+      }
     }
 
-    const result = await Doc.updateUser(docId, userId, DBRole);
+    const result = await Doc.updateUser(docId, userId, DBCollaboratorRole);
 
     return result;
 };

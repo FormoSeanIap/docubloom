@@ -45,9 +45,10 @@ const addUser = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   const { docId, userId } = req.params;
-  const { role: userRole } = req.body;
+  const { role: targetUserRole } = req.body;
+  const { role: currentUserRole } = req.user;
 
-  const result = await DocService.updateUser(docId, userId, userRole);
+  const result = await DocService.updateUser(docId, userId, targetUserRole, currentUserRole);
   if (result.error) {
       const status_code = result.status ? result.status : 403;
       res.status(status_code).send({ error: result.error });
@@ -59,7 +60,7 @@ const updateUser = async (req, res, next) => {
     data: {
       docId,
       userId,
-      userRole,
+      userRole: targetUserRole,
     }
   });
 };
