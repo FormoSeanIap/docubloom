@@ -45,52 +45,55 @@ const getUsers = async (docId) => {
   }
 };
 
-const addUser = async (docId, userEmail, userRole) => {
+const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => {
 
-  if (!userEmail) {
+  if (!collaboratorEmail) {
     return {
       status: 400,
       error: 'Request Error: user email is required'
     };
   }
-  if (!userRole) {
+  if (!collaboratorRole) {
     return {
       status: 400,
       error: 'Request Error: user role is required'
     };
   }
 
-  const user = await User.getUserDetail(userEmail);
-  if (!user) {
+  const collaborator = await User.getUserDetail(collaboratorEmail);
+  if (!collaborator) {
     return {
       status: 400,
       error: 'Request Error: user does not exist',
     };
   }
 
-  const userId = user.id;
-  if (!userId) {
+  const collaboratorId = collaborator.id;
+  if (!collaboratorId) {
     return {
       status: 500,
       error: 'Database Query Error'
     };
   }
 
-  const DBRole = getDBDocRole(userRole);
-  if (!DBRole) {
+  const collaboratorDBRole = getDBDocRole(collaboratorRole);
+  if (!collaboratorDBRole) {
     return {
       status: 400,
       error: 'invalid role',
     };
   }
-  if (DBRole === DOC_ROLE.OWNER) {
+
+  /*============ editor cannot add others as owner ============*/
+  console.log(userRole);
+  if (userRole === DOC_ROLE.EDITOR && collaboratorDBRole === DOC_ROLE.OWNER) {
     return {
       status: 400,
-      error: 'cannot add owner to document',
+      error: 'an editor cannot add owner to document',
     };
   }
 
-  const result = await Doc.addUser(docId, userId, DBRole);
+  const result = await Doc.addUser(docId, collaboratorId, collaboratorDBRole);
 
   return result;
 };

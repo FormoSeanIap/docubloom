@@ -18,9 +18,10 @@ const getUsers = async (req, res) => {
 
 const addUser = async (req, res, next) => {
   const { docId } = req.params;
-  const { email: userEmail, role: userRole } = req.body;
+  const { email: collaboratorEmail, role: collaboratorRole } = req.body;
+  const userRole = req.user.role;
 
-  const result = await DocService.addUser(docId, userEmail, userRole);
+  const result = await DocService.addUser(docId, collaboratorEmail, collaboratorRole, userRole);
 
   if (result.error) {
       const status_code = result.status ? result.status : 403;
@@ -28,16 +29,16 @@ const addUser = async (req, res, next) => {
       return;
   }
 
-  const user = await UserService.getUserDetail(userEmail);
+  const collaborator = await UserService.getUserDetail(collaboratorEmail);
 
   res.status(200).send({
     message: 'add new user success',
     data: {
       docId,
       user: {
-        email: user.email,
-        name: user.name,
-        id: user.id
+        email: collaborator.email,
+        name: collaborator.name,
+        id: collaborator.id
       }
     }
   });
