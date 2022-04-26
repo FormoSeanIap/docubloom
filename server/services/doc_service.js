@@ -26,9 +26,6 @@ const getUsers = async (docId) => {
       return user;
     }));
 
-    // TODO: more than one owners in the future
-    const owner = owners[0];
-
     const editors = await Promise.all(editorIds.map(async (id) => {
       const user = await Doc.getEditor(id);
       user.id = id;
@@ -41,7 +38,7 @@ const getUsers = async (docId) => {
       return user;
     }));
 
-    return { owner, editors, viewers };
+    return { owners, editors, viewers };
   } catch (err) {
     console.log(err);
     return { err };
