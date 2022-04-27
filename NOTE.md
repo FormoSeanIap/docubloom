@@ -232,7 +232,7 @@ MEDIUMTEXT最多可存16 MB，而LONGTEXT最多可存4 GB字串
 5. 能用varchar的地方不用text
 ```
 ## React
-- 同樣跟據不同狀況改變，如果是網頁載入時就已經決定的，用prop；如果是載入後，會跟據使用者行為而改變，就用state；
+- 同樣跟據不同狀況改變，如果是網頁載入時就已經決定的，用prop；如果是載入後，會跟據使用者行為而改變，或是打API後拿到的資料，就用state；
 - 如果要刪除清單列表中的某一個清單，要使用```setXXX((prev) => prev.filter(item => item.id !== id ))```，比如
 ```js
 const App = () => {
@@ -299,6 +299,37 @@ const Sign = () => {
 }
 ```
 https://medium.com/hannah-lin/react-hook-%E7%AD%86%E8%A8%98-usecontext-4bc289976847
+- 可以一次傳很多個context value，比如用在全網站上都會用到的東西，像是theme，或是docu-bloom裡面的userId、documentID等等。比如
+```js
+export const GlobalContext = createContext(null);
+const App = () => {
+
+  /*...*/
+
+  const [ docValue, setDocValue] = useState(initialValue);
+  const [ userName, setUserName ] = useState('Guest');
+  const [ docId, setDocId ] = useState(null);
+  const [ currentUserRole, setCurrentUserRole ] = useState(null);
+
+  /*...*/
+
+  return (
+    <div>
+      <GlobalContext.Provider value = {{ userName, currentUserRole, setUserName, setCurrentUserRole, docId, docValue, setDocId, setDocValue, switchToContainer }}>
+        <Header/>
+        { isSignShown ? <Sign /> : null }
+        { isProfileShown ? <Profile/> : null }
+        { isDocumentShown ? <Document /> : null }
+        { isEditorShown ? <Editor initDoc = {JSON.parse(initialValue)} /> : null }
+        { isUpdaterShown ? <Updater/> : null }
+        { isViewerShown ? <Viewer/> : null }
+      </GlobalContext.Provider>
+    </div>
+  );
+};
+
+}
+```
 - 如果發現有引用component，但畫面上沒有東西，可能是沒有return，如
 ```js
 const Title = ( { path, requestType, summary, security } ) => {
