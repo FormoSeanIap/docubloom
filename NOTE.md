@@ -233,6 +233,16 @@ MEDIUMTEXT最多可存16 MB，而LONGTEXT最多可存4 GB字串
 ```
 ## React
 - 同樣跟據不同狀況改變，如果是網頁載入時就已經決定的，用prop；如果是載入後，會跟據使用者行為而改變，或是打API後拿到的資料，就用state；
+- 如果想要引用圖片並做成component，使用```ReactComponent```，比如
+```js
+import { ReactComponent as NoDocImg } from '../img/no-document.svg';
+const Profile = () => {
+  /*...*/
+  return (
+    <NoDocImg style={{ width: '30rem' }} />
+  )
+}
+```
 - 如果要刪除清單列表中的某一個清單，要使用```setXXX((prev) => prev.filter(item => item.id !== id ))```，比如
 ```js
 const App = () => {
