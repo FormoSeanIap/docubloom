@@ -85,7 +85,6 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
   }
 
   /*============ editor cannot add others as owner ============*/
-  console.log(userRole);
   if (userRole === DOC_ROLE.EDITOR && collaboratorDBRole === DOC_ROLE.OWNER) {
     return {
       status: 400,
@@ -93,7 +92,21 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
     };
   }
 
+  const user = await Doc.getUser(docId, collaboratorId);
+  if (user) {
+    return {
+      status: 400,
+      error: 'user already exists',
+    };
+  }
+
   const result = await Doc.addUser(docId, collaboratorId, collaboratorDBRole);
+  if (result.error) {
+    return {
+      status: 500,
+      error: 'Database Query Error'
+    };
+  }
 
   return result;
 };
@@ -129,6 +142,12 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
       };
     } else if (DBCollaboratorRole === DOC_ROLE.EDITOR || DBCollaboratorRole === DOC_ROLE.VIEWER) {
       const collaboratorOrigin = await Doc.getUser(docId, userId);
+      if (!collaboratorOrigin) {
+        return {
+          status: 400,
+          error: 'Request Error: user is not in document',
+        };
+      }
       const collaboratorRoleOrigin = collaboratorOrigin[userId];
       if (collaboratorRoleOrigin === DOC_ROLE.OWNER) {
         if (userRole !== DOC_ROLE.OWNER) {

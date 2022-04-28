@@ -17,7 +17,7 @@ const getUser = async (docId, userId) => {
     );
     return user.users;
   } catch (err) {
-    console.error('get user error:', err.message);
+    // console.error('get user error:', err.message);
     return null;
   }
 };
@@ -65,22 +65,6 @@ const getViewer = async (viewerId) => {
 const addUser = async (docId, userId, role) => {
 
   try {
-    const user = await collection_docs.findOne(
-      {
-        $and: [
-          {'_id': ObjectId(docId)},
-          {[`users.${userId}`]: { $exists: true }}
-        ]
-      },
-      {projection: {[`users.${userId}`]: 1, _id: 0}}
-    );
-    if (user) {
-      return {
-        status: 400,
-        error: 'user already in this document',
-      };
-    }
-
     const result = await collection_docs.findOneAndUpdate(
       {'_id': ObjectId(docId)},
       {$set: {[`users.${userId}`]: role}},
@@ -96,22 +80,6 @@ const addUser = async (docId, userId, role) => {
 const updateUser = async (docId, userId, role) => {
 
   try {
-    const user = await collection_docs.findOne(
-      {
-        $and: [
-          {'_id': ObjectId(docId)},
-          {[`users.${userId}`]: { $exists: true }}
-        ]
-      },
-      {projection: {[`users.${userId}`]: 1, _id: 0}}
-    );
-    if (!user) {
-      return {
-        status: 400,
-        error: 'user does not exist in this document',
-      };
-    }
-
     const result = await collection_docs.findOneAndUpdate(
         {'_id': ObjectId(docId)},
         {$set: {[`users.${userId}`]: role}},
