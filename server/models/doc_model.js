@@ -2,8 +2,6 @@ import 'dotenv/config';
 import { collection_docs, collection_users } from './mongodb.js';
 import { ObjectId } from 'mongodb';
 
-import { DOC_ROLE } from '../../utils/constants.js';
-
 const getUser = async (docId, userId) => {
   try {
     const user = await collection_docs.findOne(
@@ -162,7 +160,6 @@ const getDocRole = async (userId, docId) => {
 };
 
 export {
-  DOC_ROLE,
   getDocRole,
   getDoc,
   createDoc,

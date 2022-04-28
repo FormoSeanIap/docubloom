@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { asyncHandler, authentication, authorizationDoc } from '../../utils/util.js';
-import { DOC_ROLE } from '../models/doc_model.js';
+import { DOC_ROLE } from '../../utils/constants.js';
 
 import { getDoc, createDoc, editDoc, deleteDoc, getUsers, addUser, updateUser, deleteUser } from '../controllers/doc_controller.js';
 
