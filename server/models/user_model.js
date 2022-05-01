@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import { client, collection_docs, collection_users } from './mongodb.js';
 import { ObjectId } from 'mongodb';
-import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
 
@@ -13,14 +12,8 @@ const DOC_ROLE = {
     VIEWER: 'V',
 };
 
-const signUp = async (name, email, password) => {
+const signUp = async (name, email, hash) => {
     try {
-        const emails = await collection_users.find({email}).project({ _id: 0, email: 1}).toArray();
-        if (emails.length > 0) {
-            return { error: 'Email Already Exists' };
-        }
-
-        const hashedPwd = await argon2.hash(password);
 
         const loginAt = dayjs().format();
         const createdDt = dayjs().format();
@@ -29,7 +22,7 @@ const signUp = async (name, email, password) => {
         const user = {
             provider: 'native',
             email,
-            password: hashedPwd,
+            password: hash,
             name,
             last_login_at: loginAt,
             created_dt: createdDt,
@@ -52,21 +45,13 @@ const signUp = async (name, email, password) => {
         user.id = result['insertedId'].toHexString();
         return { user };
     } catch (error) {
-        console.log(error);
+        console.error('sign up error:', error);
         return { error };
     }
 };
 
-const nativeSignIn = async (email, password) => {
+const nativeSignIn = async (user) => {
     try {
-        const user = await collection_users.findOne({email});
-        if (!user) {
-            return { error: 'Email Not Found' };
-        }
-
-        if (!await argon2.verify(user.password, password)) {
-            return { error: 'Password is wrong' };
-        }
 
         const loginAt = dayjs().format();
         const updatedDt = dayjs().format();
@@ -82,7 +67,7 @@ const nativeSignIn = async (email, password) => {
         );
 
         await collection_users.findOneAndUpdate(
-            {email},
+            {email: user.email},
             {$set: {
                 last_login_at: loginAt,
                 updated_dt: updatedDt,
@@ -95,6 +80,7 @@ const nativeSignIn = async (email, password) => {
 
         return { user };
     } catch (error ) {
+        console.error('native sign in error:', error);
         return { error };
     }
 };
@@ -106,7 +92,7 @@ const getUserDetail = async (email) => {
         delete user['_id'];
         return user;
     } catch (err) {
-        console.error('get user detail error:', err);
+        // console.error('get user detail error:', err);
         return null;
     }
 };

@@ -1,4 +1,5 @@
 import * as User from '../models/user_model.js';
+import { hashPassword, checkPassword } from '../../utils/util.js';
 
 const signUp = async ( name, email, password ) => {
   if (!name || !email || !password) {
@@ -7,10 +8,20 @@ const signUp = async ( name, email, password ) => {
       error: 'Request Error: name, email and password are required.'
     };
   }
-  const result = await User.signUp( name, email, password );
+  const user = await User.getUserDetail(email);
+  if (user) {
+    return {
+      status: 409,
+      error: 'Request Error: email already exists.'
+    };
+  }
+
+  const hashedPassword = await hashPassword(password);
+
+  const result = await User.signUp( name, email, hashedPassword );
   if (result.error) {
     return {
-      status: 403,
+      status: 500,
       error: result.error
     };
   }
@@ -25,13 +36,32 @@ const signUp = async ( name, email, password ) => {
 
 const nativeSignIn = async (email, password) => {
   if (!email || !password) {
-      return { error: 'Request Error: email and password are required.', status: 400 };
+      return {
+        status: 400,
+        error: 'Request Error: email and password are required.',
+      };
   }
 
-  const result = await User.nativeSignIn( email, password );
+  const user = await User.getUserDetail(email);
+  if (!user) {
+    return {
+      status: 401,
+      error: 'Request Error: email or password incorrect.',
+    };
+  }
+
+  const isPasswordCorrect = await checkPassword(password, user.password);
+  if (!isPasswordCorrect) {
+    return {
+      status: 401,
+      error: 'Request Error: email or password incorrect.',
+    };
+  }
+
+  const result = await User.nativeSignIn(user);
   if (result.error) {
       return {
-        status: 403,
+        status: 500,
         error: result.error
       };
   }

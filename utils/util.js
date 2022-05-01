@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import { promisify } from 'util';
 
@@ -99,8 +100,18 @@ function authorizationDoc(roleType) {
   };
 }
 
+async function hashPassword(password) {
+  return await argon2.hash(password);
+}
+
+async function checkPassword(password, hash) {
+  return await argon2.verify(hash, password);
+}
+
 export {
   asyncHandler,
   authentication,
   authorizationDoc,
+  hashPassword,
+  checkPassword,
 };
