@@ -3,6 +3,8 @@ import { collection_docs, collection_users } from './mongodb.js';
 import { ObjectId } from 'mongodb';
 import { DOC_ROLE } from '../../utils/constants.js';
 
+//TODO: what should I return if catch error?
+
 const getUser = async (docId, userId) => {
   try {
     const user = await collection_docs.findOne(
@@ -15,8 +17,8 @@ const getUser = async (docId, userId) => {
         {projection: {[`users.${userId}`]: 1, _id: 0}}
     );
     return user.users;
-  } catch (err) {
-    // console.error('get user error:', err.message);
+  } catch (error) {
+    // console.error('get user error:', error.message);
     return null;
   }
 };
@@ -25,9 +27,9 @@ const getUsers = async (docId) => {
   try {
     const users = await collection_docs.findOne({'_id': ObjectId(docId)}, {projection: { _id: 0, users: 1}});
     return users.users;
-  } catch (err) {
-    console.log(err);
-    return { err };
+  } catch (error) {
+    console.error('get users error:', error.message);
+    return null;
   }
 };
 
@@ -35,9 +37,9 @@ const getOwner = async (ownerId) => {
   try {
     const owner = await collection_users.findOne({'_id': ObjectId(ownerId)}, {projection: { _id: 0, name: 1, email: 1}});
     return owner;
-  } catch (err) {
-    console.error('get owner error:', err.message);
-    return { error: err.message };
+  } catch (error) {
+    console.error('get owner error:', error.message);
+    return null;
   }
 };
 
@@ -45,9 +47,9 @@ const getEditor = async (editorId) => {
   try {
       const editor = await collection_users.findOne({'_id': ObjectId(editorId)}, {projection: { name: 1, email: 1, _id: 0}});
       return editor;
-  } catch (err) {
-      console.error('get editor error:', err.message);
-      return { error: err.message };
+  } catch (error) {
+      console.error('get editor error:', error.message);
+      return null;
   }
 };
 
@@ -55,9 +57,9 @@ const getViewer = async (viewerId) => {
   try {
       const viewer = await collection_users.findOne({'_id': ObjectId(viewerId)}, {projection: { name: 1, email: 1, _id: 0}});
       return viewer;
-  } catch (err) {
-      console.error('get viewer error:', err.message);
-      return { error: err.message };
+  } catch (error) {
+      console.error('get viewer error:', error.message);
+      return null;
   }
 };
 
@@ -70,9 +72,9 @@ const addUser = async (docId, userId, role) => {
       {returnOriginal: false, 'returnDocument' : 'after'}
     );
     return result;
-  } catch (err) {
-    console.error('add user error:', err.message);
-    return { error: err.message };
+  } catch (error) {
+    console.error('add user error:', error.message);
+    return { error: error.message };
   }
 };
 
@@ -85,9 +87,9 @@ const updateUser = async (docId, userId, role) => {
         {returnOriginal: false, 'returnDocument' : 'after'}
     );
     return result;
-  } catch (err) {
-    console.error('update user error:', err.message);
-    return { error: err.message };
+  } catch (error) {
+    console.error('update user error:', error.message);
+    return { error: error.message };
   }
 };
 
@@ -99,9 +101,9 @@ const deleteUser = async (docId, userId) => {
           {returnOriginal: false, 'returnDocument' : 'after'}
       );
       return result;
-  } catch (err) {
-      console.error('delete user error:', err.message);
-      return { error: err.message };
+  } catch (error) {
+      console.error('delete user from doc error:', error.message);
+      return { error: error.message };
   }
 };
 
@@ -109,8 +111,8 @@ const getDoc = async (docId) => {
   try {
       const doc = await collection_docs.findOne({'_id': ObjectId(docId)}, {projection: {data: 1, _id: 0}});
       return doc;
-  } catch (err) {
-      console.error('get doc error:', err.message);
+  } catch (error) {
+      console.error('get doc error:', error.message);
       return null;
   }
 };
@@ -122,9 +124,9 @@ const createDoc = async (userId, doc) => {
           data: doc,
       });
       return result;
-  } catch (err) {
-      console.error('create doc error:', err.message);
-      return { error: err.message };
+  } catch (error) {
+      console.error('create doc error:', error.message);
+      return { error: error.message };
   }
 };
 
@@ -135,9 +137,9 @@ const editDoc = async (docId, doc) => {
               {$set: {data: doc}},
           );
       return result;
-  } catch (err) {
-      console.error('edit doc error:', err.message);
-      return { error: err.message };
+  } catch (error) {
+      console.error('edit doc error:', error.message);
+      return { error: error.message };
   }
 };
 
@@ -145,9 +147,9 @@ const deleteDoc = async (docId) => {
   try {
       const result = await collection_docs.deleteOne({'_id': ObjectId(docId)});
       return result;
-  } catch (err) {
-      console.error('delete doc error:', err.message);
-      return { error: err.message };
+  } catch (error) {
+      console.error('delete doc error:', error.message);
+      return { error: error.message };
   }
 };
 
@@ -155,7 +157,7 @@ const getDocRole = async (userId, docId) => {
   try {
       const result = await collection_docs.findOne({'_id': ObjectId(docId)}, {projection: {[`users.${userId}`]: 1, _id: 0}});
       return result.users[userId];
-  } catch (err) {
+  } catch (error) {
       return null;
   }
 };

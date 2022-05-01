@@ -8,6 +8,7 @@ async function checkDocBasicInfo(docId, path, method, statusCode, contentType) {
       error: 'Request Error: document is not found.',
     };
   }
+  console.log(doc.data.paths);
   const targetPathData = doc.data.paths[path];
   if(!targetPathData) {
     return {

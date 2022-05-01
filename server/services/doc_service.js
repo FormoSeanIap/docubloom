@@ -12,37 +12,38 @@ function getKeysByValue(object, value) {
 }
 
 const getUsers = async (docId) => {
-  try {
-
-    const users = await Doc.getUsers(docId);
-
-    const ownerIds = getKeysByValue(users, DOC_ROLE.OWNER);
-    const editorIds = getKeysByValue(users, DOC_ROLE.EDITOR);
-    const viewerIds = getKeysByValue(users, DOC_ROLE.VIEWER);
-
-    const owners = await Promise.all(ownerIds.map(async (id) => {
-      const user = await Doc.getEditor(id);
-      user.id = id;
-      return user;
-    }));
-
-    const editors = await Promise.all(editorIds.map(async (id) => {
-      const user = await Doc.getEditor(id);
-      user.id = id;
-      return user;
-    }));
-
-    const viewers = await Promise.all(viewerIds.map(async (id) => {
-      const user = await Doc.getViewer(id);
-      user.id = id;
-      return user;
-    }));
-
-    return { owners, editors, viewers };
-  } catch (err) {
-    console.log(err);
-    return { err };
+  const users = await Doc.getUsers(docId);
+  if (!users) {
+    return {
+      status: 500,
+      error: 'Database Query Error'
+    };
   }
+
+  const ownerIds = getKeysByValue(users, DOC_ROLE.OWNER);
+  const editorIds = getKeysByValue(users, DOC_ROLE.EDITOR);
+  const viewerIds = getKeysByValue(users, DOC_ROLE.VIEWER);
+
+  // TODO: how to do error handling here?
+  const owners = await Promise.all(ownerIds.map(async (id) => {
+    const user = await Doc.getEditor(id);
+    user.id = id;
+    return user;
+  }));
+
+  const editors = await Promise.all(editorIds.map(async (id) => {
+    const user = await Doc.getEditor(id);
+    user.id = id;
+    return user;
+  }));
+
+  const viewers = await Promise.all(viewerIds.map(async (id) => {
+    const user = await Doc.getViewer(id);
+    user.id = id;
+    return user;
+  }));
+
+  return { owners, editors, viewers };
 };
 
 const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => {
@@ -171,6 +172,12 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
     }
 
     const result = await Doc.updateUser(docId, userId, DBCollaboratorRole);
+    if (result.error) {
+      return {
+        status: 500,
+        error: 'Database Query Error'
+      };
+    }
 
     return result;
 };
@@ -194,16 +201,28 @@ const deleteUser = async (docId, userId) => {
     if (user[userId] === DOC_ROLE.OWNER) {
       return {
         status: 400,
-        error: 'Request Error: cannot delete owner',
+        error: 'Request Error: cannot remove owner from a document',
       };
     }
 
     const result = await Doc.deleteUser(docId, userId);
+    if (result.error) {
+      return {
+        status: 500,
+        error: 'Database Query Error'
+      };
+    }
 
     // Delete document if there is no user left
     const users = await Doc.getUsers(docId);
     if (Object.keys(users).length === 0) {
-      await Doc.deleteDoc(docId);
+      const deleteResult = await Doc.deleteDoc(docId);
+      if (deleteResult.error) {
+        return {
+          status: 500,
+          error: 'Database Query Error'
+        };
+      }
     }
 
     return result;
@@ -222,6 +241,12 @@ const createDoc = async (userId, doc) => {
     };
   }
   const result = await Doc.createDoc(userId, doc);
+  if (result.error) {
+    return {
+      status: 500,
+      error: 'Database Query Error'
+    };
+  }
   return result;
 };
 
@@ -233,11 +258,23 @@ const editDoc = async (docId, doc) => {
     };
   }
   const result = await Doc.editDoc(docId, doc);
+  if (result.error) {
+    return {
+      status: 500,
+      error: 'Database Query Error'
+    };
+  }
   return result;
 };
 
 const deleteDoc = async (docId) => {
   const result = await Doc.deleteDoc(docId);
+  if (result.error) {
+    return {
+      status: 500,
+      error: 'Database Query Error'
+    };
+  }
   return result;
 };
 
