@@ -28,24 +28,7 @@ const signUp = async (req, res, next) => {
 };
 
 const signIn = async (req, res) => {
-    const data = req.body;
-
-    let result;
-    switch (data.provider) {
-        case 'native':
-            result = await UserService.nativeSignIn(data.email, data.password);
-            break;
-        case 'facebook':
-            result = { error: 'Facebook signIn is currently under construction' };
-            // result = await facebookSignIn(data.access_token);
-            break;
-        case 'google':
-            result = { error: 'Google signIn is currently under construction' };
-            // result = await googleSignIn(data.access_token);
-            break;
-        default:
-            result = { error: 'Wrong Request' };
-    }
+    const result = await UserService.signIn(req.body);
 
     if (result.error) {
         const status_code = result.status ? result.status : 403;

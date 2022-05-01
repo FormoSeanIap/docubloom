@@ -34,6 +34,26 @@ const signUp = async ( name, email, password ) => {
   return result;
 };
 
+const signIn = async(data) => {
+  let result;
+  switch (data.provider) {
+    case 'native':
+      result = await nativeSignIn(data.email, data.password);
+      break;
+    case 'facebook':
+      result = { error: 'Facebook signIn is currently under construction' };
+      // result = await facebookSignIn(data.access_token);
+      break;
+    case 'google':
+      result = { error: 'Google signIn is currently under construction' };
+      // result = await googleSignIn(data.access_token);
+      break;
+    default:
+      result = { error: 'Wrong Request' };
+  }
+  return result;
+};
+
 const nativeSignIn = async (email, password) => {
   if (!email || !password) {
       return {
@@ -100,6 +120,7 @@ const getUserDetail = async (email) => {
 
 export {
   signUp,
+  signIn,
   nativeSignIn,
   getDocs,
   getUserDetail
