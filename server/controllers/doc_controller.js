@@ -22,7 +22,6 @@ const addUser = async (req, res, next) => {
   const userRole = req.user.role;
 
   const result = await DocService.addUser(docId, collaboratorEmail, collaboratorRole, userRole);
-
   if (result.error) {
       const status_code = result.status ? result.status : 403;
       res.status(status_code).send({ error: result.error });
@@ -30,6 +29,11 @@ const addUser = async (req, res, next) => {
   }
 
   const collaborator = await UserService.getUserDetail(collaboratorEmail);
+  if (collaborator.error) {
+      const status_code = result.status ? result.status : 403;
+      res.status(status_code).send({ error: collaborator.error });
+      return;
+  }
 
   res.status(200).send({
     message: 'add new user success',

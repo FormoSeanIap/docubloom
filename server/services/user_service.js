@@ -1,36 +1,37 @@
 import * as User from '../models/user_model.js';
 import { hashPassword, checkPassword } from '../../utils/util.js';
+import { QUERY_ERR_MSG } from '../../utils/constants.js';
 
 const signUp = async ( name, email, password ) => {
   if (!name || !email || !password) {
     return {
       status: 400,
-      error: 'Request Error: name, email and password are required.'
+      error: {
+        code: 31001,
+        title: 'sign up fails',
+        message: 'name, email and password are required',
+      }
     };
   }
   const user = await User.getUserDetail(email);
   if (user) {
     return {
       status: 409,
-      error: 'Request Error: email already exists.'
+      error: {
+        code: 31002,
+        title: 'sign up fails',
+        message: 'user already exists',
+      }
     };
   }
 
   const hashedPassword = await hashPassword(password);
 
   const result = await User.signUp( name, email, hashedPassword );
-  if (result.error) {
-    return {
-      status: 500,
-      error: result.error
-    };
+  if (result.error || !result.user) {
+    return QUERY_ERR_MSG.GENERAL;
   }
-  if (!result.user) {
-    return {
-      status: 500,
-      error: 'Database Query Error'
-    };
-  }
+
   return result;
 };
 
@@ -49,7 +50,13 @@ const signIn = async(data) => {
       // result = await googleSignIn(data.access_token);
       break;
     default:
-      result = { error: 'Wrong Request' };
+      result = {
+        error: {
+          code: 32101,
+          title: 'sign in fails',
+          message: 'provider is not supported',
+        }
+      };
   }
   return result;
 };
@@ -58,7 +65,11 @@ const nativeSignIn = async (email, password) => {
   if (!email || !password) {
       return {
         status: 400,
-        error: 'Request Error: email and password are required.',
+        error: {
+          code: 32201,
+          title: 'native sign in fails',
+          message: 'email and password are required',
+        }
       };
   }
 
@@ -66,7 +77,11 @@ const nativeSignIn = async (email, password) => {
   if (!user) {
     return {
       status: 401,
-      error: 'Request Error: email or password incorrect.',
+      error: {
+        code: 32202,
+        title: 'native sign in fails',
+        message: 'email or password incorrect',
+      }
     };
   }
 
@@ -74,23 +89,17 @@ const nativeSignIn = async (email, password) => {
   if (!isPasswordCorrect) {
     return {
       status: 401,
-      error: 'Request Error: email or password incorrect.',
+      error: {
+        code: 32202,
+        title: 'native sign in fails',
+        message: 'email or password incorrect',
+      }
     };
   }
 
   const result = await User.nativeSignIn(user);
-  if (result.error) {
-      return {
-        status: 500,
-        error: result.error
-      };
-  }
-
-  if (!result.user) {
-      return {
-        status: 500,
-        error: 'Database Query Error'
-      };
+  if (result.error || !result.user) {
+      return QUERY_ERR_MSG.GENERAL;
   }
 
   return result;
@@ -99,10 +108,7 @@ const nativeSignIn = async (email, password) => {
 const getDocs = async (userId) => {
   const docs = await User.getUserDocs(userId);
   if(!docs) {
-    return {
-      status: 500,
-      error: 'Database Query Error'
-    };
+    return QUERY_ERR_MSG.GENERAL;
   }
   return docs;
 };

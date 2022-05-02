@@ -66,6 +66,10 @@ const nativeSignIn = async (user) => {
             { expiresIn: TOKEN_EXPIRE },
         );
 
+        user.access_token = accessToken;
+        user.access_expired = TOKEN_EXPIRE;
+        user.login_at = loginAt;
+
         await collection_users.findOneAndUpdate(
             {email: user.email},
             {$set: {
@@ -74,12 +78,8 @@ const nativeSignIn = async (user) => {
             }},
         );
 
-        user.access_token = accessToken;
-        user.access_expired = TOKEN_EXPIRE;
-        user.login_at = loginAt;
-
         return { user };
-    } catch (error ) {
+    } catch (error) {
         console.error('native sign in error:', error);
         return { error };
     }
