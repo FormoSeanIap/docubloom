@@ -6,7 +6,7 @@ import { promisify } from 'util';
 import * as User from '../server/models/user_model.js';
 import * as Doc from '../server/models/doc_model.js';
 
-import { DOC_ROLE } from './constants.js';
+import { DOC_ROLE, AUTH_ERR_MSG } from './constants.js';
 
 const { TOKEN_SECRET } = process.env;
 
@@ -21,17 +21,25 @@ function asyncHandler(cb) {
   };
 }
 
+function respondUnauthorized(res) {
+  return res.status(AUTH_ERR_MSG.UNAUTHORIZED.status).send({ error: AUTH_ERR_MSG.UNAUTHORIZED.error });
+}
+
+function respondForbidden(res) {
+  return res.status(AUTH_ERR_MSG.FORBIDDEN.status).send({ error: AUTH_ERR_MSG.FORBIDDEN.error });
+}
+
 function authentication() {
   return async function (req, res, next) {
       let accessToken = req.get('Authorization');
       if (!accessToken) {
-          res.status(401).send({ error: 'Unauthorized' });
+          respondUnauthorized(res);
           return;
       }
 
       accessToken = accessToken.replace('Bearer ', '');
       if (accessToken == 'null') {
-          res.status(401).send({ error: 'Unauthorized' });
+          respondUnauthorized(res);
           return;
       }
 
@@ -41,7 +49,7 @@ function authentication() {
 
         const userDetail = await User.getUserDetail(user.email);
           if (!userDetail) {
-            res.status(403).send({ error: 'Forbidden' });
+            respondForbidden(res);
           } else {
               req.user.id = userDetail.id;
               req.user.role_id = userDetail.role_id;
@@ -49,7 +57,7 @@ function authentication() {
           }
           return;
       } catch (err) {
-          res.status(403).send({ error: 'Forbidden' });
+          respondForbidden(res);
           return;
       }
   };
@@ -68,7 +76,7 @@ function authorizationDoc(roleType) {
       const userRole = await Doc.getDocRole(userId, docId);
 
       if (!userRole) {
-        res.status(403).send({ error: 'Forbidden' });
+        respondForbidden(res);
         return;
       }
       req.user.role= userRole;
@@ -79,7 +87,7 @@ function authorizationDoc(roleType) {
           break;
         case DOC_ROLE.EDITOR:
           if (userRole === DOC_ROLE.VIEWER) {
-            res.status(403).send({ error: 'Forbidden' });
+            respondForbidden(res);
             return;
           } else {
             next();
@@ -87,7 +95,7 @@ function authorizationDoc(roleType) {
           break;
         case DOC_ROLE.OWNER:
           if (userRole !== DOC_ROLE.OWNER) {
-            res.status(403).send({ error: 'Forbidden' });
+            respondForbidden(res);
             return;
           } else {
             next();
