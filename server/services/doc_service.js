@@ -1,7 +1,7 @@
 import * as Doc from '../models/doc_model.js';
 import * as User from '../models/user_model.js';
 
-import { DOC_ROLE } from '../../utils/constants.js';
+import { DOC_ROLE, QUERY_ERR_MSG } from '../../utils/constants.js';
 
 function getDBDocRole(role) {
   return DOC_ROLE[role.toUpperCase()];
@@ -14,10 +14,7 @@ function getKeysByValue(object, value) {
 const getUsers = async (docId) => {
   const users = await Doc.getUsers(docId);
   if (!users) {
-    return {
-      status: 500,
-      error: 'Database Query Error'
-    };
+    return QUERY_ERR_MSG;
   }
 
   const ownerIds = getKeysByValue(users, DOC_ROLE.OWNER);
@@ -51,13 +48,21 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
   if (!collaboratorEmail) {
     return {
       status: 400,
-      error: 'Request Error: user email is required'
+      error: {
+        code: 52001,
+        title: 'collaborator management error',
+        message: 'collaborator email is required'
+      }
     };
   }
   if (!collaboratorRole) {
     return {
       status: 400,
-      error: 'Request Error: user role is required'
+      error: {
+        code: 50002,
+        title: 'collaborator management error',
+        message: 'collaborator role is required'
+      }
     };
   }
 
@@ -65,23 +70,28 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
   if (!collaborator) {
     return {
       status: 400,
-      error: 'Request Error: user does not exist',
+      error: {
+        code: 52002,
+        title: 'collaborator management error',
+        message: 'collaborator email is not registered'
+      }
     };
   }
 
   const collaboratorId = collaborator.id;
   if (!collaboratorId) {
-    return {
-      status: 500,
-      error: 'Database Query Error'
-    };
+    return QUERY_ERR_MSG;
   }
 
   const collaboratorDBRole = getDBDocRole(collaboratorRole);
   if (!collaboratorDBRole) {
     return {
       status: 400,
-      error: 'invalid role',
+      error: {
+        code: 50003,
+        title: 'collaborator management error',
+        message: 'collaborator role is invalid'
+      }
     };
   }
 
@@ -89,7 +99,11 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
   if (userRole === DOC_ROLE.EDITOR && collaboratorDBRole === DOC_ROLE.OWNER) {
     return {
       status: 400,
-      error: 'an editor cannot add owner to document',
+      error: {
+        code: 52003,
+        title: 'collaborator management error',
+        message: 'an editor cannot add others as owner'
+      }
     };
   }
 
@@ -97,16 +111,17 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
   if (user) {
     return {
       status: 400,
-      error: 'user already exists',
+      error: {
+        code: 52004,
+        title: 'collaborator management error',
+        message: 'collaborator is already in document'
+      }
     };
   }
 
   const result = await Doc.addUser(docId, collaboratorId, collaboratorDBRole);
   if (result.error) {
-    return {
-      status: 500,
-      error: 'Database Query Error'
-    };
+    return QUERY_ERR_MSG;
   }
 
   return result;
@@ -117,13 +132,21 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
     if (!userId) {
       return {
         status: 400,
-        error: 'Request Error: user id is required'
+        error: {
+          code: 50001,
+          title: 'collaborator management error',
+          message: 'user id is required'
+        }
       };
     }
     if (!collaboratorRole) {
       return {
         status: 400,
-        error: 'Request Error: user role is required'
+        error: {
+          code: 50002,
+          title: 'collaborator management error',
+          message: 'collaborator role is required'
+        }
       };
     }
 
@@ -131,7 +154,11 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
     if (!DBCollaboratorRole) {
       return {
         status: 400,
-        error: 'invalid role',
+        error: {
+          code: 50003,
+          title: 'collaborator management error',
+          message: 'collaborator role is invalid'
+        }
       };
     }
 
@@ -139,14 +166,22 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
       /*============ Only owners can change others' role to owner ============*/
       return {
         status: 403,
-        error: 'only the owner can set a user as an owner to document',
+        error: {
+          code: 53001,
+          title: 'collaborator management error',
+          message: 'only owners can change others\' role to owner'
+        }
       };
     } else if (DBCollaboratorRole === DOC_ROLE.EDITOR || DBCollaboratorRole === DOC_ROLE.VIEWER) {
       const collaboratorOrigin = await Doc.getUser(docId, userId);
       if (!collaboratorOrigin) {
         return {
           status: 400,
-          error: 'Request Error: user is not in document',
+          error: {
+            code: 53002,
+            title: 'collaborator management error',
+            message: 'collaborator is not in document'
+          }
         };
       }
       const collaboratorRoleOrigin = collaboratorOrigin[userId];
@@ -155,7 +190,11 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
           /*============ Only owners can change others' role to owner ============*/
           return {
             status: 403,
-            error: 'only the owner can set another user as an owner to document',
+            error: {
+              code: 53003,
+              title: 'collaborator management error',
+              message: 'only owners can change others\' role to owner'
+            }
           };
         } else {
           const currentDocUsers = await Doc.getUsers(docId);
@@ -164,7 +203,11 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
             /*============ There must be at least one owner to a document ============*/
             return {
               status: 400,
-              error: 'only one owner left, needs to assign another user as an owner first',
+              error: {
+                code: 53004,
+                title: 'collaborator management error',
+                message: 'only one owner left, needs to assign another user as an owner first',
+              }
             };
           }
         }
@@ -173,10 +216,7 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
 
     const result = await Doc.updateUser(docId, userId, DBCollaboratorRole);
     if (result.error) {
-      return {
-        status: 500,
-        error: 'Database Query Error'
-      };
+      return QUERY_ERR_MSG;
     }
 
     return result;
@@ -187,7 +227,11 @@ const deleteUser = async (docId, userId) => {
     if (!userId) {
       return {
         status: 400,
-        error: 'Request Error: user id is required'
+        error: {
+          code: 50001,
+          title: 'collaborator management error',
+          message: 'user id is required'
+        }
       };
     }
 
@@ -195,22 +239,27 @@ const deleteUser = async (docId, userId) => {
     if (!user) {
       return {
         status: 400,
-        error: 'Request Error: user is not in document',
+        error: {
+          code: 50004,
+          title: 'collaborator management error',
+          message: 'user is not in document'
+        }
       };
     }
     if (user[userId] === DOC_ROLE.OWNER) {
       return {
         status: 400,
-        error: 'Request Error: cannot remove owner from a document',
+        error: {
+          code: 54001,
+          title: 'collaborator management error',
+          message: 'cannot remove owner from a document'
+        }
       };
     }
 
     const result = await Doc.deleteUser(docId, userId);
     if (result.error) {
-      return {
-        status: 500,
-        error: 'Database Query Error'
-      };
+      return QUERY_ERR_MSG;
     }
 
     // Delete document if there is no user left
@@ -218,10 +267,7 @@ const deleteUser = async (docId, userId) => {
     if (Object.keys(users).length === 0) {
       const deleteResult = await Doc.deleteDoc(docId);
       if (deleteResult.error) {
-        return {
-          status: 500,
-          error: 'Database Query Error'
-        };
+        return QUERY_ERR_MSG;
       }
     }
 
@@ -237,15 +283,16 @@ const createDoc = async (userId, doc) => {
   if (!doc) {
     return {
       status: 400,
-      error: 'Request Error: document data is required.'
+      error: {
+        code: 40001,
+        title: 'document management error',
+        message: 'document data is required'
+      }
     };
   }
   const result = await Doc.createDoc(userId, doc);
   if (result.error) {
-    return {
-      status: 500,
-      error: 'Database Query Error'
-    };
+    return QUERY_ERR_MSG;
   }
   return result;
 };
@@ -254,15 +301,16 @@ const editDoc = async (docId, doc) => {
   if (!doc) {
     return {
       status: 400,
-      error: 'Request Error: document data is required.'
+      error: {
+        code: 40001,
+        title: 'document management error',
+        message: 'document data is required'
+      }
     };
   }
   const result = await Doc.editDoc(docId, doc);
   if (result.error) {
-    return {
-      status: 500,
-      error: 'Database Query Error'
-    };
+    return QUERY_ERR_MSG;
   }
   return result;
 };
@@ -270,10 +318,7 @@ const editDoc = async (docId, doc) => {
 const deleteDoc = async (docId) => {
   const result = await Doc.deleteDoc(docId);
   if (result.error) {
-    return {
-      status: 500,
-      error: 'Database Query Error'
-    };
+    return QUERY_ERR_MSG;
   }
   return result;
 };

@@ -5,7 +5,11 @@ async function checkDocBasicInfo(docId, path, method, statusCode, contentType) {
   if (!doc) {
     return {
       status: 400,
-      error: 'Request Error: document is not found.',
+      error: {
+        code: 60001,
+        title: 'get mock response error',
+        message: 'document is not found',
+      }
     };
   }
   console.log(doc.data.paths);
@@ -13,28 +17,44 @@ async function checkDocBasicInfo(docId, path, method, statusCode, contentType) {
   if(!targetPathData) {
     return {
       status: 400,
-      error: 'Request Error: path is not found.',
+      error: {
+        code: 60002,
+        title: 'get mock response error',
+        message: 'path is not found',
+      }
     };
   }
   const targetMethodData = targetPathData[method];
   if(!targetMethodData) {
     return {
       status: 400,
-      error: 'Request Error: method is not found.',
+      error: {
+        code: 60003,
+        title: 'get mock response error',
+        message: 'method is not found',
+      }
     };
   }
   const targetStatusCodeData = targetMethodData.responses[statusCode];
   if(!targetStatusCodeData) {
     return {
       status: 400,
-      error: 'Request Error: status code is not found.',
+      error: {
+        code: 60004,
+        title: 'get mock response error',
+        message: 'status code is not found',
+      }
     };
   }
   const targetContentTypeData = targetStatusCodeData.content[contentType];
   if(!targetContentTypeData) {
     return {
       status: 400,
-      error: 'Request Error: content type is not found.',
+      error: {
+        code: 60005,
+        title: 'get mock response error',
+        message: 'content type is not found',
+      }
     };
   }
   return targetContentTypeData;
@@ -50,7 +70,11 @@ const getExample = async (docId, path, method, statusCode, contentType) => {
   if (!result) {
     return {
       status: 400,
-      error: 'Request Error: example is not found.',
+      error: {
+        code: 60006,
+        title: 'get mock response error',
+        message: 'example is not found',
+      }
     };
   }
   return result;
@@ -65,14 +89,22 @@ const getExampleFromExamples = async (docId, path, method, statusCode, contentTy
   if (!targetExamplesData) {
     return {
       status: 400,
-      error: 'Request Error: examples is not found.',
+      error: {
+        code: 61001,
+        title: 'get mock response error',
+        message: 'examples is not found',
+      }
     };
   }
   const result = targetExamplesData[exampleName];
   if (!result) {
     return {
       status: 400,
-      error: 'Request Error: example is not found.',
+      error: {
+        code: 60006,
+        title: 'get mock response error',
+        message: 'example is not found',
+      }
     };
   }
   return result;
