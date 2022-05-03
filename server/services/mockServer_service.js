@@ -12,7 +12,6 @@ async function checkDocBasicInfo(docId, path, method, statusCode, contentType) {
       }
     };
   }
-  console.log(doc.data.paths);
   const targetPathData = doc.data.paths[path];
   if(!targetPathData) {
     return {
