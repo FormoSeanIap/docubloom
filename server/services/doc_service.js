@@ -1,5 +1,6 @@
 import * as Doc from '../models/doc_model.js';
 import * as User from '../models/user_model.js';
+import Cache from '../../utils/cache.js';
 
 import { DOC_ROLE, QUERY_ERR_MSG } from '../../utils/constants.js';
 
@@ -312,6 +313,18 @@ const editDoc = async (docId, doc) => {
   if (result.error) {
     return QUERY_ERR_MSG;
   }
+
+  try {
+    if (Cache.ready) {
+      const docCacheKeys = await Cache.keys(`${docId}*`);
+      for (let i = 0; i < docCacheKeys.length; i++) {
+        await Cache.del(docCacheKeys[i]);
+      }
+    }
+  } catch (error) {
+    console.error(`Delete cache keys for doc ${docId} error: ${error}`);
+  }
+
   return result;
 };
 
@@ -320,6 +333,18 @@ const deleteDoc = async (docId) => {
   if (result.error) {
     return QUERY_ERR_MSG;
   }
+
+  try {
+    if (Cache.ready) {
+      const docCacheKeys = await Cache.keys(`${docId}*`);
+      for (let i = 0; i < docCacheKeys.length; i++) {
+        await Cache.del(docCacheKeys[i]);
+      }
+    }
+  } catch (error) {
+    console.error(`Delete cache keys for doc ${docId} error: ${error}`);
+  }
+
   return result;
 };
 
