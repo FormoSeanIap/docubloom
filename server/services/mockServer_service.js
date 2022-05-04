@@ -1,4 +1,5 @@
 import * as Doc from '../models/doc_model.js';
+import Cache from '../../utils/cache.js';
 
 async function checkDocBasicInfo(docId, path, method, statusCode, contentType) {
   const doc = await Doc.getDoc(docId);
@@ -60,6 +61,21 @@ async function checkDocBasicInfo(docId, path, method, statusCode, contentType) {
 }
 
 const getExample = async (docId, path, method, statusCode, contentType) => {
+  let cacheMockRes;
+  try {
+    if (Cache.ready) {
+      cacheMockRes = await Cache.get(`${docId}_${path}_${method}_${statusCode}_${contentType}`);
+      cacheMockRes = JSON.parse(cacheMockRes);
+    }
+  } catch (error) {
+    console.error(`Get example mock response from cache error: ${error}`);
+  }
+
+  if (cacheMockRes) {
+    console.log('Get example mock response from cache');
+    return cacheMockRes;
+  }
+
   const targetContentTypeData = await checkDocBasicInfo(docId, path, method, statusCode, contentType);
   if (targetContentTypeData.error) {
     return targetContentTypeData;
@@ -76,10 +92,34 @@ const getExample = async (docId, path, method, statusCode, contentType) => {
       }
     };
   }
+
+  try {
+    if (Cache.ready) {
+      await Cache.set(`${docId}_${path}_${method}_${statusCode}_${contentType}`, JSON.stringify(result));
+    }
+  } catch (error) {
+    console.error(`Set example mock response to cache error: ${error}`);
+  }
+
   return result;
 };
 
 const getExampleFromExamples = async (docId, path, method, statusCode, contentType, exampleName) => {
+  let cacheMockRes;
+  try {
+    if (Cache.ready) {
+      cacheMockRes = await Cache.get(`${docId}_${path}_${method}_${statusCode}_${contentType}_${exampleName}`);
+      cacheMockRes = JSON.parse(cacheMockRes);
+    }
+  } catch (error) {
+    console.error(`Get examples mock response from cache error: ${error}`);
+  }
+
+  if (cacheMockRes) {
+    console.log('Get examples mock response from cache');
+    return cacheMockRes;
+  }
+
   const targetContentTypeData = await checkDocBasicInfo(docId, path, method, statusCode, contentType);
   if (targetContentTypeData.error) {
     return targetContentTypeData;
@@ -106,6 +146,15 @@ const getExampleFromExamples = async (docId, path, method, statusCode, contentTy
       }
     };
   }
+
+  try {
+    if (Cache.ready) {
+      await Cache.set(`${docId}_${path}_${method}_${statusCode}_${contentType}_${exampleName}`, JSON.stringify(result));
+    }
+  } catch (error) {
+    console.error(`Set examples mock response to cache error: ${error}`);
+  }
+
   return result;
 };
 

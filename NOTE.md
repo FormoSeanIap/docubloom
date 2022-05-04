@@ -15,6 +15,18 @@ https://ithelp.ithome.com.tw/articles/10213964
 - p.s. BCrypt長度固定為60，Argon2長度固定為95
 
 # 學習筆記
+## redis
+- 在使用redis npm的時候，在伺服器設定redis連線時，需要使用```.connect()```，比如
+```js
+import { createClient } from 'redis';
+const redisClient = createClient();
+redisClient.connect().catch(error => console.error('redis connect fail'));
+```
+但是ioRedis就不會需要做這件事情，比如
+```js
+import Redis from 'ioredis';
+const redis = new Redis();
+```
 ## 伺服器
 - 在設計API的時候，如果是自己無法掌握內容的值，就不要放在path parameter裡面，因為可能使用者填入的值包含特殊符號(比如```/```)，導致404 not found
 - 在map結合async await的時候，因為我們要await一個array裡面的所有promise，因此要使用Promise.all，比如
