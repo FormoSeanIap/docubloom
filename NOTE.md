@@ -15,6 +15,16 @@ https://ithelp.ithome.com.tw/articles/10213964
 - p.s. BCrypt長度固定為60，Argon2長度固定為95
 
 # 學習筆記
+## general
+- 可以用```.constructor```來確認東西是否為array，比如
+```js
+let { tags } = paths[pathsArr[i]][requestsArr[j]];
+if (tags.constructor !== Array) {
+  tags = [];
+  showErrorAlert(`${pathsArr[i]}/${requestsArr[j]} has no tags or the value is wrong`);
+}
+tagArr.push(...tags);
+```
 ## redis
 - 在使用redis npm的時候，在伺服器設定redis連線時，需要使用```.connect()```，比如
 ```js
