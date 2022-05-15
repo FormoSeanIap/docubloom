@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
+import Joi from 'joi';
 import { promisify } from 'util';
 
 import * as User from '../server/models/user_model.js';
@@ -116,10 +117,20 @@ async function checkPassword(password, hash) {
   return await argon2.verify(hash, password);
 }
 
+const signUpSchema = Joi.object({
+  name: [
+    Joi.string().min(1).required(),
+    Joi.number().min(1).required(),
+  ],
+  email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
+  password: Joi.string().min(4).max(30),
+});
+
 export {
   asyncHandler,
   authentication,
   authorizationDoc,
   hashPassword,
   checkPassword,
+  signUpSchema,
 };

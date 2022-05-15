@@ -1,18 +1,21 @@
 import * as User from '../models/user_model.js';
-import { hashPassword, checkPassword } from '../../utils/util.js';
+import { signUpSchema, hashPassword, checkPassword } from '../../utils/util.js';
 import { QUERY_ERR_MSG } from '../../utils/constants.js';
 
 const signUp = async ( name, email, password ) => {
-  if (!name || !email || !password) {
+
+  const validation = signUpSchema.validate({ name, email, password });
+  if (validation.error) {
     return {
       status: 400,
       error: {
         code: 31001,
         title: 'sign up fails',
-        message: 'name, email and password are required',
+        message: validation.error.message,
       }
     };
   }
+
   const user = await User.getUserDetail(email);
   if (user) {
     return {
