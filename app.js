@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import morganBody from 'morgan-body';
 
 const { NODE_ENV, PORT, PORT_TEST, API_VERSION } = process.env;
 const port = NODE_ENV === 'test' ? PORT_TEST : PORT || 3000;
@@ -23,7 +24,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+morganBody(app);
 
+// CORS allow all
 app.use(cors());
 
 app.use('/api/' + API_VERSION + '/user', /*rateLimiterRoute,*/ [userRoute]);
