@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import Redis from 'ioredis';
 
-const { CACHE_HOST, CACHE_PORT, CACHE_USER, CACHE_PASSWORD } = process.env;
+const { NODE_ENV, CACHE_HOST, CACHE_PORT, CACHE_USER, CACHE_PASSWORD } = process.env;
 
 const redis = new Redis({
     host: CACHE_HOST,
@@ -19,7 +19,9 @@ redis.on('ready', () => {
 
 redis.on('error', () => {
     redis.ready = false;
-    console.error('Error in Redis');
+    if (NODE_ENV === 'production') {
+        console.error('Error in Redis');
+    }
 });
 
 redis.on('end', () => {

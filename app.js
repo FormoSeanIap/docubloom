@@ -1,7 +1,7 @@
 import 'dotenv/config';
 
-const { PORT, API_VERSION } = process.env;
-const port = PORT || 3000;
+const { NODE_ENV, PORT, PORT_TEST, API_VERSION } = process.env;
+const port = NODE_ENV === 'test' ? PORT_TEST : PORT || 3000;
 
 // Express Initialization
 import express from 'express';
