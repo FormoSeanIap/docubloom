@@ -32,35 +32,35 @@ function respondForbidden(res) {
 
 function authentication() {
   return async function (req, res, next) {
-      let accessToken = req.get('Authorization');
-      if (!accessToken) {
-          respondUnauthorized(res);
-          return;
-      }
+    let accessToken = req.get('Authorization');
+    if (!accessToken) {
+        respondUnauthorized(res);
+        return;
+    }
 
-      accessToken = accessToken.replace('Bearer ', '');
-      if (accessToken == 'null') {
-          respondUnauthorized(res);
-          return;
-      }
+    accessToken = accessToken.replace('Bearer ', '');
+    if (accessToken == 'null') {
+        respondUnauthorized(res);
+        return;
+    }
 
-      try {
-        const user = await promisify(jwt.verify)(accessToken, TOKEN_SECRET);
-        req.user = user;
+    try {
+      const user = await promisify(jwt.verify)(accessToken, TOKEN_SECRET);
+      req.user = user;
 
-        const userDetail = await User.getUserDetail(user.email);
-          if (!userDetail) {
-            respondForbidden(res);
-          } else {
-              req.user.id = userDetail.id;
-              req.user.role_id = userDetail.role_id;
-              next();
-          }
-          return;
-      } catch (err) {
+      const userDetail = await User.getUserDetail(user.email);
+        if (!userDetail) {
           respondForbidden(res);
-          return;
-      }
+        } else {
+            req.user.id = userDetail.id;
+            req.user.role_id = userDetail.role_id;
+            next();
+        }
+        return;
+    } catch (err) {
+        respondForbidden(res);
+        return;
+    }
   };
 }
 
@@ -68,44 +68,44 @@ function authorizationDoc(roleType) {
   return async function (req, res, next) {
 
     const { docId } = req.params;
-      if (!docId) {
-          res.status(400).send({ error: 'doc id is required' });
-          return;
-      }
-
-      const userId = req.user.id;
-      const userRole = await Doc.getDocRole(userId, docId);
-
-      if (!userRole) {
-        respondForbidden(res);
+    if (!docId) {
+        res.status(400).send({ error: 'doc id is required' });
         return;
-      }
-      req.user.role= userRole;
+    }
 
-      switch (roleType) {
-        case DOC_ROLE.VIEWER:
+    const userId = req.user.id;
+    const userRole = await Doc.getDocRole(userId, docId);
+    if (!userRole) {
+      respondForbidden(res);
+      return;
+    }
+
+    req.user.role= userRole;
+
+    switch (roleType) {
+      case DOC_ROLE.VIEWER:
+        next();
+        break;
+      case DOC_ROLE.EDITOR:
+        if (userRole === DOC_ROLE.VIEWER) {
+          respondForbidden(res);
+          return;
+        } else {
           next();
-          break;
-        case DOC_ROLE.EDITOR:
-          if (userRole === DOC_ROLE.VIEWER) {
-            respondForbidden(res);
-            return;
-          } else {
-            next();
-          }
-          break;
-        case DOC_ROLE.OWNER:
-          if (userRole !== DOC_ROLE.OWNER) {
-            respondForbidden(res);
-            return;
-          } else {
-            next();
-          }
-          break;
-        default:
-          res.status(400).send({ error: 'invalid role' });
-          break;
-      }
+        }
+        break;
+      case DOC_ROLE.OWNER:
+        if (userRole !== DOC_ROLE.OWNER) {
+          respondForbidden(res);
+          return;
+        } else {
+          next();
+        }
+        break;
+      default:
+        res.status(400).send({ error: 'invalid role' });
+        break;
+    }
   };
 }
 
