@@ -34,14 +34,14 @@ function authentication() {
   return async function (req, res, next) {
     let accessToken = req.get('Authorization');
     if (!accessToken) {
-        respondUnauthorized(res);
-        return;
+      respondUnauthorized(res);
+      return;
     }
 
     accessToken = accessToken.replace('Bearer ', '');
     if (accessToken == 'null') {
-        respondUnauthorized(res);
-        return;
+      respondUnauthorized(res);
+      return;
     }
 
     try {
@@ -49,17 +49,17 @@ function authentication() {
       req.user = user;
 
       const userDetail = await User.getUserDetail(user.email);
-        if (!userDetail) {
-          respondForbidden(res);
-        } else {
-            req.user.id = userDetail.id;
-            req.user.role_id = userDetail.role_id;
-            next();
-        }
-        return;
-    } catch (err) {
+      if (!userDetail) {
         respondForbidden(res);
-        return;
+      } else {
+          req.user.id = userDetail.id;
+          req.user.role_id = userDetail.role_id;
+          next();
+      }
+      return;
+    } catch (err) {
+      respondForbidden(res);
+      return;
     }
   };
 }
