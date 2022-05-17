@@ -109,11 +109,11 @@ function docAuthorization(roleType) {
     }
     req.user.role= userRole;
 
-    const handleAuth = authMap[roleType];
-    if (!handleAuth) {
+    const authFunc = authMap[roleType];
+    if (!authFunc) {
       res.status(400).send({ error: 'invalid role' });
     }
-    handleAuth(userRole, res, next);
+    authFunc(userRole, res, next);
   };
 }
 
