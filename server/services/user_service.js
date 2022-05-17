@@ -2,69 +2,10 @@ import * as User from '../models/user_model.js';
 import { signUpSchema, hashPassword, checkPassword } from '../../utils/util.js';
 import { QUERY_ERR_MSG } from '../../utils/constants.js';
 
-const signUp = async ( name, email, password ) => {
+const nativeSignIn = async (reqBody) => {
 
-  const validation = signUpSchema.validate({ name, email, password });
-  if (validation.error) {
-    return {
-      status: 400,
-      error: {
-        code: 31001,
-        title: 'sign up fails',
-        message: validation.error.message,
-      }
-    };
-  }
+  const { email, password } = reqBody;
 
-  const user = await User.getUserDetail(email);
-  if (user) {
-    return {
-      status: 409,
-      error: {
-        code: 31002,
-        title: 'sign up fails',
-        message: 'user already exists',
-      }
-    };
-  }
-
-  const hashedPassword = await hashPassword(password);
-
-  const result = await User.signUp( name, email, hashedPassword );
-  if (result.error || !result.user) {
-    return QUERY_ERR_MSG.GENERAL;
-  }
-
-  return result;
-};
-
-const signIn = async(data) => {
-  let result;
-  switch (data.provider) {
-    case 'native':
-      result = await nativeSignIn(data.email, data.password);
-      break;
-    case 'facebook':
-      result = { error: 'Facebook signIn is currently under construction' };
-      // result = await facebookSignIn(data.access_token);
-      break;
-    case 'google':
-      result = { error: 'Google signIn is currently under construction' };
-      // result = await googleSignIn(data.access_token);
-      break;
-    default:
-      result = {
-        error: {
-          code: 32101,
-          title: 'sign in fails',
-          message: 'provider is not supported',
-        }
-      };
-  }
-  return result;
-};
-
-const nativeSignIn = async (email, password) => {
   if (!email || !password) {
       return {
         status: 400,
@@ -106,6 +47,94 @@ const nativeSignIn = async (email, password) => {
   }
 
   return result;
+};
+
+const facebookSignIn = async (reqBody) => {
+
+  const { access_token } = reqBody;
+
+  return {
+    status: 400,
+    error: {
+      code: 32301,
+      title: 'facebook sign in fails',
+      message: 'facebook sign in is currently under construction',
+    }
+  };
+};
+
+const googleSignIn = async (reqBody) => {
+
+  const { access_token } = reqBody;
+
+  return {
+    status: 400,
+    error: {
+      code: 32301,
+      title: 'google sign in fails',
+      message: 'google sign in is currently under construction',
+    }
+  };
+};
+
+const signInMap = {
+  native: nativeSignIn,
+  facebook: facebookSignIn,
+  google: googleSignIn,
+};
+
+const signUp = async ( name, email, password ) => {
+
+  const validation = signUpSchema.validate({ name, email, password });
+  if (validation.error) {
+    return {
+      status: 400,
+      error: {
+        code: 31001,
+        title: 'sign up fails',
+        message: validation.error.message,
+      }
+    };
+  }
+
+  const user = await User.getUserDetail(email);
+  if (user) {
+    return {
+      status: 409,
+      error: {
+        code: 31002,
+        title: 'sign up fails',
+        message: 'user already exists',
+      }
+    };
+  }
+
+  const hashedPassword = await hashPassword(password);
+
+  const result = await User.signUp( name, email, hashedPassword );
+  if (result.error || !result.user) {
+    return QUERY_ERR_MSG.GENERAL;
+  }
+
+  return result;
+};
+
+const signIn = async(reqBody) => {
+
+  const signInFunc = signInMap[reqBody.provider];
+  if (!signInFunc) {
+    return {
+      status: 400,
+      error: {
+        code: 32001,
+        title: 'sign in fails',
+        message: 'provider is not supported',
+      }
+    };
+  }
+
+  const signInResult = await signInFunc(reqBody);
+  return signInResult;
 };
 
 const getDocs = async (userId) => {
