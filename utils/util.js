@@ -52,9 +52,9 @@ function authentication() {
       if (!userDetail) {
         respondForbidden(res);
       } else {
-          req.user.id = userDetail.id;
-          req.user.role_id = userDetail.role_id;
-          next();
+        req.user.id = userDetail.id;
+        req.user.role_id = userDetail.role_id;
+        next();
       }
       return;
     } catch (err) {
@@ -69,8 +69,8 @@ function authorizationDoc(roleType) {
 
     const { docId } = req.params;
     if (!docId) {
-        res.status(400).send({ error: 'doc id is required' });
-        return;
+      res.status(400).send({ error: 'doc id is required' });
+      return;
     }
 
     const userId = req.user.id;
