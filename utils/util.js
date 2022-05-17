@@ -58,7 +58,7 @@ const authMap = {
   [DOC_ROLE.OWNER]: handleOwnerAuth,
 };
 
-function authentication() {
+function userAuthentication() {
   return async function (req, res, next) {
     let accessToken = req.get('Authorization');
     if (!accessToken) {
@@ -92,7 +92,7 @@ function authentication() {
   };
 }
 
-function authorizationDoc(roleType) {
+function docAuthorization(roleType) {
   return async function (req, res, next) {
 
     const { docId } = req.params;
@@ -136,8 +136,8 @@ const signUpSchema = Joi.object({
 
 export {
   asyncHandler,
-  authentication,
-  authorizationDoc,
+  userAuthentication,
+  docAuthorization,
   hashPassword,
   checkPassword,
   signUpSchema,
