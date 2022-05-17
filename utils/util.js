@@ -30,6 +30,34 @@ function respondForbidden(res) {
   return res.status(AUTH_ERR_MSG.FORBIDDEN.status).send({ error: AUTH_ERR_MSG.FORBIDDEN.error });
 }
 
+function handleViewerAuth(userRole, res, next) {
+  next();
+}
+
+function handleEditorAuth(userRole, res, next) {
+  if (userRole === DOC_ROLE.VIEWER) {
+    respondForbidden(res);
+    return;
+  } else {
+    next();
+  }
+}
+
+function handleOwnerAuth(userRole, res, next) {
+  if (userRole !== DOC_ROLE.OWNER) {
+    respondForbidden(res);
+    return;
+  } else {
+    next();
+  }
+}
+
+const authMap = {
+  [DOC_ROLE.VIEWER]: handleViewerAuth,
+  [DOC_ROLE.EDITOR]: handleEditorAuth,
+  [DOC_ROLE.OWNER]: handleOwnerAuth,
+};
+
 function authentication() {
   return async function (req, res, next) {
     let accessToken = req.get('Authorization');
@@ -79,33 +107,13 @@ function authorizationDoc(roleType) {
       respondForbidden(res);
       return;
     }
-
     req.user.role= userRole;
 
-    switch (roleType) {
-      case DOC_ROLE.VIEWER:
-        next();
-        break;
-      case DOC_ROLE.EDITOR:
-        if (userRole === DOC_ROLE.VIEWER) {
-          respondForbidden(res);
-          return;
-        } else {
-          next();
-        }
-        break;
-      case DOC_ROLE.OWNER:
-        if (userRole !== DOC_ROLE.OWNER) {
-          respondForbidden(res);
-          return;
-        } else {
-          next();
-        }
-        break;
-      default:
-        res.status(400).send({ error: 'invalid role' });
-        break;
+    const handleAuth = authMap[roleType];
+    if (!handleAuth) {
+      res.status(400).send({ error: 'invalid role' });
     }
+    handleAuth(userRole, res, next);
   };
 }
 
