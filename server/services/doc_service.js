@@ -284,38 +284,18 @@ const getDoc = async (docId) => {
 };
 
 const createDoc = async (userId, doc) => {
-  if (!doc) {
-    return {
-      status: 400,
-      error: {
-        code: 40001,
-        title: 'document management error',
-        message: 'document data is required'
-      }
-    };
-  }
+  if (!doc) return generateResponse(40001);
+
   const result = await Doc.createDoc(userId, doc);
-  if (result.error) {
-    return generateResponse(10001);
-  }
+  if (result.error) return generateResponse(10001);
   return result;
 };
 
 const editDoc = async (docId, doc) => {
-  if (!doc) {
-    return {
-      status: 400,
-      error: {
-        code: 40001,
-        title: 'document management error',
-        message: 'document data is required'
-      }
-    };
-  }
+  if (!doc) return generateResponse(40001);
+
   const result = await Doc.editDoc(docId, doc);
-  if (result.error) {
-    return generateResponse(10001);
-  }
+  if (result.error) return generateResponse(10001);
 
   try {
     if (Cache.ready) {

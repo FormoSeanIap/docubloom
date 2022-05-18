@@ -57,6 +57,12 @@ const MAP = {
     message: 'third-party sign-in is currently under construction',
   },
   /*============ document management error ============*/
+  40001: {
+    type: 'error',
+    status: 400,
+    title: 'document management error',
+    message: 'document data is required',
+  },
   /*============ collaborator management error ============*/
   /*============ mock response error ============*/
 };
