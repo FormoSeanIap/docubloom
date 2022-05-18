@@ -1,6 +1,9 @@
-import 'dotenv/config';
-const { MONGO_DB_URL, MONGO_DB_NAME, MONGO_DB_COLLECTION_DOCS, MONGO_DB_COLLECTION_USERS } = process.env;
+import 'dotenv/config.js';
 import { MongoClient } from 'mongodb';
+
+const {
+  MONGO_DB_URL, MONGO_DB_NAME, MONGO_DB_COLLECTION_DOCS, MONGO_DB_COLLECTION_USERS,
+} = process.env;
 
 // Connection URL
 const url = MONGO_DB_URL;

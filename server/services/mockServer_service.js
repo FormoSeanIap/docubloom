@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import * as Doc from '../models/doc_model.js';
 import { generateResponse } from '../../utils/util.js';
 import Cache from '../../utils/cache.js';
@@ -41,7 +40,13 @@ const getExample = async (docId, path, method, statusCode, contentType) => {
     return cacheMockResValue;
   }
 
-  const targetContentTypeData = await checkDocBasicInfo(docId, path, method, statusCode, contentType);
+  const targetContentTypeData = await checkDocBasicInfo(
+    docId,
+    path,
+    method,
+    statusCode,
+    contentType,
+  );
   if (targetContentTypeData.error) {
     return targetContentTypeData;
   }
@@ -61,7 +66,14 @@ const getExample = async (docId, path, method, statusCode, contentType) => {
   return result;
 };
 
-const getExampleFromExamples = async (docId, path, method, statusCode, contentType, exampleName) => {
+const getExampleFromExamples = async (
+  docId,
+  path,
+  method,
+  statusCode,
+  contentType,
+  exampleName,
+) => {
   const cacheMockResKey = `${docId}_${path}_${method}_${statusCode}_${contentType}_${exampleName}`;
   let cacheMockResValue;
   try {
@@ -78,7 +90,13 @@ const getExampleFromExamples = async (docId, path, method, statusCode, contentTy
     return cacheMockResValue;
   }
 
-  const targetContentTypeData = await checkDocBasicInfo(docId, path, method, statusCode, contentType);
+  const targetContentTypeData = await checkDocBasicInfo(
+    docId,
+    path,
+    method,
+    statusCode,
+    contentType,
+  );
   if (targetContentTypeData.error) {
     return targetContentTypeData;
   }

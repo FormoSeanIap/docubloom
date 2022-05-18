@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import 'dotenv/config.js';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import Joi from 'joi';
@@ -28,10 +28,10 @@ function generateResponse(code) {
   return {
     status: contents.status,
     [contents.type]: {
-      code: code,
+      code,
       title: contents.title,
       message: contents.message,
-    }
+    },
   };
 }
 
@@ -39,14 +39,12 @@ function respondUnauthorized(res) {
   const response = generateResponse(20001);
   const { status, error } = response;
   res.status(status).send({ error });
-  return;
 }
 
 function respondForbidden(res) {
   const response = generateResponse(20002);
   const { status, error } = response;
   res.status(status).send({ error });
-  return;
 }
 
 function handleViewerAuth(userRole, res, next) {
@@ -56,7 +54,6 @@ function handleViewerAuth(userRole, res, next) {
 function handleEditorAuth(userRole, res, next) {
   if (userRole === DOC_ROLE.VIEWER) {
     respondForbidden(res);
-    return;
   } else {
     next();
   }
@@ -65,7 +62,6 @@ function handleEditorAuth(userRole, res, next) {
 function handleOwnerAuth(userRole, res, next) {
   if (userRole !== DOC_ROLE.OWNER) {
     respondForbidden(res);
-    return;
   } else {
     next();
   }
@@ -86,7 +82,7 @@ function userAuthentication() {
     }
 
     accessToken = accessToken.replace('Bearer ', '');
-    if (accessToken == 'null') {
+    if (accessToken === 'null') {
       respondUnauthorized(res);
       return;
     }
@@ -99,22 +95,20 @@ function userAuthentication() {
       if (!userDetail) {
         respondForbidden(res);
         return;
-      } else {
-        req.user.id = userDetail.id;
-        req.user.role_id = userDetail.role_id;
-        next();
       }
+      req.user.id = userDetail.id;
+      req.user.role_id = userDetail.role_id;
+      next();
+
       return;
     } catch (err) {
       respondForbidden(res);
-      return;
     }
   };
 }
 
 function docAuthorization(roleType) {
   return async function (req, res, next) {
-
     const { docId } = req.params;
     if (!docId) {
       const response = generateResponse(50005);
@@ -129,7 +123,7 @@ function docAuthorization(roleType) {
       respondForbidden(res);
       return;
     }
-    req.user.role= userRole;
+    req.user.role = userRole;
 
     const authFunc = authMap[roleType];
     if (!authFunc) {
@@ -143,11 +137,13 @@ function docAuthorization(roleType) {
 }
 
 async function hashPassword(password) {
-  return await argon2.hash(password);
+  const hashResult = await argon2.hash(password);
+  return hashResult;
 }
 
 async function checkPassword(password, hash) {
-  return await argon2.verify(hash, password);
+  const verifyResult = await argon2.verify(hash, password);
+  return verifyResult;
 }
 
 const signUpSchema = Joi.object({

@@ -3,7 +3,9 @@ import express from 'express';
 import { asyncHandler, userAuthentication, docAuthorization } from '../../utils/util.js';
 import { DOC_ROLE } from '../../utils/constants.js';
 
-import { getDoc, createDoc, editDoc, deleteDoc, getUsers, addUser, updateUser, deleteUser } from '../controllers/doc_controller.js';
+import {
+  getDoc, createDoc, editDoc, deleteDoc, getUsers, addUser, updateUser, deleteUser,
+} from '../controllers/doc_controller.js';
 
 const router = express.Router();
 
@@ -16,4 +18,4 @@ router.route('/:docId/users/').post(userAuthentication(), docAuthorization(DOC_R
 router.route('/:docId/users/:userId').put(userAuthentication(), docAuthorization(DOC_ROLE.EDITOR), asyncHandler(updateUser));
 router.route('/:docId/users/:userId').delete(userAuthentication(), docAuthorization(DOC_ROLE.OWNER), asyncHandler(deleteUser));
 
-export { router };
+export default router;

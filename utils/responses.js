@@ -1,12 +1,12 @@
 const MAP = {
-  /*============ query error ============*/
+  /*= =========== query error ============ */
   10001: {
     type: 'error',
     status: 500,
     title: 'query fails',
     message: 'database query error',
   },
-  /*============ auth error ============*/
+  /*= =========== auth error ============ */
   20001: {
     type: 'error',
     status: 401,
@@ -19,12 +19,12 @@ const MAP = {
     title: 'forbidden',
     message: 'user is forbidden',
   },
-  /*============ user error ============*/
+  /*= =========== user error ============ */
   31001: {
     type: 'error',
     status: 400,
     title: 'sign up fails',
-    message: 'sign up validation fails', //rule in utils/util.js/signUpSchema
+    message: 'sign up validation fails', // rule in utils/util.js/signUpSchema
   },
   31002: {
     type: 'error',
@@ -56,14 +56,14 @@ const MAP = {
     title: 'third-party sign-in fails',
     message: 'third-party sign-in is currently under construction',
   },
-  /*============ document management error ============*/
+  /*= =========== document management error ============ */
   40001: {
     type: 'error',
     status: 400,
     title: 'document management error',
     message: 'document data is required',
   },
-  /*============ collaborator management error ============*/
+  /*= =========== collaborator management error ============ */
   50001: {
     type: 'error',
     status: 400,
@@ -148,7 +148,7 @@ const MAP = {
     title: 'collaborator management error',
     message: 'cannot remove owner from a document',
   },
-  /*============ mock response error ============*/
+  /*= =========== mock response error ============ */
   60001: {
     type: 'error',
     status: 400,

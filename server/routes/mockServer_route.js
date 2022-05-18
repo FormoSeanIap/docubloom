@@ -9,5 +9,4 @@ router.route('/docs/:docId/example').get(asyncHandler(getExample));
 
 router.route('/docs/:docId/examples').get(asyncHandler(getExampleFromExamples));
 
-export { router };
-
+export default router;

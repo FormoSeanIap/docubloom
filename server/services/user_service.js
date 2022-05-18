@@ -1,9 +1,9 @@
 import * as User from '../models/user_model.js';
-import { signUpSchema, hashPassword, checkPassword } from '../../utils/util.js';
-import { generateResponse } from '../../utils/util.js';
+import {
+  signUpSchema, hashPassword, checkPassword, generateResponse,
+} from '../../utils/util.js';
 
 const nativeSignIn = async (reqBody) => {
-
   const { email, password } = reqBody;
 
   if (!email || !password) return generateResponse(32201);
@@ -21,14 +21,12 @@ const nativeSignIn = async (reqBody) => {
 };
 
 const facebookSignIn = async (reqBody) => {
-
   const { access_token } = reqBody;
 
   return generateResponse(32301);
 };
 
 const googleSignIn = async (reqBody) => {
-
   const { access_token } = reqBody;
 
   return generateResponse(32301);
@@ -40,8 +38,7 @@ const signInMap = {
   google: googleSignIn,
 };
 
-const signUp = async ( name, email, password ) => {
-
+const signUp = async (name, email, password) => {
   const validation = signUpSchema.validate({ name, email, password });
   if (validation.error) return generateResponse(31001);
 
@@ -50,14 +47,13 @@ const signUp = async ( name, email, password ) => {
 
   const hashedPassword = await hashPassword(password);
 
-  const result = await User.signUp( name, email, hashedPassword );
+  const result = await User.signUp(name, email, hashedPassword);
   if (result.error || !result.user) return generateResponse(10001);
 
   return result;
 };
 
-const signIn = async(reqBody) => {
-
+const signIn = async (reqBody) => {
   const signInFunc = signInMap[reqBody.provider];
   if (!signInFunc) return generateResponse(32101);
 
@@ -67,7 +63,7 @@ const signIn = async(reqBody) => {
 
 const getDocs = async (userId) => {
   const docs = await User.getUserDocs(userId);
-  if(!docs) return generateResponse(10001);
+  if (!docs) return generateResponse(10001);
 
   return docs;
 };
@@ -82,5 +78,5 @@ export {
   signIn,
   nativeSignIn,
   getDocs,
-  getUserDetail
+  getUserDetail,
 };

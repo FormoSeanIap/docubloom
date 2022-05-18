@@ -1,8 +1,5 @@
-import 'dotenv/config';
+import 'dotenv/config.js';
 import morganBody from 'morgan-body';
-
-const { NODE_ENV, PORT, PORT_TEST, API_VERSION } = process.env;
-const port = NODE_ENV === 'test' ? PORT_TEST : PORT || 3000;
 
 // Express Initialization
 import express from 'express';
@@ -12,9 +9,14 @@ import http from 'http';
 import cors from 'cors';
 
 // API routes
-import { router as userRoute } from './server/routes/user_route.js';
-import { router as docRoute } from './server/routes/docs_route.js';
-import { router as mockServerRoute } from './server/routes/mockServer_route.js';
+import userRoute from './server/routes/user_route.js';
+import docRoute from './server/routes/docs_route.js';
+import mockServerRoute from './server/routes/mockServer_route.js';
+
+const {
+  NODE_ENV, PORT, PORT_TEST, API_VERSION,
+} = process.env;
+const port = NODE_ENV === 'test' ? PORT_TEST : PORT || 3000;
 
 const app = express();
 const server = http.createServer(app);
@@ -29,20 +31,19 @@ morganBody(app);
 // CORS allow all
 app.use(cors());
 
-app.use('/api/' + API_VERSION + '/user', /*rateLimiterRoute,*/ [userRoute]);
-app.use('/api/' + API_VERSION + '/docs', /*rateLimiterRoute,*/ [docRoute]);
-app.use('/api/' + API_VERSION + '/mock-server', /*rateLimiterRoute,*/ [mockServerRoute]);
-
+app.use(`/api/${API_VERSION}/user`, /* rateLimiterRoute, */ [userRoute]);
+app.use(`/api/${API_VERSION}/docs`, /* rateLimiterRoute, */ [docRoute]);
+app.use(`/api/${API_VERSION}/mock-server`, /* rateLimiterRoute, */ [mockServerRoute]);
 
 // Page not found
-app.use(function (req, res, next) {
-    res.status(404).send('page not found');
+app.use((req, res, next) => {
+  res.status(404).send('page not found');
 });
 
 // Error handling
-app.use(function (err, req, res, next) {
-    console.log(err);
-    res.status(500).send('Internal Server Error');
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.status(500).send('Internal Server Error');
 });
 
 server.listen(port, async () => {

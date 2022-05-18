@@ -10,7 +10,7 @@ function getDBDocRole(role) {
 }
 
 function getKeysByValue(object, value) {
-  return Object.keys(object).filter(key => object[key] === value);
+  return Object.keys(object).filter((key) => object[key] === value);
 }
 
 const getUsers = async (docId) => {
@@ -44,7 +44,6 @@ const getUsers = async (docId) => {
 };
 
 const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => {
-
   if (!collaboratorEmail) return generateResponse(52001);
   if (!collaboratorRole) return generateResponse(50002);
 
@@ -57,8 +56,10 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
   const collaboratorDBRole = getDBDocRole(collaboratorRole);
   if (!collaboratorDBRole) return generateResponse(50003);
 
-  /*============ editor cannot add others as owner ============*/
-  if (userRole === DOC_ROLE.EDITOR && collaboratorDBRole === DOC_ROLE.OWNER) return generateResponse(52003);
+  /*= =========== editor cannot add others as owner ============ */
+  if (userRole === DOC_ROLE.EDITOR && collaboratorDBRole === DOC_ROLE.OWNER) {
+    return generateResponse(52003);
+  }
 
   const user = await Doc.getUser(docId, collaboratorId);
   if (user) return generateResponse(52004);
@@ -70,7 +71,6 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
 };
 
 const updateUser = async (docId, userId, collaboratorRole, userRole) => {
-
   if (!userId) return generateResponse(50001);
   if (!collaboratorRole) return generateResponse(50002);
 
@@ -78,7 +78,7 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
   if (!DBCollaboratorRole) return generateResponse(50003);
 
   if (DBCollaboratorRole === DOC_ROLE.OWNER) {
-    /*============ Only owners can change others' role to owner ============*/
+    /*= =========== Only owners can change others' role to owner ============ */
     if (userRole !== DOC_ROLE.OWNER) return generateResponse(53001);
   } else {
     const collaboratorOrigin = await Doc.getUser(docId, userId);
@@ -87,13 +87,12 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
     const collaboratorRoleOrigin = collaboratorOrigin[userId];
     if (collaboratorRoleOrigin === DOC_ROLE.OWNER) {
       if (userRole !== DOC_ROLE.OWNER) {
-        /*============ Only owners can change an owner's role ============*/
+        /*= =========== Only owners can change an owner's role ============ */
         return generateResponse(53003);
-      } else {
-        const currentDocUsers = await Doc.getUsers(docId);
-        const currentDocOwners = getKeysByValue(currentDocUsers, DOC_ROLE.OWNER);
-        if (currentDocOwners.length === 1) return generateResponse(53004);
       }
+      const currentDocUsers = await Doc.getUsers(docId);
+      const currentDocOwners = getKeysByValue(currentDocUsers, DOC_ROLE.OWNER);
+      if (currentDocOwners.length === 1) return generateResponse(53004);
     }
   }
 
@@ -104,7 +103,6 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
 };
 
 const deleteUser = async (docId, userId) => {
-
   if (!userId) return generateResponse(50001);
 
   const user = await Doc.getUser(docId, userId);
@@ -148,9 +146,13 @@ const editDoc = async (docId, doc) => {
   try {
     if (Cache.ready) {
       const docCacheKeys = await Cache.keys(`${docId}*`);
-      for (let i = 0; i < docCacheKeys.length; i++) {
-        await Cache.del(docCacheKeys[i]);
-      }
+      await Promise.all(docCacheKeys.map((key) => Cache.del(key)));
+      // for (const key of docCacheKeys) {
+      //   await Cache.del(key);
+      // }
+      // for (let i = 0; i < docCacheKeys.length; i++) {
+      //   await Cache.del(docCacheKeys[i]);
+      // }
     }
   } catch (error) {
     console.error(`Delete cache keys for doc ${docId} error: ${error}`);
@@ -167,9 +169,10 @@ const deleteDoc = async (docId) => {
   try {
     if (Cache.ready) {
       const docCacheKeys = await Cache.keys(`${docId}*`);
-      for (let i = 0; i < docCacheKeys.length; i++) {
-        await Cache.del(docCacheKeys[i]);
-      }
+      await Promise.all(docCacheKeys.map((key) => Cache.del(key)));
+      // for (let i = 0; i < docCacheKeys.length; i++) {
+      //   await Cache.del(docCacheKeys[i]);
+      // }
     }
   } catch (error) {
     console.error(`Delete cache keys for doc ${docId} error: ${error}`);
@@ -186,5 +189,5 @@ export {
   getDoc,
   createDoc,
   editDoc,
-  deleteDoc
+  deleteDoc,
 };
