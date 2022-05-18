@@ -64,6 +64,84 @@ const MAP = {
     message: 'document data is required',
   },
   /*============ collaborator management error ============*/
+  50001: {
+    type: 'error',
+    status: 400,
+    title: 'collaborator management error',
+    message: 'user id is required',
+  },
+  50002: {
+    type: 'error',
+    status: 400,
+    title: 'collaborator management error',
+    message: 'collaborator role is required',
+  },
+  50003: {
+    type: 'error',
+    status: 400,
+    title: 'collaborator management error',
+    message: 'collaborator role is invalid',
+  },
+  50004: {
+    type: 'error',
+    status: 400,
+    title: 'collaborator management error',
+    message: 'user is not in document',
+  },
+  52001: {
+    type: 'error',
+    status: 400,
+    title: 'collaborator management error',
+    message: 'collaborator email is required',
+  },
+  52002: {
+    type: 'error',
+    status: 400,
+    title: 'collaborator management error',
+    message: 'collaborator email is not registered',
+  },
+  52003: {
+    type: 'error',
+    status: 400,
+    title: 'collaborator management error',
+    message: 'an editor cannot add others as owner',
+  },
+  52004: {
+    type: 'error',
+    status: 400,
+    title: 'collaborator management error',
+    message: 'collaborator is already in document',
+  },
+  53001: {
+    type: 'error',
+    status: 403,
+    title: 'collaborator management error',
+    message: 'only owners can change others\' role to owner',
+  },
+  53002: {
+    type: 'error',
+    status: 400,
+    title: 'collaborator management error',
+    message: 'collaborator is not in document',
+  },
+  53003: {
+    type: 'error',
+    status: 403,
+    title: 'collaborator management error',
+    message: 'only owners can change an owner\'s role',
+  },
+  53004: {
+    type: 'error',
+    status: 400,
+    title: 'collaborator management error',
+    message: 'only one owner left, needs to assign another user as an owner first',
+  },
+  54001: {
+    type: 'error',
+    status: 400,
+    title: 'collaborator management error',
+    message: 'cannot remove owner from a document',
+  },
   /*============ mock response error ============*/
 };
 
