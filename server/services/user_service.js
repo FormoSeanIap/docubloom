@@ -74,12 +74,6 @@ const getDocs = async (userId) => {
 
 const getUserDetail = async (email) => {
   const user = await User.getUserDetail(email);
-  if (!user) {
-    return {
-      status: 400,
-      error: 'Request Error: user does not exist',
-    };
-  }
   return user;
 };
 

@@ -88,6 +88,12 @@ const MAP = {
     title: 'collaborator management error',
     message: 'user is not in document',
   },
+  50005: {
+    type: 'error',
+    status: 400,
+    title: 'collaborator management error',
+    message: 'doc ID is required',
+  },
   52001: {
     type: 'error',
     status: 400,

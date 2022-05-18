@@ -16,9 +16,9 @@ function asyncHandler(cb) {
   return async (req, res, next) => {
     try {
       await cb(req, res, next);
-    } catch (err) {
-      console.log(err);
-      next(err);
+    } catch (error) {
+      console.error(error);
+      next(error);
     }
   };
 }
@@ -38,13 +38,15 @@ function generateResponse(code) {
 function respondUnauthorized(res) {
   const response = generateResponse(20001);
   const { status, error } = response;
-  return res.status(status).send({ error });
+  res.status(status).send({ error });
+  return;
 }
 
 function respondForbidden(res) {
   const response = generateResponse(20002);
   const { status, error } = response;
-  return res.status(status).send({ error });
+  res.status(status).send({ error });
+  return;
 }
 
 function handleViewerAuth(userRole, res, next) {
@@ -96,6 +98,7 @@ function userAuthentication() {
       const userDetail = await User.getUserDetail(user.email);
       if (!userDetail) {
         respondForbidden(res);
+        return;
       } else {
         req.user.id = userDetail.id;
         req.user.role_id = userDetail.role_id;
@@ -114,7 +117,9 @@ function docAuthorization(roleType) {
 
     const { docId } = req.params;
     if (!docId) {
-      res.status(400).send({ error: 'doc id is required' });
+      const response = generateResponse(50005);
+      const { status, error } = response;
+      res.status(status).send({ error });
       return;
     }
 
@@ -128,7 +133,10 @@ function docAuthorization(roleType) {
 
     const authFunc = authMap[roleType];
     if (!authFunc) {
-      res.status(400).send({ error: 'invalid role' });
+      const response = generateResponse(50003);
+      const { status, error } = response;
+      res.status(status).send({ error });
+      return;
     }
     authFunc(userRole, res, next);
   };
