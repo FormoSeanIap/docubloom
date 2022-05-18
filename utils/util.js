@@ -23,7 +23,7 @@ function asyncHandler(cb) {
   };
 }
 
-function codeToResponse(code) {
+function generateResponse(code) {
   const contents = Response.MAP[code];
   return {
     status: contents.status,
@@ -36,13 +36,13 @@ function codeToResponse(code) {
 }
 
 function respondUnauthorized(res) {
-  const response = codeToResponse(20001);
+  const response = generateResponse(20001);
   const { status, error } = response;
   return res.status(status).send({ error });
 }
 
 function respondForbidden(res) {
-  const response = codeToResponse(20002);
+  const response = generateResponse(20002);
   const { status, error } = response;
   return res.status(status).send({ error });
 }
@@ -153,7 +153,7 @@ const signUpSchema = Joi.object({
 
 export {
   asyncHandler,
-  codeToResponse,
+  generateResponse,
   userAuthentication,
   docAuthorization,
   hashPassword,

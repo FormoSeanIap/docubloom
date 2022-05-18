@@ -3,7 +3,7 @@ import * as User from '../models/user_model.js';
 import Cache from '../../utils/cache.js';
 
 import { DOC_ROLE } from '../../utils/constants.js';
-import { codeToResponse } from '../../utils/util.js';
+import { generateResponse } from '../../utils/util.js';
 
 function getDBDocRole(role) {
   return DOC_ROLE[role.toUpperCase()];
@@ -16,7 +16,7 @@ function getKeysByValue(object, value) {
 const getUsers = async (docId) => {
   const users = await Doc.getUsers(docId);
   if (!users) {
-    return codeToResponse(10001);
+    return generateResponse(10001);
   }
 
   const ownerIds = getKeysByValue(users, DOC_ROLE.OWNER);
@@ -82,7 +82,7 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
 
   const collaboratorId = collaborator.id;
   if (!collaboratorId) {
-    return codeToResponse(10001);
+    return generateResponse(10001);
   }
 
   const collaboratorDBRole = getDBDocRole(collaboratorRole);
@@ -123,7 +123,7 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
 
   const result = await Doc.addUser(docId, collaboratorId, collaboratorDBRole);
   if (result.error) {
-    return codeToResponse(10001);
+    return generateResponse(10001);
   }
 
   return result;
@@ -220,7 +220,7 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
 
     const result = await Doc.updateUser(docId, userId, DBCollaboratorRole);
     if (result.error) {
-      return codeToResponse(10001);
+      return generateResponse(10001);
     }
 
     return result;
@@ -263,7 +263,7 @@ const deleteUser = async (docId, userId) => {
 
     const result = await Doc.deleteUser(docId, userId);
     if (result.error) {
-      return codeToResponse(10001);
+      return generateResponse(10001);
     }
 
     // Delete document if there is no user left
@@ -271,7 +271,7 @@ const deleteUser = async (docId, userId) => {
     if (Object.keys(users).length === 0) {
       const deleteResult = await Doc.deleteDoc(docId);
       if (deleteResult.error) {
-        return codeToResponse(10001);
+        return generateResponse(10001);
       }
     }
 
@@ -296,7 +296,7 @@ const createDoc = async (userId, doc) => {
   }
   const result = await Doc.createDoc(userId, doc);
   if (result.error) {
-    return codeToResponse(10001);
+    return generateResponse(10001);
   }
   return result;
 };
@@ -314,7 +314,7 @@ const editDoc = async (docId, doc) => {
   }
   const result = await Doc.editDoc(docId, doc);
   if (result.error) {
-    return codeToResponse(10001);
+    return generateResponse(10001);
   }
 
   try {
@@ -334,7 +334,7 @@ const editDoc = async (docId, doc) => {
 const deleteDoc = async (docId) => {
   const result = await Doc.deleteDoc(docId);
   if (result.error) {
-    return codeToResponse(10001);
+    return generateResponse(10001);
   }
 
   try {

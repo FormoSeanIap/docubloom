@@ -1,50 +1,21 @@
 import * as User from '../models/user_model.js';
 import { signUpSchema, hashPassword, checkPassword } from '../../utils/util.js';
-import { codeToResponse } from '../../utils/util.js';
+import { generateResponse } from '../../utils/util.js';
 
 const nativeSignIn = async (reqBody) => {
 
   const { email, password } = reqBody;
 
-  if (!email || !password) {
-      return {
-        status: 400,
-        error: {
-          code: 32201,
-          title: 'native sign in fails',
-          message: 'email and password are required',
-        }
-      };
-  }
+  if (!email || !password) return generateResponse(32201);
 
   const user = await User.getUserDetail(email);
-  if (!user) {
-    return {
-      status: 401,
-      error: {
-        code: 32202,
-        title: 'native sign in fails',
-        message: 'email or password incorrect',
-      }
-    };
-  }
+  if (!user) return generateResponse(32202);
 
   const isPasswordCorrect = await checkPassword(password, user.password);
-  if (!isPasswordCorrect) {
-    return {
-      status: 401,
-      error: {
-        code: 32202,
-        title: 'native sign in fails',
-        message: 'email or password incorrect',
-      }
-    };
-  }
+  if (!isPasswordCorrect) return generateResponse(32202);
 
   const result = await User.nativeSignIn(user);
-  if (result.error || !result.user) {
-      return codeToResponse(10001);
-  }
+  if (result.error || !result.user) return generateResponse(10001);
 
   return result;
 };
@@ -53,28 +24,14 @@ const facebookSignIn = async (reqBody) => {
 
   const { access_token } = reqBody;
 
-  return {
-    status: 400,
-    error: {
-      code: 32301,
-      title: 'facebook sign in fails',
-      message: 'facebook sign in is currently under construction',
-    }
-  };
+  return generateResponse(32301);
 };
 
 const googleSignIn = async (reqBody) => {
 
   const { access_token } = reqBody;
 
-  return {
-    status: 400,
-    error: {
-      code: 32301,
-      title: 'google sign in fails',
-      message: 'google sign in is currently under construction',
-    }
-  };
+  return generateResponse(32301);
 };
 
 const signInMap = {
@@ -86,35 +43,15 @@ const signInMap = {
 const signUp = async ( name, email, password ) => {
 
   const validation = signUpSchema.validate({ name, email, password });
-  if (validation.error) {
-    return {
-      status: 400,
-      error: {
-        code: 31001,
-        title: 'sign up fails',
-        message: validation.error.message,
-      }
-    };
-  }
+  if (validation.error) return generateResponse(31001);
 
   const user = await User.getUserDetail(email);
-  if (user) {
-    return {
-      status: 409,
-      error: {
-        code: 31002,
-        title: 'sign up fails',
-        message: 'user already exists',
-      }
-    };
-  }
+  if (user) return generateResponse(31002);
 
   const hashedPassword = await hashPassword(password);
 
   const result = await User.signUp( name, email, hashedPassword );
-  if (result.error || !result.user) {
-    return codeToResponse(10001);
-  }
+  if (result.error || !result.user) return generateResponse(10001);
 
   return result;
 };
@@ -122,16 +59,7 @@ const signUp = async ( name, email, password ) => {
 const signIn = async(reqBody) => {
 
   const signInFunc = signInMap[reqBody.provider];
-  if (!signInFunc) {
-    return {
-      status: 400,
-      error: {
-        code: 32001,
-        title: 'sign in fails',
-        message: 'provider is not supported',
-      }
-    };
-  }
+  if (!signInFunc) return generateResponse(32101);
 
   const signInResult = await signInFunc(reqBody);
   return signInResult;
@@ -139,9 +67,8 @@ const signIn = async(reqBody) => {
 
 const getDocs = async (userId) => {
   const docs = await User.getUserDocs(userId);
-  if(!docs) {
-    return codeToResponse(10001);
-  }
+  if(!docs) return generateResponse(10001);
+
   return docs;
 };
 
