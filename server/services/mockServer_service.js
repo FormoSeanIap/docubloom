@@ -1,65 +1,26 @@
 import 'dotenv/config';
 import * as Doc from '../models/doc_model.js';
+import { generateResponse } from '../../utils/util.js';
 import Cache from '../../utils/cache.js';
 
 const { CACHE_MOCK_RESPONSE_EXPIRE } = process.env;
 
 async function checkDocBasicInfo(docId, path, method, statusCode, contentType) {
   const doc = await Doc.getDoc(docId);
-  if (!doc) {
-    return {
-      status: 400,
-      error: {
-        code: 60001,
-        title: 'get mock response error',
-        message: 'document is not found',
-      }
-    };
-  }
+  if (!doc) return generateResponse(60001);
+
   const targetPathData = doc.data.paths[path];
-  if(!targetPathData) {
-    return {
-      status: 400,
-      error: {
-        code: 60002,
-        title: 'get mock response error',
-        message: 'path is not found',
-      }
-    };
-  }
+  if (!targetPathData) return generateResponse(60002);
+
   const targetMethodData = targetPathData[method];
-  if(!targetMethodData) {
-    return {
-      status: 400,
-      error: {
-        code: 60003,
-        title: 'get mock response error',
-        message: 'method is not found',
-      }
-    };
-  }
+  if (!targetMethodData) return generateResponse(60003);
+
   const targetStatusCodeData = targetMethodData.responses[statusCode];
-  if(!targetStatusCodeData) {
-    return {
-      status: 400,
-      error: {
-        code: 60004,
-        title: 'get mock response error',
-        message: 'status code is not found',
-      }
-    };
-  }
+  if (!targetStatusCodeData) return generateResponse(60004);
+
   const targetContentTypeData = targetStatusCodeData.content[contentType];
-  if(!targetContentTypeData) {
-    return {
-      status: 400,
-      error: {
-        code: 60005,
-        title: 'get mock response error',
-        message: 'content type is not found',
-      }
-    };
-  }
+  if (!targetContentTypeData) return generateResponse(60005);
+
   return targetContentTypeData;
 }
 
@@ -86,16 +47,7 @@ const getExample = async (docId, path, method, statusCode, contentType) => {
   }
 
   const result = targetContentTypeData.example;
-  if (!result) {
-    return {
-      status: 400,
-      error: {
-        code: 60006,
-        title: 'get mock response error',
-        message: 'example is not found',
-      }
-    };
-  }
+  if (!result) return generateResponse(60006);
 
   try {
     if (Cache.ready) {
@@ -131,27 +83,10 @@ const getExampleFromExamples = async (docId, path, method, statusCode, contentTy
     return targetContentTypeData;
   }
   const targetExamplesData = targetContentTypeData.examples;
-  if (!targetExamplesData) {
-    return {
-      status: 400,
-      error: {
-        code: 61001,
-        title: 'get mock response error',
-        message: 'examples is not found',
-      }
-    };
-  }
+  if (!targetExamplesData) return generateResponse(61001);
+
   const result = targetExamplesData[exampleName];
-  if (!result) {
-    return {
-      status: 400,
-      error: {
-        code: 60006,
-        title: 'get mock response error',
-        message: 'example is not found',
-      }
-    };
-  }
+  if (!result) return generateResponse(60006);
 
   try {
     if (Cache.ready) {

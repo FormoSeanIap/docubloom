@@ -143,15 +143,48 @@ const MAP = {
     message: 'cannot remove owner from a document',
   },
   /*============ mock response error ============*/
-};
-
-const controller = async (req, res) => {
-  // Raw input
-  // input to service
-  //output from service
-  // call transfer
-  // if get method => resp.data = output.data
-  // res
+  60001: {
+    type: 'error',
+    status: 400,
+    title: 'get mock response error',
+    message: 'document is not found',
+  },
+  60002: {
+    type: 'error',
+    status: 400,
+    title: 'get mock response error',
+    message: 'path is not found',
+  },
+  60003: {
+    type: 'error',
+    status: 400,
+    title: 'get mock response error',
+    message: 'method is not found',
+  },
+  60004: {
+    type: 'error',
+    status: 400,
+    title: 'get mock response error',
+    message: 'status code is not found',
+  },
+  60005: {
+    type: 'error',
+    status: 400,
+    title: 'get mock response error',
+    message: 'content type is not found',
+  },
+  60006: {
+    type: 'error',
+    status: 400,
+    title: 'get mock response error',
+    message: 'example is not found',
+  },
+  61001: {
+    type: 'error',
+    status: 400,
+    title: 'get mock response error',
+    message: 'examples is not found',
+  },
 };
 
 export {
