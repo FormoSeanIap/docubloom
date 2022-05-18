@@ -2,7 +2,8 @@ import * as Doc from '../models/doc_model.js';
 import * as User from '../models/user_model.js';
 import Cache from '../../utils/cache.js';
 
-import { DOC_ROLE, QUERY_ERR_MSG } from '../../utils/constants.js';
+import { DOC_ROLE } from '../../utils/constants.js';
+import { codeToResponse } from '../../utils/util.js';
 
 function getDBDocRole(role) {
   return DOC_ROLE[role.toUpperCase()];
@@ -15,7 +16,7 @@ function getKeysByValue(object, value) {
 const getUsers = async (docId) => {
   const users = await Doc.getUsers(docId);
   if (!users) {
-    return QUERY_ERR_MSG;
+    return codeToResponse(10001);
   }
 
   const ownerIds = getKeysByValue(users, DOC_ROLE.OWNER);
@@ -81,7 +82,7 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
 
   const collaboratorId = collaborator.id;
   if (!collaboratorId) {
-    return QUERY_ERR_MSG;
+    return codeToResponse(10001);
   }
 
   const collaboratorDBRole = getDBDocRole(collaboratorRole);
@@ -122,7 +123,7 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
 
   const result = await Doc.addUser(docId, collaboratorId, collaboratorDBRole);
   if (result.error) {
-    return QUERY_ERR_MSG;
+    return codeToResponse(10001);
   }
 
   return result;
@@ -163,17 +164,19 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
       };
     }
 
-    if (DBCollaboratorRole === DOC_ROLE.OWNER && userRole !== DOC_ROLE.OWNER) {
+    if (DBCollaboratorRole === DOC_ROLE.OWNER) {
       /*============ Only owners can change others' role to owner ============*/
-      return {
-        status: 403,
-        error: {
-          code: 53001,
-          title: 'collaborator management error',
-          message: 'only owners can change others\' role to owner'
-        }
-      };
-    } else if (DBCollaboratorRole === DOC_ROLE.EDITOR || DBCollaboratorRole === DOC_ROLE.VIEWER) {
+      if (userRole !== DOC_ROLE.OWNER) {
+        return {
+          status: 403,
+          error: {
+            code: 53001,
+            title: 'collaborator management error',
+            message: 'only owners can change others\' role to owner'
+          }
+        };
+      }
+    } else {
       const collaboratorOrigin = await Doc.getUser(docId, userId);
       if (!collaboratorOrigin) {
         return {
@@ -188,13 +191,13 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
       const collaboratorRoleOrigin = collaboratorOrigin[userId];
       if (collaboratorRoleOrigin === DOC_ROLE.OWNER) {
         if (userRole !== DOC_ROLE.OWNER) {
-          /*============ Only owners can change others' role to owner ============*/
+          /*============ Only owners can change an owner's role ============*/
           return {
             status: 403,
             error: {
               code: 53003,
               title: 'collaborator management error',
-              message: 'only owners can change others\' role to owner'
+              message: 'only owners can change an owner\'s role'
             }
           };
         } else {
@@ -217,7 +220,7 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
 
     const result = await Doc.updateUser(docId, userId, DBCollaboratorRole);
     if (result.error) {
-      return QUERY_ERR_MSG;
+      return codeToResponse(10001);
     }
 
     return result;
@@ -260,7 +263,7 @@ const deleteUser = async (docId, userId) => {
 
     const result = await Doc.deleteUser(docId, userId);
     if (result.error) {
-      return QUERY_ERR_MSG;
+      return codeToResponse(10001);
     }
 
     // Delete document if there is no user left
@@ -268,7 +271,7 @@ const deleteUser = async (docId, userId) => {
     if (Object.keys(users).length === 0) {
       const deleteResult = await Doc.deleteDoc(docId);
       if (deleteResult.error) {
-        return QUERY_ERR_MSG;
+        return codeToResponse(10001);
       }
     }
 
@@ -293,7 +296,7 @@ const createDoc = async (userId, doc) => {
   }
   const result = await Doc.createDoc(userId, doc);
   if (result.error) {
-    return QUERY_ERR_MSG;
+    return codeToResponse(10001);
   }
   return result;
 };
@@ -311,7 +314,7 @@ const editDoc = async (docId, doc) => {
   }
   const result = await Doc.editDoc(docId, doc);
   if (result.error) {
-    return QUERY_ERR_MSG;
+    return codeToResponse(10001);
   }
 
   try {
@@ -331,7 +334,7 @@ const editDoc = async (docId, doc) => {
 const deleteDoc = async (docId) => {
   const result = await Doc.deleteDoc(docId);
   if (result.error) {
-    return QUERY_ERR_MSG;
+    return codeToResponse(10001);
   }
 
   try {

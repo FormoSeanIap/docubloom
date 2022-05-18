@@ -1,6 +1,6 @@
 import * as User from '../models/user_model.js';
 import { signUpSchema, hashPassword, checkPassword } from '../../utils/util.js';
-import { QUERY_ERR_MSG } from '../../utils/constants.js';
+import { codeToResponse } from '../../utils/util.js';
 
 const nativeSignIn = async (reqBody) => {
 
@@ -43,7 +43,7 @@ const nativeSignIn = async (reqBody) => {
 
   const result = await User.nativeSignIn(user);
   if (result.error || !result.user) {
-      return QUERY_ERR_MSG.GENERAL;
+      return codeToResponse(10001);
   }
 
   return result;
@@ -113,7 +113,7 @@ const signUp = async ( name, email, password ) => {
 
   const result = await User.signUp( name, email, hashedPassword );
   if (result.error || !result.user) {
-    return QUERY_ERR_MSG.GENERAL;
+    return codeToResponse(10001);
   }
 
   return result;
@@ -140,7 +140,7 @@ const signIn = async(reqBody) => {
 const getDocs = async (userId) => {
   const docs = await User.getUserDocs(userId);
   if(!docs) {
-    return QUERY_ERR_MSG.GENERAL;
+    return codeToResponse(10001);
   }
   return docs;
 };

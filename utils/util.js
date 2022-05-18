@@ -7,7 +7,8 @@ import { promisify } from 'util';
 import * as User from '../server/models/user_model.js';
 import * as Doc from '../server/models/doc_model.js';
 
-import { DOC_ROLE, AUTH_ERR_MSG } from './constants.js';
+import { DOC_ROLE } from './constants.js';
+import * as Response from './responses.js';
 
 const { TOKEN_SECRET } = process.env;
 
@@ -22,12 +23,28 @@ function asyncHandler(cb) {
   };
 }
 
+function codeToResponse(code) {
+  const contents = Response.MAP[code];
+  return {
+    status: contents.status,
+    [contents.type]: {
+      code: code,
+      title: contents.title,
+      message: contents.message,
+    }
+  };
+}
+
 function respondUnauthorized(res) {
-  return res.status(AUTH_ERR_MSG.UNAUTHORIZED.status).send({ error: AUTH_ERR_MSG.UNAUTHORIZED.error });
+  const response = codeToResponse(20001);
+  const { status, error } = response;
+  return res.status(status).send({ error });
 }
 
 function respondForbidden(res) {
-  return res.status(AUTH_ERR_MSG.FORBIDDEN.status).send({ error: AUTH_ERR_MSG.FORBIDDEN.error });
+  const response = codeToResponse(20002);
+  const { status, error } = response;
+  return res.status(status).send({ error });
 }
 
 function handleViewerAuth(userRole, res, next) {
@@ -136,6 +153,7 @@ const signUpSchema = Joi.object({
 
 export {
   asyncHandler,
+  codeToResponse,
   userAuthentication,
   docAuthorization,
   hashPassword,
