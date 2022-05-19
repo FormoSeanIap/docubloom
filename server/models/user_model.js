@@ -1,7 +1,7 @@
 import 'dotenv/config.js';
 import jwt from 'jsonwebtoken';
 import dayjs from 'dayjs';
-import { collection_docs, collection_users } from './mongodb.js';
+import { docCollection, userCollection } from './mongodb.js';
 
 const { TOKEN_EXPIRE, TOKEN_SECRET } = process.env; // 30 days by seconds
 
@@ -27,7 +27,7 @@ const signUp = async (name, email, hash) => {
       updated_dt: updatedDt,
     };
 
-    const result = await collection_users.insertOne(user);
+    const result = await userCollection.insertOne(user);
 
     const accessToken = jwt.sign(
       {
@@ -67,7 +67,7 @@ const nativeSignIn = async (user) => {
     user.access_expired = TOKEN_EXPIRE;
     user.login_at = loginAt;
 
-    await collection_users.findOneAndUpdate(
+    await userCollection.findOneAndUpdate(
       { email: user.email },
       {
         $set: {
@@ -86,7 +86,7 @@ const nativeSignIn = async (user) => {
 
 const getUserDetail = async (email) => {
   try {
-    const user = await collection_users.findOne({ email });
+    const user = await userCollection.findOne({ email });
     user.id = user._id.toHexString();
     delete user._id;
     return user;
@@ -100,7 +100,7 @@ const getUserDocs = async (userId) => {
   try {
     // const rawDocInfos = await collection.find({[`users.${userId}`]: {"$exists": true}}).project({data: 0}).toArray();
 
-    const rawDocInfos = await collection_docs.find({ [`users.${userId}`]: { $exists: true } }).project({ users: 1, 'data.info': 1, 'data.openapi': 1 }).toArray();
+    const rawDocInfos = await docCollection.find({ [`users.${userId}`]: { $exists: true } }).project({ users: 1, 'data.info': 1, 'data.openapi': 1 }).toArray();
 
     const docInfos = rawDocInfos.map((info) => {
       info.id = info._id.toHexString();

@@ -23,6 +23,16 @@ function asyncHandler(cb) {
   };
 }
 
+async function modelWrapper(modelFunc, content) {
+  try {
+    const result = await modelFunc(content);
+    return result;
+  } catch (err) {
+    console.error('error', err);
+    return { error: err };
+  }
+}
+
 function generateResponse(code) {
   const contents = Response.MAP[code];
   return {
@@ -74,7 +84,7 @@ const authMap = {
 };
 
 function userAuthentication() {
-  return async function (req, res, next) {
+  return async (req, res, next) => {
     let accessToken = req.get('Authorization');
     if (!accessToken) {
       respondUnauthorized(res);
@@ -108,7 +118,7 @@ function userAuthentication() {
 }
 
 function docAuthorization(roleType) {
-  return async function (req, res, next) {
+  return async (req, res, next) => {
     const { docId } = req.params;
     if (!docId) {
       const response = generateResponse(50005);

@@ -21,13 +21,15 @@ const nativeSignIn = async (reqBody) => {
 };
 
 const facebookSignIn = async (reqBody) => {
-  const { access_token } = reqBody;
+  // eslint-disable-next-line no-unused-vars
+  const { access_token: accessToken } = reqBody;
 
   return generateResponse(32301);
 };
 
 const googleSignIn = async (reqBody) => {
-  const { access_token } = reqBody;
+  // eslint-disable-next-line no-unused-vars
+  const { access_token: accessToken } = reqBody;
 
   return generateResponse(32301);
 };

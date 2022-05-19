@@ -20,7 +20,7 @@ try {
   console.error('MongoDB connection failed', err);
 }
 
-const collection_docs = db.collection(MONGO_DB_COLLECTION_DOCS);
-const collection_users = db.collection(MONGO_DB_COLLECTION_USERS);
+const docCollection = db.collection(MONGO_DB_COLLECTION_DOCS);
+const userCollection = db.collection(MONGO_DB_COLLECTION_USERS);
 
-export { client, collection_docs, collection_users };
+export { client, docCollection, userCollection };

@@ -36,11 +36,12 @@ app.use(`/api/${API_VERSION}/docs`, /* rateLimiterRoute, */ [docRoute]);
 app.use(`/api/${API_VERSION}/mock-server`, /* rateLimiterRoute, */ [mockServerRoute]);
 
 // Page not found
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.status(404).send('page not found');
 });
 
 // Error handling
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.log(err);
   res.status(500).send('Internal Server Error');

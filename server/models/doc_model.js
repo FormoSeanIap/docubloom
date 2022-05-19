@@ -1,13 +1,13 @@
 import 'dotenv/config.js';
 import { ObjectId } from 'mongodb';
-import { collection_docs, collection_users } from './mongodb.js';
+import { docCollection, userCollection } from './mongodb.js';
 import { DOC_ROLE } from '../../utils/constants.js';
 
 // TODO: what should I return if catch error?
 
 const getUser = async (docId, userId) => {
   try {
-    const user = await collection_docs.findOne(
+    const user = await docCollection.findOne(
       {
         $and: [
           { _id: ObjectId(docId) },
@@ -25,7 +25,7 @@ const getUser = async (docId, userId) => {
 
 const getUsers = async (docId) => {
   try {
-    const users = await collection_docs.findOne({ _id: ObjectId(docId) }, { projection: { _id: 0, users: 1 } });
+    const users = await docCollection.findOne({ _id: ObjectId(docId) }, { projection: { _id: 0, users: 1 } });
     return users.users;
   } catch (error) {
     console.error('get users error:', error.message);
@@ -35,7 +35,7 @@ const getUsers = async (docId) => {
 
 const getOwner = async (ownerId) => {
   try {
-    const owner = await collection_users.findOne({ _id: ObjectId(ownerId) }, { projection: { _id: 0, name: 1, email: 1 } });
+    const owner = await userCollection.findOne({ _id: ObjectId(ownerId) }, { projection: { _id: 0, name: 1, email: 1 } });
     return owner;
   } catch (error) {
     console.error('get owner error:', error.message);
@@ -45,7 +45,7 @@ const getOwner = async (ownerId) => {
 
 const getEditor = async (editorId) => {
   try {
-    const editor = await collection_users.findOne({ _id: ObjectId(editorId) }, { projection: { name: 1, email: 1, _id: 0 } });
+    const editor = await userCollection.findOne({ _id: ObjectId(editorId) }, { projection: { name: 1, email: 1, _id: 0 } });
     return editor;
   } catch (error) {
     console.error('get editor error:', error.message);
@@ -55,7 +55,7 @@ const getEditor = async (editorId) => {
 
 const getViewer = async (viewerId) => {
   try {
-    const viewer = await collection_users.findOne({ _id: ObjectId(viewerId) }, { projection: { name: 1, email: 1, _id: 0 } });
+    const viewer = await userCollection.findOne({ _id: ObjectId(viewerId) }, { projection: { name: 1, email: 1, _id: 0 } });
     return viewer;
   } catch (error) {
     console.error('get viewer error:', error.message);
@@ -65,7 +65,7 @@ const getViewer = async (viewerId) => {
 
 const addUser = async (docId, userId, role) => {
   try {
-    const result = await collection_docs.findOneAndUpdate(
+    const result = await docCollection.findOneAndUpdate(
       { _id: ObjectId(docId) },
       { $set: { [`users.${userId}`]: role } },
       { returnOriginal: false, returnDocument: 'after' },
@@ -79,7 +79,7 @@ const addUser = async (docId, userId, role) => {
 
 const updateUser = async (docId, userId, role) => {
   try {
-    const result = await collection_docs.findOneAndUpdate(
+    const result = await docCollection.findOneAndUpdate(
       { _id: ObjectId(docId) },
       { $set: { [`users.${userId}`]: role } },
       { returnOriginal: false, returnDocument: 'after' },
@@ -93,7 +93,7 @@ const updateUser = async (docId, userId, role) => {
 
 const deleteUser = async (docId, userId) => {
   try {
-    const result = await collection_docs.findOneAndUpdate(
+    const result = await docCollection.findOneAndUpdate(
       { _id: ObjectId(docId) },
       { $unset: { [`users.${userId}`]: 1 } },
       { returnOriginal: false, returnDocument: 'after' },
@@ -107,7 +107,7 @@ const deleteUser = async (docId, userId) => {
 
 const getDoc = async (docId) => {
   try {
-    const doc = await collection_docs.findOne({ _id: ObjectId(docId) }, { projection: { data: 1, _id: 0 } });
+    const doc = await docCollection.findOne({ _id: ObjectId(docId) }, { projection: { data: 1, _id: 0 } });
     return doc;
   } catch (error) {
     console.error('get doc error:', error.message);
@@ -117,7 +117,7 @@ const getDoc = async (docId) => {
 
 const createDoc = async (userId, doc) => {
   try {
-    const result = await collection_docs.insertOne({
+    const result = await docCollection.insertOne({
       users: { [userId]: DOC_ROLE.OWNER },
       data: doc,
     });
@@ -130,7 +130,7 @@ const createDoc = async (userId, doc) => {
 
 const editDoc = async (docId, doc) => {
   try {
-    const result = await collection_docs.findOneAndUpdate(
+    const result = await docCollection.findOneAndUpdate(
       { _id: ObjectId(docId) },
       { $set: { data: doc } },
     );
@@ -143,7 +143,7 @@ const editDoc = async (docId, doc) => {
 
 const deleteDoc = async (docId) => {
   try {
-    const result = await collection_docs.deleteOne({ _id: ObjectId(docId) });
+    const result = await docCollection.deleteOne({ _id: ObjectId(docId) });
     return result;
   } catch (error) {
     console.error('delete doc error:', error.message);
@@ -153,7 +153,7 @@ const deleteDoc = async (docId) => {
 
 const getDocRole = async (userId, docId) => {
   try {
-    const result = await collection_docs.findOne({ _id: ObjectId(docId) }, { projection: { [`users.${userId}`]: 1, _id: 0 } });
+    const result = await docCollection.findOne({ _id: ObjectId(docId) }, { projection: { [`users.${userId}`]: 1, _id: 0 } });
     return result.users[userId];
   } catch (error) {
     return null;
