@@ -53,6 +53,7 @@ const nativeSignIn = async (user) => {
     const loginAt = dayjs().format();
     const updatedDt = dayjs().format();
 
+    // TODO: move this to util
     const accessToken = jwt.sign(
       {
         provider: user.provider,
