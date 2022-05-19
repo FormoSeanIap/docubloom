@@ -45,6 +45,19 @@ function generateResponse(code) {
   };
 }
 
+function respondPageNotFound(res) {
+  const response = generateResponse(10001);
+  const { status, error } = response;
+  res.status(status).send({ error });
+}
+
+function respondServerErr(err, res) {
+  console.error(err);
+  const response = generateResponse(10002);
+  const { status, error } = response;
+  res.status(status).send({ error });
+}
+
 function respondUnauthorized(res) {
   const response = generateResponse(20001);
   const { status, error } = response;
@@ -168,6 +181,8 @@ const signUpSchema = Joi.object({
 export {
   asyncHandler,
   generateResponse,
+  respondPageNotFound,
+  respondServerErr,
   userAuthentication,
   docAuthorization,
   hashPassword,

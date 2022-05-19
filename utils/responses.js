@@ -1,6 +1,18 @@
 const MAP = {
-  /*= =========== query error ============ */
+  /*= =========== general error ============ */
   10001: {
+    type: 'error',
+    status: 404,
+    title: 'page not found',
+    message: 'page not found',
+  },
+  10002: {
+    type: 'error',
+    status: 500,
+    title: 'internal server error',
+    message: 'internal server error',
+  },
+  10003: {
     type: 'error',
     status: 500,
     title: 'query fails',
