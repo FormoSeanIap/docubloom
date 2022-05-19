@@ -8,7 +8,7 @@ import * as User from '../server/models/user_model.js';
 import * as Doc from '../server/models/doc_model.js';
 
 import { DOC_ROLE } from './constants.js';
-import * as Response from './responses.js';
+import ResMap from './responses.js';
 
 const { TOKEN_SECRET } = process.env;
 
@@ -34,7 +34,7 @@ async function modelWrapper(modelFunc, content) {
 }
 
 function generateResponse(code) {
-  const contents = Response.MAP[code];
+  const contents = ResMap[code];
   return {
     status: contents.status,
     [contents.type]: {

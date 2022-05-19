@@ -205,6 +205,4 @@ const MAP = {
   },
 };
 
-export {
-  MAP,
-};
+export default MAP;
