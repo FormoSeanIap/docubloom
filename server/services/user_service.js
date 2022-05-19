@@ -29,7 +29,11 @@ const nativeSignIn = async (reqBody) => {
   const signInResult = await User.nativeSignIn(userRaw, loginAt, updateDt);
   if (signInResult.error) return generateResponse(10003);
 
-  const { accessToken, accTokenExp } = await generateAccessToken(user);
+  const { accessToken, accTokenExp } = await generateAccessToken({
+    provider: 'native',
+    name: user.name,
+    email: user.email,
+  });
 
   const signedInUser = {
     user: {
@@ -73,10 +77,34 @@ const signUp = async (name, email, password) => {
 
   const hashedPassword = await hashPassword(password);
 
-  const result = await User.signUp(name, email, hashedPassword);
-  if (result.error || !result.user) return generateResponse(10003);
+  const loginAt = getCurrentTime();
+  const createdDt = getCurrentTime();
+  const updatedDt = getCurrentTime();
 
-  return result;
+  const user = {
+    provider: 'native',
+    email,
+    password: hashedPassword,
+    name,
+    last_login_at: loginAt,
+    created_dt: createdDt,
+    updated_dt: updatedDt,
+  };
+
+  const result = await User.signUp(user);
+  if (result.error) return generateResponse(10003);
+
+  const { accessToken, accTokenExp } = await generateAccessToken({
+    provider: 'native',
+    name: user.name,
+    email: user.email,
+  });
+
+  user.access_token = accessToken;
+  user.access_expired = accTokenExp;
+  user.id = result.insertedId.toHexString();
+
+  return { user };
 };
 
 const signIn = async (reqBody) => {

@@ -138,17 +138,17 @@ function userAuthentication() {
       return;
     }
 
-    const userDetailCheck = await User.getUserDetail(user.email);
-    if (userDetailCheck.error) {
-      respondQueryErr(res);
-      return;
-    }
-    if (userDetailCheck === null) {
+    const userDetailResult = await User.getUserDetail(user.email);
+    if (userDetailResult === null) {
       respondForbidden(res);
       return;
     }
+    if (userDetailResult.error) {
+      respondQueryErr(res);
+      return;
+    }
 
-    const userDetail = convertMongoId(userDetailCheck);
+    const userDetail = convertMongoId(userDetailResult);
 
     req.user = user;
     req.user.id = userDetail.id;
@@ -187,7 +187,7 @@ function docAuthorization(roleType) {
 
 async function generateAccessToken(user) {
   const accessToken = await promisify(jwt.sign)(
-    { user },
+    user,
     TOKEN_SECRET,
     { expiresIn: TOKEN_EXPIRE },
   );

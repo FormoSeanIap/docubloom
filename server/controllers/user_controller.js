@@ -16,7 +16,7 @@ const signUp = async (req, res) => {
     data: {
       access_token: user.access_token,
       access_expired: user.access_expired,
-      login_at: user.login_at,
+      login_at: user.last_login_at,
       user: {
         id: user.id,
         name: user.name,
