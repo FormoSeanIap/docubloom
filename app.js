@@ -45,4 +45,4 @@ app.use((req, res) => respondPageNotFound(res));
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => respondServerErr(err, res));
 
-server.listen(port, () => console.log(`Listening on port: ${port}`));
+server.listen(port, () => console.log(`Listening on port ${port} in ${NODE_ENV} mode`));
