@@ -98,7 +98,9 @@ const getUserDetail = async (email) => {
 
 const getUserDocs = async (userId) => {
   try {
-    // const rawDocInfos = await collection.find({[`users.${userId}`]: {"$exists": true}}).project({data: 0}).toArray();
+    // const rawDocInfos = await collection
+    // .find({[`users.${userId}`]: {"$exists": true}}).project({data: 0})
+    // .toArray();
 
     const rawDocInfos = await docCollection.find({ [`users.${userId}`]: { $exists: true } }).project({ users: 1, 'data.info': 1, 'data.openapi': 1 }).toArray();
 
@@ -106,7 +108,9 @@ const getUserDocs = async (userId) => {
       info.id = info._id.toHexString();
       delete info._id;
 
-      info.role = Object.keys(DOC_ROLE).find((key) => DOC_ROLE[key] === info.users[userId]).toLowerCase();
+      info.role = Object.keys(DOC_ROLE)
+        .find((key) => DOC_ROLE[key] === info.users[userId])
+        .toLowerCase();
       delete info.users;
 
       if (info.data && info.data.info) {

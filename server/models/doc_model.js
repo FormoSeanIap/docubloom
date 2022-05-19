@@ -25,7 +25,10 @@ const getUser = async (docId, userId) => {
 
 const getUsers = async (docId) => {
   try {
-    const users = await docCollection.findOne({ _id: ObjectId(docId) }, { projection: { _id: 0, users: 1 } });
+    const users = await docCollection.findOne(
+      { _id: ObjectId(docId) },
+      { projection: { _id: 0, users: 1 } },
+    );
     return users.users;
   } catch (error) {
     console.error('get users error:', error.message);
@@ -35,7 +38,10 @@ const getUsers = async (docId) => {
 
 const getOwner = async (ownerId) => {
   try {
-    const owner = await userCollection.findOne({ _id: ObjectId(ownerId) }, { projection: { _id: 0, name: 1, email: 1 } });
+    const owner = await userCollection.findOne(
+      { _id: ObjectId(ownerId) },
+      { projection: { _id: 0, name: 1, email: 1 } },
+    );
     return owner;
   } catch (error) {
     console.error('get owner error:', error.message);
@@ -45,7 +51,10 @@ const getOwner = async (ownerId) => {
 
 const getEditor = async (editorId) => {
   try {
-    const editor = await userCollection.findOne({ _id: ObjectId(editorId) }, { projection: { name: 1, email: 1, _id: 0 } });
+    const editor = await userCollection.findOne(
+      { _id: ObjectId(editorId) },
+      { projection: { name: 1, email: 1, _id: 0 } },
+    );
     return editor;
   } catch (error) {
     console.error('get editor error:', error.message);
@@ -55,7 +64,10 @@ const getEditor = async (editorId) => {
 
 const getViewer = async (viewerId) => {
   try {
-    const viewer = await userCollection.findOne({ _id: ObjectId(viewerId) }, { projection: { name: 1, email: 1, _id: 0 } });
+    const viewer = await userCollection.findOne(
+      { _id: ObjectId(viewerId) },
+      { projection: { name: 1, email: 1, _id: 0 } },
+    );
     return viewer;
   } catch (error) {
     console.error('get viewer error:', error.message);
@@ -107,7 +119,10 @@ const deleteUser = async (docId, userId) => {
 
 const getDoc = async (docId) => {
   try {
-    const doc = await docCollection.findOne({ _id: ObjectId(docId) }, { projection: { data: 1, _id: 0 } });
+    const doc = await docCollection.findOne(
+      { _id: ObjectId(docId) },
+      { projection: { data: 1, _id: 0 } },
+    );
     return doc;
   } catch (error) {
     console.error('get doc error:', error.message);
