@@ -7,6 +7,7 @@ const { CACHE_MOCK_RESPONSE_EXPIRE } = process.env;
 async function checkDocBasicInfo(docId, path, method, statusCode, contentType) {
   const doc = await Doc.getDoc(docId);
   if (!doc) return generateResponse(60001);
+  if (doc.error) return generateResponse(10003);
 
   const targetPathData = doc.data.paths[path];
   if (!targetPathData) return generateResponse(60002);

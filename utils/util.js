@@ -141,11 +141,10 @@ function docAuthorization(roleType) {
     }
 
     const userId = req.user.id;
-    const userRole = await Doc.getDocRole(userId, docId);
-    if (!userRole) {
-      respondForbidden(res);
-      return;
-    }
+    const userRoleCheck = await Doc.getDocRole(userId, docId);
+    if (userRoleCheck.error) generateResponse(10003);
+
+    const userRole = userRoleCheck.users[userId];
     req.user.role = userRole;
 
     const authFunc = authMap[roleType];

@@ -7,7 +7,7 @@ import { DOC_ROLE } from '../../utils/constants.js';
 
 const getUser = async (docId, userId) => {
   try {
-    const user = await docCollection.findOne(
+    return await docCollection.findOne(
       {
         $and: [
           { _id: ObjectId(docId) },
@@ -16,73 +16,67 @@ const getUser = async (docId, userId) => {
       },
       { projection: { [`users.${userId}`]: 1, _id: 0 } },
     );
-    return user.users;
   } catch (error) {
-    // console.error('get user error:', error.message);
-    return null;
+    console.error('get user error:', error.message);
+    return { error: error.message };
   }
 };
 
 const getUsers = async (docId) => {
   try {
-    const users = await docCollection.findOne(
+    return await docCollection.findOne(
       { _id: ObjectId(docId) },
       { projection: { _id: 0, users: 1 } },
     );
-    return users.users;
   } catch (error) {
     console.error('get users error:', error.message);
-    return null;
+    return { error: error.message };
   }
 };
 
 const getOwner = async (ownerId) => {
   try {
-    const owner = await userCollection.findOne(
+    return await userCollection.findOne(
       { _id: ObjectId(ownerId) },
       { projection: { _id: 0, name: 1, email: 1 } },
     );
-    return owner;
   } catch (error) {
     console.error('get owner error:', error.message);
-    return null;
+    return { error: error.message };
   }
 };
 
 const getEditor = async (editorId) => {
   try {
-    const editor = await userCollection.findOne(
+    return await userCollection.findOne(
       { _id: ObjectId(editorId) },
       { projection: { name: 1, email: 1, _id: 0 } },
     );
-    return editor;
   } catch (error) {
     console.error('get editor error:', error.message);
-    return null;
+    return { error: error.message };
   }
 };
 
 const getViewer = async (viewerId) => {
   try {
-    const viewer = await userCollection.findOne(
+    return await userCollection.findOne(
       { _id: ObjectId(viewerId) },
       { projection: { name: 1, email: 1, _id: 0 } },
     );
-    return viewer;
   } catch (error) {
     console.error('get viewer error:', error.message);
-    return null;
+    return { error: error.message };
   }
 };
 
 const addUser = async (docId, userId, role) => {
   try {
-    const result = await docCollection.findOneAndUpdate(
+    return await docCollection.findOneAndUpdate(
       { _id: ObjectId(docId) },
       { $set: { [`users.${userId}`]: role } },
       { returnOriginal: false, returnDocument: 'after' },
     );
-    return result;
   } catch (error) {
     console.error('add user error:', error.message);
     return { error: error.message };
@@ -91,12 +85,11 @@ const addUser = async (docId, userId, role) => {
 
 const updateUser = async (docId, userId, role) => {
   try {
-    const result = await docCollection.findOneAndUpdate(
+    return await docCollection.findOneAndUpdate(
       { _id: ObjectId(docId) },
       { $set: { [`users.${userId}`]: role } },
       { returnOriginal: false, returnDocument: 'after' },
     );
-    return result;
   } catch (error) {
     console.error('update user error:', error.message);
     return { error: error.message };
@@ -105,12 +98,11 @@ const updateUser = async (docId, userId, role) => {
 
 const deleteUser = async (docId, userId) => {
   try {
-    const result = await docCollection.findOneAndUpdate(
+    return await docCollection.findOneAndUpdate(
       { _id: ObjectId(docId) },
       { $unset: { [`users.${userId}`]: 1 } },
       { returnOriginal: false, returnDocument: 'after' },
     );
-    return result;
   } catch (error) {
     console.error('delete user from doc error:', error.message);
     return { error: error.message };
@@ -119,24 +111,22 @@ const deleteUser = async (docId, userId) => {
 
 const getDoc = async (docId) => {
   try {
-    const doc = await docCollection.findOne(
+    return await docCollection.findOne(
       { _id: ObjectId(docId) },
       { projection: { data: 1, _id: 0 } },
     );
-    return doc;
   } catch (error) {
     console.error('get doc error:', error.message);
-    return null;
+    return { error: error.message };
   }
 };
 
 const createDoc = async (userId, doc) => {
   try {
-    const result = await docCollection.insertOne({
+    return await docCollection.insertOne({
       users: { [userId]: DOC_ROLE.OWNER },
       data: doc,
     });
-    return result;
   } catch (error) {
     console.error('create doc error:', error.message);
     return { error: error.message };
@@ -145,11 +135,10 @@ const createDoc = async (userId, doc) => {
 
 const editDoc = async (docId, doc) => {
   try {
-    const result = await docCollection.findOneAndUpdate(
+    return await docCollection.findOneAndUpdate(
       { _id: ObjectId(docId) },
       { $set: { data: doc } },
     );
-    return result;
   } catch (error) {
     console.error('edit doc error:', error.message);
     return { error: error.message };
@@ -168,10 +157,13 @@ const deleteDoc = async (docId) => {
 
 const getDocRole = async (userId, docId) => {
   try {
-    const result = await docCollection.findOne({ _id: ObjectId(docId) }, { projection: { [`users.${userId}`]: 1, _id: 0 } });
-    return result.users[userId];
+    return await docCollection.findOne(
+      { _id: ObjectId(docId) },
+      { projection: { [`users.${userId}`]: 1, _id: 0 } },
+    );
   } catch (error) {
-    return null;
+    console.error('get doc role error:', error.message);
+    return { error: error.message };
   }
 };
 
