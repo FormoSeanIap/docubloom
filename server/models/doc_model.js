@@ -7,7 +7,7 @@ import { DOC_ROLE } from '../../utils/constants.js';
 
 const getUser = async (docId, userId) => {
   try {
-    const user = await docCollection.findOne(
+    return await docCollection.findOne(
       {
         $and: [
           { _id: ObjectId(docId) },
@@ -16,10 +16,9 @@ const getUser = async (docId, userId) => {
       },
       { projection: { [`users.${userId}`]: 1, _id: 0 } },
     );
-    return user.users;
   } catch (error) {
-    // console.error('get user error:', error.message);
-    return null;
+    console.error('get user error:', error.message);
+    return { error: error.message };
   }
 };
 

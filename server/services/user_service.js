@@ -15,7 +15,7 @@ const nativeSignIn = async (reqBody) => {
   if (!isPasswordCorrect) return generateResponse(32202);
 
   const result = await User.nativeSignIn(user);
-  if (result.error || !result.user) return generateResponse(10001);
+  if (result.error || !result.user) return generateResponse(10003);
 
   return result;
 };
@@ -50,7 +50,7 @@ const signUp = async (name, email, password) => {
   const hashedPassword = await hashPassword(password);
 
   const result = await User.signUp(name, email, hashedPassword);
-  if (result.error || !result.user) return generateResponse(10001);
+  if (result.error || !result.user) return generateResponse(10003);
 
   return result;
 };
@@ -65,7 +65,7 @@ const signIn = async (reqBody) => {
 
 const getDocs = async (userId) => {
   const docs = await User.getUserDocs(userId);
-  if (!docs) return generateResponse(10001);
+  if (!docs) return generateResponse(10003);
 
   return docs;
 };
