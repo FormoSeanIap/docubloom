@@ -3,7 +3,7 @@ import * as User from '../models/user_model.js';
 import Cache from '../../utils/cache.js';
 
 import { DOC_ROLE } from '../../utils/constants.js';
-import { generateResponse } from '../../utils/util.js';
+import { generateResponse, convertMongoId } from '../../utils/util.js';
 
 function getDBDocRole(role) {
   return DOC_ROLE[role.toUpperCase()];
@@ -48,9 +48,11 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
   if (!collaboratorEmail) return generateResponse(52001);
   if (!collaboratorRole) return generateResponse(50002);
 
-  const collaborator = await User.getUserDetail(collaboratorEmail);
-  if (!collaborator) return generateResponse(52002);
+  const collaboratorCheck = await User.getUserDetail(collaboratorEmail);
+  if (collaboratorCheck === null) return generateResponse(52002);
+  if (collaboratorCheck.error) return generateResponse(10003);
 
+  const collaborator = convertMongoId(collaboratorCheck);
   const collaboratorId = collaborator.id;
   if (!collaboratorId) return generateResponse(10003);
 

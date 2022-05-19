@@ -90,15 +90,24 @@ const nativeSignIn = async (user) => {
 
 const getUserDetail = async (email) => {
   try {
-    const user = await userCollection.findOne({ email });
-    user.id = user._id.toHexString();
-    delete user._id;
-    return user;
-  } catch (err) {
-    // console.error('get user detail error:', err);
-    return null;
+    return await userCollection.findOne({ email });
+  } catch (error) {
+    console.error('get user detail error:', error);
+    return { error: error.message };
   }
 };
+
+// const getUserDetail = async (email) => {
+//   try {
+//     const user = await userCollection.findOne({ email });
+//     user.id = user._id.toHexString();
+//     delete user._id;
+//     return user;
+//   } catch (err) {
+//     console.error('get user detail error:', err);
+//     return null;
+//   }
+// };
 
 const getUserDocs = async (userId) => {
   try {

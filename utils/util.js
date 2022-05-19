@@ -12,6 +12,13 @@ import ResMap from './responses.js';
 
 const { TOKEN_SECRET } = process.env;
 
+function convertMongoId(obj) {
+  const newObj = obj;
+  newObj.id = obj._id.toHexString();
+  delete newObj._id;
+  return newObj;
+}
+
 function asyncHandler(cb) {
   return async (req, res, next) => {
     try {
@@ -45,6 +52,7 @@ function generateResponse(code) {
   };
 }
 
+// TODO: handle duplicate format
 function respondPageNotFound(res) {
   const response = generateResponse(10001);
   const { status, error } = response;
@@ -54,6 +62,12 @@ function respondPageNotFound(res) {
 function respondServerErr(err, res) {
   console.error(err);
   const response = generateResponse(10002);
+  const { status, error } = response;
+  res.status(status).send({ error });
+}
+
+function respondQueryErr(res) {
+  const response = generateResponse(10003);
   const { status, error } = response;
   res.status(status).send({ error });
 }
@@ -110,23 +124,31 @@ function userAuthentication() {
       return;
     }
 
+    let user;
+
     try {
-      const user = await promisify(jwt.verify)(accessToken, TOKEN_SECRET);
-      req.user = user;
-
-      const userDetail = await User.getUserDetail(user.email);
-      if (!userDetail) {
-        respondForbidden(res);
-        return;
-      }
-      req.user.id = userDetail.id;
-      req.user.role_id = userDetail.role_id;
-      next();
-
-      return;
+      user = await promisify(jwt.verify)(accessToken, TOKEN_SECRET);
     } catch (err) {
       respondForbidden(res);
+      return;
     }
+
+    const userDetailCheck = await User.getUserDetail(user.email);
+    if (userDetailCheck.error) {
+      respondQueryErr(res);
+      return;
+    }
+    if (userDetailCheck === null) {
+      respondForbidden(res);
+      return;
+    }
+
+    const userDetail = convertMongoId(userDetailCheck);
+
+    req.user = user;
+    req.user.id = userDetail.id;
+    req.user.role_id = userDetail.role_id;
+    next();
   };
 }
 
@@ -179,6 +201,7 @@ const signUpSchema = Joi.object({
 
 export {
   asyncHandler,
+  convertMongoId,
   generateResponse,
   respondPageNotFound,
   respondServerErr,
