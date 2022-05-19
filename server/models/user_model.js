@@ -63,9 +63,12 @@ const nativeSignIn = async (user) => {
       { expiresIn: TOKEN_EXPIRE },
     );
 
-    user.access_token = accessToken;
-    user.access_expired = TOKEN_EXPIRE;
-    user.login_at = loginAt;
+    const signInUser = {
+      ...user,
+      access_token: accessToken,
+      access_expired: TOKEN_EXPIRE,
+      login_at: loginAt,
+    };
 
     await userCollection.findOneAndUpdate(
       { email: user.email },
@@ -77,7 +80,7 @@ const nativeSignIn = async (user) => {
       },
     );
 
-    return { user };
+    return { user: signInUser };
   } catch (error) {
     console.error('native sign in error:', error);
     return { error };
@@ -99,35 +102,67 @@ const getUserDetail = async (email) => {
 const getUserDocs = async (userId) => {
   try {
     // const rawDocInfos = await collection
-    // .find({[`users.${userId}`]: {"$exists": true}}).project({data: 0})
+    // .find({[`users.${userId}`]: {"$exists": true}})
+    // .project({data: 0})
     // .toArray();
 
-    const rawDocInfos = await docCollection.find({ [`users.${userId}`]: { $exists: true } }).project({ users: 1, 'data.info': 1, 'data.openapi': 1 }).toArray();
+    const rawDocInfos = await docCollection
+      .find({ [`users.${userId}`]: { $exists: true } })
+      .project({ users: 1, 'data.info': 1, 'data.openapi': 1 })
+      .toArray();
 
+    // TODO: move this function out of this func
     const docInfos = rawDocInfos.map((info) => {
-      info.id = info._id.toHexString();
-      delete info._id;
+      const newInfo = { ...info };
 
-      info.role = Object.keys(DOC_ROLE)
+      newInfo.id = info._id.toHexString();
+      delete newInfo._id;
+
+      newInfo.role = Object.keys(DOC_ROLE)
         .find((key) => DOC_ROLE[key] === info.users[userId])
         .toLowerCase();
-      delete info.users;
+      delete newInfo.users;
 
       if (info.data && info.data.info) {
-        info.info = info.data.info;
+        newInfo.info = info.data.info;
       } else {
-        info.info = '';
+        newInfo.info = '';
       }
 
       if (info.data && info.data.openapi) {
-        info.openapi = info.data.openapi;
+        newInfo.openapi = info.data.openapi;
       } else {
-        info.openapi = '';
+        newInfo.openapi = '';
       }
-      delete info.data;
+      delete newInfo.data;
 
-      return info;
+      return newInfo;
     });
+
+    // const docInfos = rawDocInfos.map((info) => {
+    //   info.id = info._id.toHexString();
+    //   delete info._id;
+
+    //   info.role = Object.keys(DOC_ROLE)
+    //     .find((key) => DOC_ROLE[key] === info.users[userId])
+    //     .toLowerCase();
+    //   delete info.users;
+
+    //   if (info.data && info.data.info) {
+    //     info.info = info.data.info;
+    //   } else {
+    //     info.info = '';
+    //   }
+
+    //   if (info.data && info.data.openapi) {
+    //     info.openapi = info.data.openapi;
+    //   } else {
+    //     info.openapi = '';
+    //   }
+    //   delete info.data;
+
+    //   return info;
+    // });
 
     return docInfos;
   } catch (err) {
