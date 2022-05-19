@@ -2,6 +2,7 @@ import 'dotenv/config.js';
 import argon2 from 'argon2';
 import jwt from 'jsonwebtoken';
 import Joi from 'joi';
+import dayjs from 'dayjs';
 import { promisify } from 'util';
 
 import * as User from '../server/models/user_model.js';
@@ -10,13 +11,10 @@ import * as Doc from '../server/models/doc_model.js';
 import { DOC_ROLE } from './constants.js';
 import ResMap from './responses.js';
 
-const { TOKEN_SECRET } = process.env;
+const { TOKEN_SECRET, TOKEN_EXPIRE } = process.env;
 
-function convertMongoId(obj) {
-  const newObj = obj;
-  newObj.id = obj._id.toHexString();
-  delete newObj._id;
-  return newObj;
+function getCurrentTime() {
+  return dayjs().format();
 }
 
 function asyncHandler(cb) {
@@ -38,6 +36,13 @@ async function modelWrapper(modelFunc, content) {
     console.error('error', err);
     return { error: err };
   }
+}
+
+function convertMongoId(obj) {
+  const newObj = obj;
+  newObj.id = obj._id.toHexString();
+  delete newObj._id;
+  return newObj;
 }
 
 function generateResponse(code) {
@@ -180,6 +185,29 @@ function docAuthorization(roleType) {
   };
 }
 
+async function generateAccessToken(user) {
+  const accessToken = await promisify(jwt.sign)(
+    { user },
+    TOKEN_SECRET,
+    { expiresIn: TOKEN_EXPIRE },
+  );
+  return {
+    accessToken,
+    accTokenExp: TOKEN_EXPIRE,
+  };
+}
+
+// TODO: move this to util
+// const accessToken = jwt.sign(
+//   {
+//     provider: user.provider,
+//     name: user.name,
+//     email: user.email,
+//   },
+//   TOKEN_SECRET,
+//   { expiresIn: TOKEN_EXPIRE },
+// );
+
 async function hashPassword(password) {
   const hashResult = await argon2.hash(password);
   return hashResult;
@@ -200,6 +228,7 @@ const signUpSchema = Joi.object({
 });
 
 export {
+  getCurrentTime,
   asyncHandler,
   convertMongoId,
   generateResponse,
@@ -207,6 +236,7 @@ export {
   respondServerErr,
   userAuthentication,
   docAuthorization,
+  generateAccessToken,
   hashPassword,
   checkPassword,
   signUpSchema,

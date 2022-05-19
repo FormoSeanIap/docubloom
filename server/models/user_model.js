@@ -42,30 +42,9 @@ const signUp = async (name, email, hash) => {
   }
 };
 
-const nativeSignIn = async (user) => {
+const nativeSignIn = async (user, loginAt, updatedDt) => {
   try {
-    const loginAt = dayjs().format();
-    const updatedDt = dayjs().format();
-
-    // TODO: move this to util
-    const accessToken = jwt.sign(
-      {
-        provider: user.provider,
-        name: user.name,
-        email: user.email,
-      },
-      TOKEN_SECRET,
-      { expiresIn: TOKEN_EXPIRE },
-    );
-
-    const signInUser = {
-      ...user,
-      access_token: accessToken,
-      access_expired: TOKEN_EXPIRE,
-      login_at: loginAt,
-    };
-
-    await userCollection.findOneAndUpdate(
+    return await userCollection.findOneAndUpdate(
       { email: user.email },
       {
         $set: {
@@ -74,8 +53,6 @@ const nativeSignIn = async (user) => {
         },
       },
     );
-
-    return { user: signInUser };
   } catch (error) {
     console.error('native sign in error:', error);
     return { error: error.message };

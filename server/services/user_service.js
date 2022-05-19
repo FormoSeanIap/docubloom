@@ -1,6 +1,12 @@
 import * as User from '../models/user_model.js';
 import {
-  signUpSchema, hashPassword, checkPassword, generateResponse, convertMongoId,
+  signUpSchema,
+  hashPassword,
+  checkPassword,
+  generateResponse,
+  convertMongoId,
+  generateAccessToken,
+  getCurrentTime,
 } from '../../utils/util.js';
 import { DOC_ROLE } from '../../utils/constants.js';
 
@@ -9,18 +15,32 @@ const nativeSignIn = async (reqBody) => {
 
   if (!email || !password) return generateResponse(32201);
 
-  const userCheck = await User.getUserDetail(email);
-  if (userCheck === null) return generateResponse(32202);
-  if (userCheck.error) return generateResponse(10003);
-  const user = convertMongoId(userCheck);
+  const userRaw = await User.getUserDetail(email);
+  if (userRaw === null) return generateResponse(32202);
+  if (userRaw.error) return generateResponse(10003);
+  const user = convertMongoId(userRaw);
 
   const isPasswordCorrect = await checkPassword(password, user.password);
   if (!isPasswordCorrect) return generateResponse(32202);
 
-  const result = await User.nativeSignIn(userCheck);
-  if (result.error || !result.user) return generateResponse(10003);
+  const loginAt = getCurrentTime();
+  const updateDt = getCurrentTime();
 
-  return result;
+  const signInResult = await User.nativeSignIn(userRaw, loginAt, updateDt);
+  if (signInResult.error) return generateResponse(10003);
+
+  const { accessToken, accTokenExp } = await generateAccessToken(user);
+
+  const signedInUser = {
+    user: {
+      ...user,
+      access_token: accessToken,
+      access_expired: accTokenExp,
+      login_at: loginAt,
+    },
+  };
+
+  return signedInUser;
 };
 
 const facebookSignIn = async (reqBody) => {
