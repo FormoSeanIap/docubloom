@@ -5,12 +5,6 @@ import { docCollection, userCollection } from './mongodb.js';
 
 const { TOKEN_EXPIRE, TOKEN_SECRET } = process.env; // 30 days by seconds
 
-const DOC_ROLE = {
-  OWNER: 'O',
-  EDITOR: 'E',
-  VIEWER: 'V',
-};
-
 const signUp = async (name, email, hash) => {
   try {
     const loginAt = dayjs().format();
@@ -44,7 +38,7 @@ const signUp = async (name, email, hash) => {
     return { user };
   } catch (error) {
     console.error('sign up error:', error);
-    return { error };
+    return { error: error.message };
   }
 };
 
@@ -84,7 +78,7 @@ const nativeSignIn = async (user) => {
     return { user: signInUser };
   } catch (error) {
     console.error('native sign in error:', error);
-    return { error };
+    return { error: error.message };
   }
 };
 
@@ -97,87 +91,15 @@ const getUserDetail = async (email) => {
   }
 };
 
-// const getUserDetail = async (email) => {
-//   try {
-//     const user = await userCollection.findOne({ email });
-//     user.id = user._id.toHexString();
-//     delete user._id;
-//     return user;
-//   } catch (err) {
-//     console.error('get user detail error:', err);
-//     return null;
-//   }
-// };
-
 const getUserDocs = async (userId) => {
   try {
-    // const rawDocInfos = await collection
-    // .find({[`users.${userId}`]: {"$exists": true}})
-    // .project({data: 0})
-    // .toArray();
-
-    const rawDocInfos = await docCollection
+    return await docCollection
       .find({ [`users.${userId}`]: { $exists: true } })
       .project({ users: 1, 'data.info': 1, 'data.openapi': 1 })
       .toArray();
-
-    // TODO: move this function out of this func
-    const docInfos = rawDocInfos.map((info) => {
-      const newInfo = { ...info };
-
-      newInfo.id = info._id.toHexString();
-      delete newInfo._id;
-
-      newInfo.role = Object.keys(DOC_ROLE)
-        .find((key) => DOC_ROLE[key] === info.users[userId])
-        .toLowerCase();
-      delete newInfo.users;
-
-      if (info.data && info.data.info) {
-        newInfo.info = info.data.info;
-      } else {
-        newInfo.info = '';
-      }
-
-      if (info.data && info.data.openapi) {
-        newInfo.openapi = info.data.openapi;
-      } else {
-        newInfo.openapi = '';
-      }
-      delete newInfo.data;
-
-      return newInfo;
-    });
-
-    // const docInfos = rawDocInfos.map((info) => {
-    //   info.id = info._id.toHexString();
-    //   delete info._id;
-
-    //   info.role = Object.keys(DOC_ROLE)
-    //     .find((key) => DOC_ROLE[key] === info.users[userId])
-    //     .toLowerCase();
-    //   delete info.users;
-
-    //   if (info.data && info.data.info) {
-    //     info.info = info.data.info;
-    //   } else {
-    //     info.info = '';
-    //   }
-
-    //   if (info.data && info.data.openapi) {
-    //     info.openapi = info.data.openapi;
-    //   } else {
-    //     info.openapi = '';
-    //   }
-    //   delete info.data;
-
-    //   return info;
-    // });
-
-    return docInfos;
-  } catch (err) {
-    console.log('get user docs error:', err);
-    return null;
+  } catch (error) {
+    console.error('get user docs error:', error);
+    return { error: error.message };
   }
 };
 

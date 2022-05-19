@@ -2,6 +2,7 @@ import * as User from '../models/user_model.js';
 import {
   signUpSchema, hashPassword, checkPassword, generateResponse, convertMongoId,
 } from '../../utils/util.js';
+import { DOC_ROLE } from '../../utils/constants.js';
 
 const nativeSignIn = async (reqBody) => {
   const { email, password } = reqBody;
@@ -67,8 +68,35 @@ const signIn = async (reqBody) => {
 };
 
 const getDocs = async (userId) => {
-  const docs = await User.getUserDocs(userId);
-  if (!docs) return generateResponse(10003);
+  const rawDocs = await User.getUserDocs(userId);
+  if (!rawDocs || rawDocs.error) return generateResponse(10003);
+
+  const docs = rawDocs.map((info) => {
+    const newInfo = { ...info };
+
+    newInfo.id = info._id.toHexString();
+    delete newInfo._id;
+
+    newInfo.role = Object.keys(DOC_ROLE)
+      .find((key) => DOC_ROLE[key] === info.users[userId])
+      .toLowerCase();
+    delete newInfo.users;
+
+    if (info.data && info.data.info) {
+      newInfo.info = info.data.info;
+    } else {
+      newInfo.info = '';
+    }
+
+    if (info.data && info.data.openapi) {
+      newInfo.openapi = info.data.openapi;
+    } else {
+      newInfo.openapi = '';
+    }
+    delete newInfo.data;
+
+    return newInfo;
+  });
 
   return docs;
 };
