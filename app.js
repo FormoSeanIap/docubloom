@@ -29,7 +29,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static('public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-morganBody(app);
+if (NODE_ENV === 'production') morganBody(app);
 
 // CORS allow all
 app.use(cors());
