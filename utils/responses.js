@@ -58,7 +58,7 @@ const MAP = {
   },
   32202: {
     type: 'error',
-    status: 401,
+    status: 403,
     title: 'native sign in fails',
     message: 'email or password incorrect',
   },
