@@ -1,31 +1,14 @@
 /* eslint-disable no-undef */
 import 'dotenv/config.js';
-import sinon from 'sinon';
 import { users } from './fake_data.js';
-import { expect, requester, assert } from './set_up.js';
+import { expect, requester } from './set_up.js';
 import { getCurrentTime, getTimeDiff } from './fake_data_generator.js';
-import { docCollection, userCollection } from '../server/models/mongodb.js';
-// import * as UserModel from '../server/models/user_model.js';
+import { userCollection } from '../server/models/mongodb.js';
 
 const expectedExpireTime = process.env.TOKEN_EXPIRE;
 
-// let stub;
-
 describe('user', () => {
-  before(() => {
-    // const fakeGetFacebookProfile = (token) => {
-    //   if (!token) {
-    //     return Promise.resolve();
-    //   }
-    //   if (token === fbTokenSignInFirstTime) {
-    //     return Promise.resolve(fbProfileSignInFirstTime);
-    //   } if (token === fbTokenSignInAgain) {
-    //     return Promise.resolve(fbProfileSignInAgain);
-    //   }
-    //   return Promise.reject({ error: { code: 190 } });
-    // };
-    // stub = sinon.stub(UserModel, 'getFacebookProfile').callsFake(fakeGetFacebookProfile);
-  });
+  before(() => console.log('user test began'));
 
   /* ============ sign up ============ */
 
@@ -293,9 +276,7 @@ describe('user', () => {
     expect(res.body.error.code).to.deep.equal(32101);
   });
 
-  /**
-   * Get User Profile
-   */
+  /* ============ get user profile ============ */
 
   it('get profile with valid access_token', async () => {
     const userToSignIn = {
@@ -311,30 +292,33 @@ describe('user', () => {
     const accessToken = signInRes.body.data.access_token;
     const profileRes = await requester.get('/api/1.0/user/profile').set('Authorization', `Bearer ${accessToken}`);
 
-    const user2 = profileRes.body.data;
-    const expectedUser = {
-      provider: user1.provider,
-      name: fbProfileSignInFirstTime.name,
-      email: fbProfileSignInFirstTime.email,
-      picture: `https://graph.facebook.com/${fbProfileSignInFirstTime.id}/picture?type=large`,
+    const { data } = profileRes.body;
+    const user2 = {
+      id: data.id,
+      provider: data.provider,
+      name: data.name,
+      email: data.email,
     };
 
-    expect(user2).to.deep.equal(expectedUser);
+    const { docs } = data;
+
+    expect(user2).to.deep.equal(user1);
+    expect(docs).to.be.an('array').lengthOf(0);
   });
 
-  // it('get profile without access_token', async () => {
-  //   const res = await requester.get('/api/1.0/user/profile');
+  it('get profile without access_token', async () => {
+    const res = await requester.get('/api/1.0/user/profile');
 
-  //   expect(res.status).to.equal(401);
-  // });
-
-  // it('get profile with invalid access_token', async () => {
-  //   const res = await requester.get('/api/1.0/user/profile').set('Authorization', 'Bearer wrong_token');
-
-  //   expect(res.status).to.equal(403);
-  // });
-
-  after(() => {
-    // stub.restore();
+    expect(res.status).to.equal(401);
+    expect(res.body.error.code).to.equal(20001);
   });
+
+  it('get profile with invalid access_token', async () => {
+    const res = await requester.get('/api/1.0/user/profile').set('Authorization', 'Bearer wrong_token');
+
+    expect(res.status).to.equal(403);
+    expect(res.body.error.code).to.equal(20002);
+  });
+
+  after(() => console.log('user test finished'));
 });

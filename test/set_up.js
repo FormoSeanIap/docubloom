@@ -10,6 +10,7 @@ const { NODE_ENV } = process.env;
 
 chai.use(chaiHttp);
 chai.use(deepEqualInAnyOrder);
+chai.should();
 
 const { assert } = chai;
 const { expect } = chai;
@@ -24,4 +25,6 @@ before(async () => {
   await createFakeData();
 });
 
-export { assert, expect, requester };
+export {
+  assert, expect, requester,
+};
