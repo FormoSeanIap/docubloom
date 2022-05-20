@@ -70,8 +70,11 @@ const signInMap = {
 const signUp = async (name, email, password) => {
   if (!name || !email || !password) return generateResponse(31003);
 
-  const validation = signUpSchema.validate({ name, email, password });
-  if (validation.error) return generateResponse(31001);
+  try {
+    await signUpSchema.validateAsync({ name, email, password });
+  } catch (err) {
+    return generateResponse(31001);
+  }
 
   const userCheck = await User.getUserDetail(email);
   if (userCheck !== null) return generateResponse(31002);

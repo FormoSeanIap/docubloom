@@ -197,17 +197,6 @@ async function generateAccessToken(user) {
   };
 }
 
-// TODO: move this to util
-// const accessToken = jwt.sign(
-//   {
-//     provider: user.provider,
-//     name: user.name,
-//     email: user.email,
-//   },
-//   TOKEN_SECRET,
-//   { expiresIn: TOKEN_EXPIRE },
-// );
-
 async function hashPassword(password) {
   const hashResult = await argon2.hash(password);
   return hashResult;
