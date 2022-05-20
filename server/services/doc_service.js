@@ -14,10 +14,10 @@ function getKeysByValue(object, value) {
 }
 
 const getUsers = async (docId) => {
-  const usersCheck = await Doc.getUsers(docId);
-  if (usersCheck === null || usersCheck.error) return generateResponse(10003);
+  const usersResult = await Doc.getUsers(docId);
+  if (usersResult === null || usersResult.error) return generateResponse(10003);
 
-  const { users } = usersCheck;
+  const { users } = usersResult;
   const ownerIds = getKeysByValue(users, DOC_ROLE.OWNER);
   const editorIds = getKeysByValue(users, DOC_ROLE.EDITOR);
   const viewerIds = getKeysByValue(users, DOC_ROLE.VIEWER);
@@ -48,11 +48,11 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
   if (!collaboratorEmail) return generateResponse(52001);
   if (!collaboratorRole) return generateResponse(50002);
 
-  const collaboratorCheck = await User.getUserDetail(collaboratorEmail);
-  if (collaboratorCheck === null) return generateResponse(52002);
-  if (collaboratorCheck.error) return generateResponse(10003);
+  const collaboratorResult = await User.getUserDetail(collaboratorEmail);
+  if (collaboratorResult === null) return generateResponse(52002);
+  if (collaboratorResult.error) return generateResponse(10003);
 
-  const collaborator = convertMongoId(collaboratorCheck);
+  const collaborator = convertMongoId(collaboratorResult);
   const collaboratorId = collaborator.id;
   if (!collaboratorId) return generateResponse(10003);
 
@@ -87,11 +87,11 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
     /*= =========== Only owners can change others' role to owner ============ */
     if (userRole !== DOC_ROLE.OWNER) return generateResponse(53001);
   } else {
-    const collaboratorCheck = await Doc.getUser(docId, userId);
-    if (!collaboratorCheck) return generateResponse(53002);
-    if (collaboratorCheck.error) return generateResponse(10003);
+    const collaboratorResult = await Doc.getUser(docId, userId);
+    if (!collaboratorResult) return generateResponse(53002);
+    if (collaboratorResult.error) return generateResponse(10003);
 
-    const collaboratorOrigin = collaboratorCheck.users;
+    const collaboratorOrigin = collaboratorResult.users;
     const collaboratorRoleOrigin = collaboratorOrigin[userId];
     if (collaboratorRoleOrigin === DOC_ROLE.OWNER) {
       if (userRole !== DOC_ROLE.OWNER) {
@@ -99,12 +99,12 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
         return generateResponse(53003);
       }
 
-      const currentDocUsersCheck = await Doc.getUsers(docId);
-      if (currentDocUsersCheck === null || currentDocUsersCheck.error) {
+      const currentDocUsersResult = await Doc.getUsers(docId);
+      if (currentDocUsersResult === null || currentDocUsersResult.error) {
         return generateResponse(10003);
       }
 
-      const { users } = currentDocUsersCheck;
+      const { users } = currentDocUsersResult;
       const currentDocOwners = getKeysByValue(users, DOC_ROLE.OWNER);
       if (currentDocOwners.length === 1) return generateResponse(53004);
     }
@@ -119,20 +119,20 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
 const deleteUser = async (docId, userId) => {
   if (!userId) return generateResponse(50001);
 
-  const userCheck = await Doc.getUser(docId, userId);
-  if (userCheck === null) return generateResponse(50004);
-  if (userCheck.error) return generateResponse(10003);
+  const userResult = await Doc.getUser(docId, userId);
+  if (userResult === null) return generateResponse(50004);
+  if (userResult.error) return generateResponse(10003);
 
-  const user = userCheck.users;
+  const user = userResult.users;
   if (user[userId] === DOC_ROLE.OWNER) return generateResponse(54001);
 
   const result = await Doc.deleteUser(docId, userId);
   if (result.error) return generateResponse(10003);
 
-  const usersCheck = await Doc.getUsers(docId);
-  if (usersCheck === null || usersCheck.error) return generateResponse(10003);
+  const usersResult = await Doc.getUsers(docId);
+  if (usersResult === null || usersResult.error) return generateResponse(10003);
 
-  const { users } = usersCheck;
+  const { users } = usersResult;
   // Delete document if there is no user left
   if (Object.keys(users).length === 0) {
     const deleteResult = await Doc.deleteDoc(docId);

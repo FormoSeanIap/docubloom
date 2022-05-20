@@ -168,10 +168,10 @@ function docAuthorization(roleType) {
     }
 
     const userId = req.user.id;
-    const userRoleCheck = await Doc.getDocRole(userId, docId);
-    if (userRoleCheck.error) generateResponse(10003);
+    const userRoleResult = await Doc.getDocRole(userId, docId);
+    if (userRoleResult.error) generateResponse(10003);
 
-    const userRole = userRoleCheck.users[userId];
+    const userRole = userRoleResult.users[userId];
     req.user.role = userRole;
 
     const authFunc = authMap[roleType];

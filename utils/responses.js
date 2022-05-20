@@ -1,4 +1,4 @@
-const MAP = {
+const resMap = {
   /*= =========== general error ============ */
   10001: {
     type: 'error',
@@ -211,4 +211,4 @@ const MAP = {
   },
 };
 
-export default MAP;
+export default resMap;

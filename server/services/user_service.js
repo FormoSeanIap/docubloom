@@ -76,9 +76,9 @@ const signUp = async (name, email, password) => {
     return generateResponse(31001);
   }
 
-  const userCheck = await User.getUserDetail(email);
-  if (userCheck !== null) return generateResponse(31002);
-  if (userCheck && userCheck.error) return generateResponse(10003);
+  const userResult = await User.getUserDetail(email);
+  if (userResult !== null) return generateResponse(31002);
+  if (userResult && userResult.error) return generateResponse(10003);
 
   const hashedPassword = await hashPassword(password);
 
@@ -155,9 +155,9 @@ const getDocs = async (userId) => {
 };
 
 const getUserDetail = async (email) => {
-  const userCheck = await User.getUserDetail(email);
-  if (userCheck.error) return generateResponse(10003);
-  const userDetail = convertMongoId(userCheck);
+  const userResult = await User.getUserDetail(email);
+  if (userResult.error) return generateResponse(10003);
+  const userDetail = convertMongoId(userResult);
   return userDetail;
 };
 
