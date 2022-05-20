@@ -6,8 +6,7 @@ const getUsers = async (req, res) => {
   const result = await DocService.getUsers(docId);
 
   if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
 
@@ -23,15 +22,13 @@ const addUser = async (req, res) => {
 
   const result = await DocService.addUser(docId, collaboratorEmail, collaboratorRole, userRole);
   if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
 
   const collaborator = await UserService.getUserDetail(collaboratorEmail);
   if (collaborator.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: collaborator.error });
+    res.status(result.status).send({ error: collaborator.error });
     return;
   }
 
@@ -55,8 +52,7 @@ const updateUser = async (req, res) => {
 
   const result = await DocService.updateUser(docId, userId, collaboratorRole, userRole);
   if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
 
@@ -75,8 +71,7 @@ const deleteUser = async (req, res) => {
 
   const result = await DocService.deleteUser(docId, userId);
   if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
 
@@ -94,8 +89,7 @@ const getDoc = async (req, res) => {
 
   const result = await DocService.getDoc(docId);
   if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
   const doc = result.data;
@@ -109,8 +103,7 @@ const createDoc = async (req, res) => {
 
   const result = await DocService.createDoc(req.user.id, doc);
   if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
 
@@ -129,8 +122,7 @@ const editDoc = async (req, res) => {
 
   const result = await DocService.editDoc(docId, doc);
   if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
 
@@ -143,8 +135,7 @@ const deleteDoc = async (req, res) => {
 
   const result = await DocService.deleteDoc(docId);
   if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
 

@@ -8,8 +8,7 @@ const getExample = async (req, res) => {
   const result = await MockServerService.getExample(docId, path, method, statusCode, contentType);
 
   if (result.error) {
-    const resultCode = result.status ? result.status : 403;
-    res.status(resultCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
   res.status(statusCode).send(result);
@@ -30,8 +29,7 @@ const getExampleFromExamples = async (req, res) => {
   );
 
   if (result.error) {
-    const resultCode = result.status ? result.status : 403;
-    res.status(resultCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
   res.status(statusCode).send(result);

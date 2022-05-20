@@ -7,8 +7,7 @@ const signUp = async (req, res) => {
   const result = await UserService.signUp(name, email, password);
 
   if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
   const { user } = result;
@@ -30,8 +29,7 @@ const signIn = async (req, res) => {
   const result = await UserService.signIn(req.body);
 
   if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
 
@@ -56,8 +54,7 @@ const getProfile = async (req, res) => {
   const userDocs = await UserService.getDocs(req.user.id);
 
   if (userDocs.error) {
-    const statusCode = userDocs.status ? userDocs.status : 403;
-    res.status(statusCode).send({ error: userDocs.error });
+    res.status(result.status).send({ error: userDocs.error });
     return;
   }
 
@@ -78,8 +75,7 @@ const leaveDoc = async (req, res) => {
 
   const result = await DocService.deleteUser(docId, userId);
   if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+    res.status(result.status).send({ error: result.error });
     return;
   }
 
