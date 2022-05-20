@@ -263,7 +263,7 @@ describe('user', () => {
     expect(res.body.error.code).to.deep.equal(32202);
   });
 
-  it('sign in with unsupported', async () => {
+  it('sign in with unsupported provider', async () => {
     const user = {
       provider: 'unsupported',
       email: 'test@test.com',
