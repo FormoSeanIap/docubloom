@@ -167,15 +167,9 @@ const editDoc = async (docId, doc) => {
     if (Cache.ready) {
       const docCacheKeys = await Cache.keys(`${docId}*`);
       await Promise.all(docCacheKeys.map((key) => Cache.del(key)));
-      // for (const key of docCacheKeys) {
-      //   await Cache.del(key);
-      // }
-      // for (let i = 0; i < docCacheKeys.length; i++) {
-      //   await Cache.del(docCacheKeys[i]);
-      // }
     }
-  } catch (error) {
-    console.error(`Delete cache keys for doc ${docId} error: ${error}`);
+  } catch (err) {
+    console.error(`Delete cache keys for doc ${docId} error: ${err}`);
   }
 
   return result;
@@ -190,12 +184,9 @@ const deleteDoc = async (docId) => {
     if (Cache.ready) {
       const docCacheKeys = await Cache.keys(`${docId}*`);
       await Promise.all(docCacheKeys.map((key) => Cache.del(key)));
-      // for (let i = 0; i < docCacheKeys.length; i++) {
-      //   await Cache.del(docCacheKeys[i]);
-      // }
     }
-  } catch (error) {
-    console.error(`Delete cache keys for doc ${docId} error: ${error}`);
+  } catch (err) {
+    console.error(`Delete cache keys for doc ${docId} error: ${err}`);
   }
 
   return result;

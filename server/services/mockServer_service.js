@@ -32,8 +32,8 @@ const getExample = async (docId, path, method, statusCode, contentType) => {
       cacheMockResValue = await Cache.get(cacheMockResKey);
       cacheMockResValue = JSON.parse(cacheMockResValue);
     }
-  } catch (error) {
-    console.error(`Get example mock response from cache error: ${error}`);
+  } catch (err) {
+    console.error(`Get example mock response from cache error: ${err}`);
   }
 
   if (cacheMockResValue) {
@@ -60,8 +60,8 @@ const getExample = async (docId, path, method, statusCode, contentType) => {
       await Cache.set(cacheMockResKey, JSON.stringify(result));
       await Cache.expire(cacheMockResKey, CACHE_MOCK_RESPONSE_EXPIRE);
     }
-  } catch (error) {
-    console.error(`Set example mock response to cache error: ${error}`);
+  } catch (err) {
+    console.error(`Set example mock response to cache error: ${err}`);
   }
 
   return result;
@@ -82,8 +82,8 @@ const getExampleFromExamples = async (
       cacheMockResValue = await Cache.get(cacheMockResKey);
       cacheMockResValue = JSON.parse(cacheMockResValue);
     }
-  } catch (error) {
-    console.error(`Get examples mock response from cache error: ${error}`);
+  } catch (err) {
+    console.error(`Get examples mock response from cache error: ${err}`);
   }
 
   if (cacheMockResValue) {
