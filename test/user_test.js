@@ -218,7 +218,7 @@ describe('user', () => {
     const res1 = await requester.post('/api/1.0/user/signin').send(userWrongPwd);
 
     expect(res1.status).to.equal(403);
-    expect(res1.body.error).to.equal({
+    expect(res1.body).to.deep.equal({
       error: {
         code: 32202,
         title: 'native sign in fails',
@@ -235,7 +235,7 @@ describe('user', () => {
     const res2 = await requester.post('/api/1.0/user/signin').send(userWrongEmail);
 
     expect(res2.status).to.equal(403);
-    expect(res2.body.error).to.equal({
+    expect(res2.body).to.deep.equal({
       error: {
         code: 32202,
         title: 'native sign in fails',
@@ -255,7 +255,7 @@ describe('user', () => {
     const res = await requester.post('/api/1.0/user/signin').send(user);
 
     expect(res.status).to.equal(403);
-    expect(res.body.error).to.equal({
+    expect(res.body).to.deep.equal({
       error: {
         code: 32202,
         title: 'native sign in fails',
