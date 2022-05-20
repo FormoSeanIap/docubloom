@@ -5,17 +5,17 @@ import url from 'url';
 import { docCollection, userCollection } from '../server/models/mongodb.js';
 import { users } from './fake_data.js';
 
-/* ============ execute when called directly from the command line ============ */
-// if (require.main === module) {
-//   main();
-// }
-
 const { NODE_ENV } = process.env;
 
 // TODO: study and use bulk in replace of insertMany and deleteMany in the future
 
 function getCurrentTime() {
   return dayjs().format();
+}
+
+function getTimeDiff(startTime, endTime, type) {
+  const diff = dayjs(endTime).diff(dayjs(startTime), type);
+  return diff;
 }
 
 async function hashPassword(password) {
@@ -79,10 +79,10 @@ async function truncateFakeData() {
   }
   console.log('truncate fake data finished');
 }
-
 async function main() {
   await truncateFakeData();
   await createFakeData();
+  console.log('all finished');
 }
 
 /* ============ execute when called directly via command line ============ */
@@ -94,3 +94,10 @@ if (import.meta.url === url.pathToFileURL(process.argv[1]).href) {
 // if (require.main === module) {
 //   main();
 // }
+
+export {
+  truncateFakeData,
+  createFakeData,
+  getCurrentTime,
+  getTimeDiff,
+};

@@ -46,3 +46,5 @@ app.use((req, res) => respondPageNotFound(res));
 app.use((err, req, res, next) => respondServerErr(err, res));
 
 server.listen(port, () => console.log(`Listening on port ${port} in ${NODE_ENV} mode`));
+
+export default app;
