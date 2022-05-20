@@ -57,7 +57,6 @@ function generateResponse(code) {
   };
 }
 
-// TODO: handle duplicate format
 function respondPageNotFound(res) {
   const response = generateResponse(10001);
   const { status, error } = response;

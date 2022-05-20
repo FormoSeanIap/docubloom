@@ -54,7 +54,7 @@ const getProfile = async (req, res) => {
   const userDocs = await UserService.getDocs(req.user.id);
 
   if (userDocs.error) {
-    res.status(result.status).send({ error: userDocs.error });
+    res.status(userDocs.status).send({ error: userDocs.error });
     return;
   }
 

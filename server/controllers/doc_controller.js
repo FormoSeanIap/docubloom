@@ -131,7 +131,6 @@ const editDoc = async (req, res) => {
 
 const deleteDoc = async (req, res) => {
   const { docId } = req.params;
-  // const userId = req.user.id;
 
   const result = await DocService.deleteDoc(docId);
   if (result.error) {

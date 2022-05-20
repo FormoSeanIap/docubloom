@@ -23,11 +23,6 @@ async function hashPassword(password) {
   return hash;
 }
 
-async function checkPassword(password, hash) {
-  const isPwdCorrect = await argon2.verify(hash, password);
-  return isPwdCorrect;
-}
-
 async function createFakeUsers() {
   const usersToInsert = await Promise.all(users.map(async (user) => {
     const {

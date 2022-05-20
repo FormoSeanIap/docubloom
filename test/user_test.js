@@ -151,7 +151,7 @@ describe('user', () => {
     expect(data.access_expired).to.equal(expectedExpireTime);
     expect(getTimeDiff(data.login_at, getCurrentTime(), 'second') < 1);
 
-    // make sure DB is changed, too
+    // make sure DB is changed as well
     const { last_login_at: loginTime, updated_dt: updatedDt } = await userCollection
       .findOne({ email: user.email });
 
