@@ -5,7 +5,7 @@ import { users } from './fake_data.js';
 import { expect, requester, assert } from './set_up.js';
 import { getCurrentTime, getTimeDiff } from './fake_data_generator.js';
 import { docCollection, userCollection } from '../server/models/mongodb.js';
-import * as UserModel from '../server/models/user_model.js';
+// import * as UserModel from '../server/models/user_model.js';
 
 const expectedExpireTime = process.env.TOKEN_EXPIRE;
 
@@ -27,9 +27,7 @@ describe('user', () => {
     // stub = sinon.stub(UserModel, 'getFacebookProfile').callsFake(fakeGetFacebookProfile);
   });
 
-  /**
-   * Sign Up
-   */
+  /* ============ sign up ============ */
 
   it('sign up', async () => {
     const user = {
@@ -145,11 +143,7 @@ describe('user', () => {
     expect(res.body.error.code).to.deep.equal(31001);
   });
 
-  // TODO: other sign-up fails
-
-  /**
-   * Native Sign In
-   */
+  /* ============ sign in ============ */
 
   it('native sign in with correct password', async () => {
     const user1 = users[0];
@@ -303,29 +297,30 @@ describe('user', () => {
    * Get User Profile
    */
 
-  // it('get profile with valid access_token', async () => {
-  //   const user = {
-  //     provider: 'facebook',
-  //     access_token: fbTokenSignInFirstTime,
-  //   };
+  it('get profile with valid access_token', async () => {
+    const userToSignIn = {
+      provider: 'native',
+      email: 'test@test.com',
+      password: 'test',
+    };
 
-  //   const res1 = await requester.post('/api/1.0/user/signin').send(user);
+    const signInRes = await requester.post('/api/1.0/user/signin').send(userToSignIn);
 
-  //   const user1 = res1.body.data.user;
+    const user1 = signInRes.body.data.user;
 
-  //   const accessToken = res1.body.data.access_token;
-  //   const res2 = await requester.get('/api/1.0/user/profile').set('Authorization', `Bearer ${accessToken}`);
+    const accessToken = signInRes.body.data.access_token;
+    const profileRes = await requester.get('/api/1.0/user/profile').set('Authorization', `Bearer ${accessToken}`);
 
-  //   const user2 = res2.body.data;
-  //   const expectedUser = {
-  //     provider: user1.provider,
-  //     name: fbProfileSignInFirstTime.name,
-  //     email: fbProfileSignInFirstTime.email,
-  //     picture: `https://graph.facebook.com/${fbProfileSignInFirstTime.id}/picture?type=large`,
-  //   };
+    const user2 = profileRes.body.data;
+    const expectedUser = {
+      provider: user1.provider,
+      name: fbProfileSignInFirstTime.name,
+      email: fbProfileSignInFirstTime.email,
+      picture: `https://graph.facebook.com/${fbProfileSignInFirstTime.id}/picture?type=large`,
+    };
 
-  //   expect(user2).to.deep.equal(expectedUser);
-  // });
+    expect(user2).to.deep.equal(expectedUser);
+  });
 
   // it('get profile without access_token', async () => {
   //   const res = await requester.get('/api/1.0/user/profile');
