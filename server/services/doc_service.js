@@ -22,26 +22,35 @@ const getUsers = async (docId) => {
   const editorIds = getKeysByValue(users, DOC_ROLE.EDITOR);
   const viewerIds = getKeysByValue(users, DOC_ROLE.VIEWER);
 
-  // TODO: how to do error handling here?
   const owners = await Promise.all(ownerIds.map(async (id) => {
     const user = await DocModel.getOwner(id);
+    if (user.error) return 'error';
     user.id = id;
     return user;
   }));
+  if (owners.includes('error')) return generateResponse(10003);
 
   const editors = await Promise.all(editorIds.map(async (id) => {
     const user = await DocModel.getEditor(id);
+    if (user.error) return 'error';
     user.id = id;
     return user;
   }));
+  if (editors.includes('error')) return generateResponse(10003);
 
   const viewers = await Promise.all(viewerIds.map(async (id) => {
     const user = await DocModel.getViewer(id);
+    if (user.error) return 'error';
     user.id = id;
     return user;
   }));
+  if (viewers.includes('error')) return generateResponse(10003);
 
-  return { owners, editors, viewers };
+  return {
+    owners,
+    editors,
+    viewers,
+  };
 };
 
 const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => {
