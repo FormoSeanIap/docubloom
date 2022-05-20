@@ -1,5 +1,5 @@
-import * as Doc from '../models/doc_model.js';
-import * as User from '../models/user_model.js';
+import * as DocModel from '../models/doc_model.js';
+import * as UserModel from '../models/user_model.js';
 import Cache from '../../utils/cache.js';
 
 import { DOC_ROLE } from '../../utils/constants.js';
@@ -14,7 +14,7 @@ function getKeysByValue(object, value) {
 }
 
 const getUsers = async (docId) => {
-  const usersResult = await Doc.getUsers(docId);
+  const usersResult = await DocModel.getUsers(docId);
   if (usersResult === null || usersResult.error) return generateResponse(10003);
 
   const { users } = usersResult;
@@ -24,19 +24,19 @@ const getUsers = async (docId) => {
 
   // TODO: how to do error handling here?
   const owners = await Promise.all(ownerIds.map(async (id) => {
-    const user = await Doc.getOwner(id);
+    const user = await DocModel.getOwner(id);
     user.id = id;
     return user;
   }));
 
   const editors = await Promise.all(editorIds.map(async (id) => {
-    const user = await Doc.getEditor(id);
+    const user = await DocModel.getEditor(id);
     user.id = id;
     return user;
   }));
 
   const viewers = await Promise.all(viewerIds.map(async (id) => {
-    const user = await Doc.getViewer(id);
+    const user = await DocModel.getViewer(id);
     user.id = id;
     return user;
   }));
@@ -48,7 +48,7 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
   if (!collaboratorEmail) return generateResponse(52001);
   if (!collaboratorRole) return generateResponse(50002);
 
-  const collaboratorResult = await User.getUserDetail(collaboratorEmail);
+  const collaboratorResult = await UserModel.getUserDetail(collaboratorEmail);
   if (collaboratorResult === null) return generateResponse(52002);
   if (collaboratorResult.error) return generateResponse(10003);
 
@@ -64,13 +64,13 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
     return generateResponse(52003);
   }
 
-  const users = await Doc.getUser(docId, collaboratorId);
+  const users = await DocModel.getUser(docId, collaboratorId);
   if (users) {
     if (users.error) return generateResponse(10003);
     return generateResponse(52004);
   }
 
-  const result = await Doc.addUser(docId, collaboratorId, collaboratorDBRole);
+  const result = await DocModel.addUser(docId, collaboratorId, collaboratorDBRole);
   if (result.error) return generateResponse(10003);
 
   return result;
@@ -87,7 +87,7 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
     /*= =========== Only owners can change others' role to owner ============ */
     if (userRole !== DOC_ROLE.OWNER) return generateResponse(53001);
   } else {
-    const collaboratorResult = await Doc.getUser(docId, userId);
+    const collaboratorResult = await DocModel.getUser(docId, userId);
     if (!collaboratorResult) return generateResponse(53002);
     if (collaboratorResult.error) return generateResponse(10003);
 
@@ -99,7 +99,7 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
         return generateResponse(53003);
       }
 
-      const currentDocUsersResult = await Doc.getUsers(docId);
+      const currentDocUsersResult = await DocModel.getUsers(docId);
       if (currentDocUsersResult === null || currentDocUsersResult.error) {
         return generateResponse(10003);
       }
@@ -110,7 +110,7 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
     }
   }
 
-  const result = await Doc.updateUser(docId, userId, DBCollaboratorRole);
+  const result = await DocModel.updateUser(docId, userId, DBCollaboratorRole);
   if (result.error) return generateResponse(10003);
 
   return result;
@@ -119,23 +119,23 @@ const updateUser = async (docId, userId, collaboratorRole, userRole) => {
 const deleteUser = async (docId, userId) => {
   if (!userId) return generateResponse(50001);
 
-  const userResult = await Doc.getUser(docId, userId);
+  const userResult = await DocModel.getUser(docId, userId);
   if (userResult === null) return generateResponse(50004);
   if (userResult.error) return generateResponse(10003);
 
   const user = userResult.users;
   if (user[userId] === DOC_ROLE.OWNER) return generateResponse(54001);
 
-  const result = await Doc.deleteUser(docId, userId);
+  const result = await DocModel.deleteUser(docId, userId);
   if (result.error) return generateResponse(10003);
 
-  const usersResult = await Doc.getUsers(docId);
+  const usersResult = await DocModel.getUsers(docId);
   if (usersResult === null || usersResult.error) return generateResponse(10003);
 
   const { users } = usersResult;
   // Delete document if there is no user left
   if (Object.keys(users).length === 0) {
-    const deleteResult = await Doc.deleteDoc(docId);
+    const deleteResult = await DocModel.deleteDoc(docId);
     if (deleteResult.error) return generateResponse(10003);
   }
 
@@ -143,7 +143,7 @@ const deleteUser = async (docId, userId) => {
 };
 
 const getDoc = async (docId) => {
-  const doc = await Doc.getDoc(docId);
+  const doc = await DocModel.getDoc(docId);
   if (doc.error) return generateResponse(10003);
   return doc;
 };
@@ -151,7 +151,7 @@ const getDoc = async (docId) => {
 const createDoc = async (userId, doc) => {
   if (!doc) return generateResponse(40001);
 
-  const result = await Doc.createDoc(userId, doc);
+  const result = await DocModel.createDoc(userId, doc);
   if (result.error) return generateResponse(10003);
   return result;
 };
@@ -159,7 +159,7 @@ const createDoc = async (userId, doc) => {
 const editDoc = async (docId, doc) => {
   if (!doc) return generateResponse(40001);
 
-  const result = await Doc.editDoc(docId, doc);
+  const result = await DocModel.editDoc(docId, doc);
   if (result.error) return generateResponse(10003);
 
   // Delete mock response cache
@@ -182,7 +182,7 @@ const editDoc = async (docId, doc) => {
 };
 
 const deleteDoc = async (docId) => {
-  const result = await Doc.deleteDoc(docId);
+  const result = await DocModel.deleteDoc(docId);
   if (result.error) return generateResponse(10003);
 
   // Delete mock response cache

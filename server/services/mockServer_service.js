@@ -1,11 +1,11 @@
-import * as Doc from '../models/doc_model.js';
+import * as DocModel from '../models/doc_model.js';
 import { generateResponse } from '../../utils/util.js';
 import Cache from '../../utils/cache.js';
 
 const { CACHE_MOCK_RESPONSE_EXPIRE } = process.env;
 
 async function checkDocBasicInfo(docId, path, method, statusCode, contentType) {
-  const doc = await Doc.getDoc(docId);
+  const doc = await DocModel.getDoc(docId);
   if (!doc) return generateResponse(60001);
   if (doc.error) return generateResponse(10003);
 

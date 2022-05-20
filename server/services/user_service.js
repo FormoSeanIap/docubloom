@@ -1,4 +1,4 @@
-import * as User from '../models/user_model.js';
+import * as UserModel from '../models/user_model.js';
 import {
   signUpSchema,
   hashPassword,
@@ -15,7 +15,7 @@ const nativeSignIn = async (reqBody) => {
 
   if (!email || !password) return generateResponse(32201);
 
-  const userRaw = await User.getUserDetail(email);
+  const userRaw = await UserModel.getUserDetail(email);
   if (userRaw === null) return generateResponse(32202);
   if (userRaw.error) return generateResponse(10003);
   const user = convertMongoId(userRaw);
@@ -26,7 +26,7 @@ const nativeSignIn = async (reqBody) => {
   const loginAt = getCurrentTime();
   const updateDt = getCurrentTime();
 
-  const signInResult = await User.nativeSignIn(userRaw, loginAt, updateDt);
+  const signInResult = await UserModel.nativeSignIn(userRaw, loginAt, updateDt);
   if (signInResult.error) return generateResponse(10003);
 
   const { accessToken, accTokenExp } = await generateAccessToken({
@@ -76,7 +76,7 @@ const signUp = async (name, email, password) => {
     return generateResponse(31001);
   }
 
-  const userResult = await User.getUserDetail(email);
+  const userResult = await UserModel.getUserDetail(email);
   if (userResult !== null) return generateResponse(31002);
   if (userResult && userResult.error) return generateResponse(10003);
 
@@ -96,7 +96,7 @@ const signUp = async (name, email, password) => {
     updated_dt: updatedDt,
   };
 
-  const result = await User.signUp(user);
+  const result = await UserModel.signUp(user);
   if (result.error) return generateResponse(10003);
 
   const { accessToken, accTokenExp } = await generateAccessToken({
@@ -121,7 +121,7 @@ const signIn = async (reqBody) => {
 };
 
 const getDocs = async (userId) => {
-  const rawDocs = await User.getUserDocs(userId);
+  const rawDocs = await UserModel.getUserDocs(userId);
   if (!rawDocs || rawDocs.error) return generateResponse(10003);
 
   const docs = rawDocs.map((info) => {
@@ -155,7 +155,7 @@ const getDocs = async (userId) => {
 };
 
 const getUserDetail = async (email) => {
-  const userResult = await User.getUserDetail(email);
+  const userResult = await UserModel.getUserDetail(email);
   if (userResult.error) return generateResponse(10003);
   const userDetail = convertMongoId(userResult);
   return userDetail;

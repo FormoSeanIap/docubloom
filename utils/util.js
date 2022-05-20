@@ -5,8 +5,8 @@ import Joi from 'joi';
 import dayjs from 'dayjs';
 import { promisify } from 'util';
 
-import * as User from '../server/models/user_model.js';
-import * as Doc from '../server/models/doc_model.js';
+import * as UserModel from '../server/models/user_model.js';
+import * as DocModel from '../server/models/doc_model.js';
 
 import { DOC_ROLE } from './constants.js';
 import ResMap from './responses.js';
@@ -138,7 +138,7 @@ function userAuthentication() {
       return;
     }
 
-    const userDetailResult = await User.getUserDetail(user.email);
+    const userDetailResult = await UserModel.getUserDetail(user.email);
     if (userDetailResult === null) {
       respondForbidden(res);
       return;
@@ -168,7 +168,7 @@ function docAuthorization(roleType) {
     }
 
     const userId = req.user.id;
-    const userRoleResult = await Doc.getDocRole(userId, docId);
+    const userRoleResult = await DocModel.getDocRole(userId, docId);
     if (userRoleResult.error) generateResponse(10003);
 
     const userRole = userRoleResult.users[userId];
