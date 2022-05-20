@@ -1,23 +1,13 @@
 /* eslint-disable no-undef */
 import 'dotenv/config.js';
-import assert from 'assert';
 import sinon from 'sinon';
-import dayjs from 'dayjs';
 import { users } from './fake_data.js';
-import { expect, requester } from './set_up.js';
+import { expect, requester, assert } from './set_up.js';
 import { getCurrentTime, getTimeDiff } from './fake_data_generator.js';
 import { docCollection, userCollection } from '../server/models/mongodb.js';
 import * as UserModel from '../server/models/user_model.js';
 
 const expectedExpireTime = process.env.TOKEN_EXPIRE;
-
-describe('Array', () => {
-  describe('#indexOf()', () => {
-    it('should return -1 when the value is not present', () => {
-      assert.equal([1, 2, 3].indexOf(4), -1);
-    });
-  });
-});
 
 // let stub;
 
@@ -41,83 +31,134 @@ describe('user', () => {
    * Sign Up
    */
 
-  // it('sign up', async () => {
-  //   const user = {
-  //     name: 'arthur',
-  //     email: 'arthur@gmail.com',
-  //     password: 'password',
-  //   };
+  it('sign up', async () => {
+    const user = {
+      name: 'sean',
+      email: 'sean@sean.com',
+      password: 'sean',
+    };
 
-  //   const res = await requester.post('/api/1.0/user/signup').send(user);
+    const res = await requester.post('/api/1.0/user/signup').send(user);
 
-  //   const { data } = res.body;
+    const { body } = res;
 
-  //   const userExpected = {
-  //     id: data.user.id, // need id from returned data
-  //     provider: 'native',
-  //     name: user.name,
-  //     email: user.email,
-  //     picture: null,
-  //   };
+    const expectedRes = {
+      data: {
+        access_token: body.data.access_token,
+        access_expired: body.data.access_expired,
+        login_at: body.data.login_at,
+        user: {
+          id: body.data.user.id,
+          name: body.data.user.name,
+          email: body.data.user.email,
+        },
+      },
+    };
 
-  //   expect(data.user).to.deep.equal(userExpected);
-  //   expect(data.access_token).to.be.a('string');
-  //   expect(data.access_expired).to.equal(expectedExpireTime);
-  //   expect(new Date(data.login_at).getTime()).to.closeTo(Date.now(), 1000);
-  // });
+    expect(body).to.deep.equal(expectedRes);
+    expect(body.data.access_token).to.be.a('string');
+    expect(body.data.access_expired).to.equal(expectedExpireTime);
+    expect(expect(getTimeDiff(body.data.login_at, getCurrentTime(), 'second') < 1));
+  });
 
-  // it('sign up without name or email or password', async () => {
-  //   const user1 = {
-  //     email: 'arthur@gmail.com',
-  //     password: 'password',
-  //   };
+  it.skip('sign up without email or password', async () => {
+    const user1 = {
+      email: 'arthur@gmail.com',
+      password: 'password',
+    };
 
-  //   const res1 = await requester.post('/api/1.0/user/signup').send(user1);
+    const res1 = await requester.post('/api/1.0/user/signup').send(user1);
 
-  //   expect(res1.statusCode).to.equal(400);
+    expect(res1.statusCode).to.equal(400);
+    expect(res1.body.error.code).to.equal(31001);
 
-  //   const user2 = {
-  //     name: 'arthur',
-  //     password: 'password',
-  //   };
+    const user2 = {
+      name: 'arthur',
+      password: 'password',
+    };
 
-  //   const res2 = await requester.post('/api/1.0/user/signup').send(user2);
+    const res2 = await requester.post('/api/1.0/user/signup').send(user2);
 
-  //   expect(res2.statusCode).to.equal(400);
+    expect(res2.statusCode).to.equal(400);
+    expect(res2.body.error.code).to.equal(31001);
 
-  //   const user3 = {
-  //     name: 'arthur',
-  //     email: 'arthur@gmail.com',
-  //   };
+    const user3 = {
+      name: 'arthur',
+      email: 'arthur@gmail.com',
+    };
 
-  //   const res3 = await requester.post('/api/1.0/user/signup').send(user3);
+    const res3 = await requester.post('/api/1.0/user/signup').send(user3);
 
-  //   expect(res3.statusCode).to.equal(400);
-  // });
+    expect(res3.statusCode).to.equal(400);
+    expect(res3.body.error.code).to.equal(31001);
+  });
 
-  // it('sign up with existed email', async () => {
-  //   const user = {
-  //     name: users[0].name,
-  //     email: users[0].email,
-  //     password: 'password',
-  //   };
+  it('sign up with existed email', async () => {
+    const user = {
+      name: users[0].name,
+      email: users[0].email,
+      password: 'password',
+    };
 
-  //   const res = await requester.post('/api/1.0/user/signup').send(user);
+    const res = await requester.post('/api/1.0/user/signup').send(user);
 
-  //   expect(res.body.error).to.equal('Email Already Exists');
-  // });
+    expect(res.status).to.equal(409);
+    expect(res.body.error.code).to.equal(31002);
+  });
 
-  // it('sign up with malicious email', async () => {
-  //   const user = {
-  //     name: users[0].name,
-  //     email: '<script>alert(1)</script>',
-  //     password: 'password',
-  //   };
+  it('sign up with invalid email', async () => {
+    const user = {
+      name: 'sean',
+      email: 'sean',
+      password: 'sean',
+    };
 
-  //   const res = await requester.post('/api/1.0/user/signup').send(user);
+    const res = await requester.post('/api/1.0/user/signup').send(user);
 
-  //   expect(res.body.error).to.equal('Request Error: Invalid email format');
-  // });
+    expect(res.status).to.equal(400);
+    expect(res.body.error.code).to.deep.equal(31001);
+  });
+
+  it('sign up with invalid password', async () => {
+    const user = {
+      name: 'sean',
+      email: 'sean@sean.com',
+      password: 'sea',
+    };
+
+    const res = await requester.post('/api/1.0/user/signup').send(user);
+
+    expect(res.status).to.equal(400);
+    expect(res.body.error.code).to.deep.equal(31001);
+  });
+
+  it('sign up without name', async () => {
+    const user = {
+      name: '',
+      email: 'sean@sean.com',
+      password: 'sean',
+    };
+
+    const res = await requester.post('/api/1.0/user/signup').send(user);
+
+    expect(res.status).to.equal(400);
+    expect(res.body.error.code).to.deep.equal(31001);
+  });
+
+  it('sign up with malicious email', async () => {
+    const user = {
+      name: 'sean',
+      email: '<script>alert(1)</script>',
+      password: 'password',
+    };
+
+    const res = await requester.post('/api/1.0/user/signup').send(user);
+
+    expect(res.status).to.equal(400);
+    expect(res.body.error.code).to.deep.equal(31001);
+  });
+
+  // TODO: other sign-up fails
 
   /**
    * Native Sign In
@@ -255,13 +296,20 @@ describe('user', () => {
     const res = await requester.post('/api/1.0/user/signin').send(user);
 
     expect(res.status).to.equal(403);
-    expect(res.body).to.deep.equal({
-      error: {
-        code: 32202,
-        title: 'native sign in fails',
-        message: 'email or password incorrect',
-      },
-    });
+    expect(res.body.error.code).to.deep.equal(32202);
+  });
+
+  it('sign in with unsupported', async () => {
+    const user = {
+      provider: 'unsupported',
+      email: 'test@test.com',
+      password: 'test',
+    };
+
+    const res = await requester.post('/api/1.0/user/signin').send(user);
+
+    expect(res.status).to.equal(400);
+    expect(res.body.error.code).to.deep.equal(32101);
   });
 
   /**
