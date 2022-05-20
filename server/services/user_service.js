@@ -68,6 +68,8 @@ const signInMap = {
 };
 
 const signUp = async (name, email, password) => {
+  if (!name || !email || !password) return generateResponse(31003);
+
   const validation = signUpSchema.validate({ name, email, password });
   if (validation.error) return generateResponse(31001);
 

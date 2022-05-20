@@ -44,6 +44,12 @@ const MAP = {
     title: 'sign up fails',
     message: 'user already exists',
   },
+  31003: {
+    type: 'error',
+    status: 400,
+    title: 'sign up fails',
+    message: 'name, email, password are all required',
+  },
   32101: {
     type: 'error',
     status: 400,

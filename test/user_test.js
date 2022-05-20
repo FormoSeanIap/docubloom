@@ -61,36 +61,36 @@ describe('user', () => {
     expect(expect(getTimeDiff(body.data.login_at, getCurrentTime(), 'second') < 1));
   });
 
-  it.skip('sign up without email or password', async () => {
-    const user1 = {
+  it('sign up without name, email or password', async () => {
+    const userNoName = {
       email: 'arthur@gmail.com',
       password: 'password',
     };
 
-    const res1 = await requester.post('/api/1.0/user/signup').send(user1);
+    const resNoname = await requester.post('/api/1.0/user/signup').send(userNoName);
 
-    expect(res1.statusCode).to.equal(400);
-    expect(res1.body.error.code).to.equal(31001);
+    expect(resNoname.statusCode).to.equal(400);
+    expect(resNoname.body.error.code).to.equal(31003);
 
-    const user2 = {
+    const userNoEmail = {
       name: 'arthur',
       password: 'password',
     };
 
-    const res2 = await requester.post('/api/1.0/user/signup').send(user2);
+    const resNoEmail = await requester.post('/api/1.0/user/signup').send(userNoEmail);
 
-    expect(res2.statusCode).to.equal(400);
-    expect(res2.body.error.code).to.equal(31001);
+    expect(resNoEmail.statusCode).to.equal(400);
+    expect(resNoEmail.body.error.code).to.equal(31003);
 
-    const user3 = {
+    const userNoPwd = {
       name: 'arthur',
       email: 'arthur@gmail.com',
     };
 
-    const res3 = await requester.post('/api/1.0/user/signup').send(user3);
+    const resNoPwd = await requester.post('/api/1.0/user/signup').send(userNoPwd);
 
-    expect(res3.statusCode).to.equal(400);
-    expect(res3.body.error.code).to.equal(31001);
+    expect(resNoPwd.statusCode).to.equal(400);
+    expect(resNoPwd.body.error.code).to.equal(31003);
   });
 
   it('sign up with existed email', async () => {
@@ -124,19 +124,6 @@ describe('user', () => {
       name: 'sean',
       email: 'sean@sean.com',
       password: 'sea',
-    };
-
-    const res = await requester.post('/api/1.0/user/signup').send(user);
-
-    expect(res.status).to.equal(400);
-    expect(res.body.error.code).to.deep.equal(31001);
-  });
-
-  it('sign up without name', async () => {
-    const user = {
-      name: '',
-      email: 'sean@sean.com',
-      password: 'sean',
     };
 
     const res = await requester.post('/api/1.0/user/signup').send(user);
