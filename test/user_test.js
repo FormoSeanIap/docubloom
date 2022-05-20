@@ -281,8 +281,8 @@ describe('user', () => {
   it('get profile with valid access_token', async () => {
     const userToSignIn = {
       provider: 'native',
-      email: 'test@test.com',
-      password: 'test',
+      email: 'test0@test.com',
+      password: 'test0',
     };
 
     const signInRes = await requester.post('/api/1.0/user/signin').send(userToSignIn);
@@ -303,7 +303,7 @@ describe('user', () => {
     const { docs } = data;
 
     expect(user2).to.deep.equal(user1);
-    expect(docs).to.be.an('array').lengthOf(0);
+    expect(docs).to.be.an('array').lengthOf(2);
   });
 
   it('get profile without access_token', async () => {

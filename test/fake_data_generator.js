@@ -3,7 +3,7 @@ import argon2 from 'argon2';
 import dayjs from 'dayjs';
 import url from 'url';
 import { docCollection, userCollection } from '../server/models/mongodb.js';
-import { users } from './fake_data.js';
+import { users, docs } from './fake_data.js';
 
 const { NODE_ENV } = process.env;
 
@@ -51,12 +51,59 @@ async function createFakeUsers() {
   }
 }
 
+async function createFakeDocs() {
+  const rawUserIds = await userCollection.find({}, { projection: { _id: 1 } }).toArray();
+  const userIds = rawUserIds.map((user) => user._id.toHexString());
+
+  // doc 1 has test0 as owner, test1 as editor, test2 as viewer
+  const doc1ToInsert = {
+    users: {
+      [userIds[0]]: 'O',
+      [userIds[1]]: 'E',
+      [userIds[2]]: 'V',
+    },
+    data: docs[0],
+  };
+  // doc 2 has test0 as owner, test1 as viewer
+  const doc2ToInsert = {
+    users: {
+      [userIds[0]]: 'O',
+      [userIds[1]]: 'V',
+    },
+    data: docs[1],
+  };
+  // doc 3 has test1 as owner, test2 as editor
+  const doc3ToInsert = {
+    users: {
+      [userIds[1]]: 'O',
+      [userIds[2]]: 'E',
+    },
+    data: docs[2],
+  };
+  // doc 4 has test2 as owner
+  const doc4ToInsert = {
+    users: {
+      [userIds[2]]: 'O',
+    },
+    data: docs[3],
+  };
+
+  const docsToInsert = [doc1ToInsert, doc2ToInsert, doc3ToInsert, doc4ToInsert];
+  try {
+    await docCollection.insertMany(docsToInsert);
+    console.log('createFakeDocs success');
+  } catch (e) {
+    console.error('createFakeDocs error', e);
+  }
+}
+
 async function createFakeData() {
   if (NODE_ENV !== 'test') {
     console.error('createFakeData only runs in test env');
     return;
   }
   await createFakeUsers();
+  await createFakeDocs();
   console.log('createFakeData finished');
 }
 
