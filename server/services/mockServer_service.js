@@ -6,22 +6,22 @@ const { CACHE_MOCK_RESPONSE_EXPIRE } = process.env;
 
 async function checkDocBasicInfo(docId, path, method, statusCode, contentType) {
   const doc = await DocModel.getDoc(docId);
-  if (!doc) return generateResponse(60001);
-  if (doc.error) return generateResponse(10003);
+  if (!doc) return { code: 60001 };
+  if (doc.error) return { code: 10003 };
 
   const targetPathData = doc.data.paths[path];
-  if (!targetPathData) return generateResponse(60002);
+  if (!targetPathData) return { code: 60002 };
 
   const targetMethodData = targetPathData[method];
-  if (!targetMethodData) return generateResponse(60003);
+  if (!targetMethodData) return { code: 60003 };
 
   const targetStatusCodeData = targetMethodData.responses[statusCode];
-  if (!targetStatusCodeData) return generateResponse(60004);
+  if (!targetStatusCodeData) return { code: 60004 };
 
   const targetContentTypeData = targetStatusCodeData.content[contentType];
-  if (!targetContentTypeData) return generateResponse(60005);
+  if (!targetContentTypeData) return { code: 60005 };
 
-  return targetContentTypeData;
+  return { code: 0, targetContentTypeData };
 }
 
 const getExample = async (docId, path, method, statusCode, contentType) => {
@@ -38,33 +38,33 @@ const getExample = async (docId, path, method, statusCode, contentType) => {
 
   if (cacheMockResValue) {
     console.log('Get example mock response from cache');
-    return cacheMockResValue;
+    return { data: cacheMockResValue };
   }
 
-  const targetContentTypeData = await checkDocBasicInfo(
+  const { code, targetContentTypeData } = await checkDocBasicInfo(
     docId,
     path,
     method,
     statusCode,
     contentType,
   );
-  if (targetContentTypeData.error) {
-    return targetContentTypeData;
+  if (code !== 0) {
+    return { code };
   }
 
-  const result = targetContentTypeData.example;
-  if (!result) return generateResponse(60006);
+  const data = targetContentTypeData.example;
+  if (!data) return { code: 60006 };
 
   try {
     if (Cache.ready) {
-      await Cache.set(cacheMockResKey, JSON.stringify(result));
+      await Cache.set(cacheMockResKey, JSON.stringify(data));
       await Cache.expire(cacheMockResKey, CACHE_MOCK_RESPONSE_EXPIRE);
     }
   } catch (err) {
     console.error(`Set example mock response to cache error: ${err}`);
   }
 
-  return result;
+  return { code: 2, data };
 };
 
 const getExampleFromExamples = async (
@@ -88,35 +88,36 @@ const getExampleFromExamples = async (
 
   if (cacheMockResValue) {
     console.log('Get examples mock response from cache');
-    return cacheMockResValue;
+    return { code: 2, data: cacheMockResValue };
   }
 
-  const targetContentTypeData = await checkDocBasicInfo(
+  const { code, targetContentTypeData } = await checkDocBasicInfo(
     docId,
     path,
     method,
     statusCode,
     contentType,
   );
-  if (targetContentTypeData.error) {
-    return targetContentTypeData;
+  if (code !== 0) {
+    return { code };
   }
+
   const targetExamplesData = targetContentTypeData.examples;
   if (!targetExamplesData) return generateResponse(61001);
 
-  const result = targetExamplesData[exampleName];
-  if (!result) return generateResponse(60006);
+  const data = targetExamplesData[exampleName];
+  if (!data) return { code: 60006 };
 
   try {
     if (Cache.ready) {
-      await Cache.set(cacheMockResKey, JSON.stringify(result));
+      await Cache.set(cacheMockResKey, JSON.stringify(data));
       await Cache.expire(cacheMockResKey, CACHE_MOCK_RESPONSE_EXPIRE);
     }
   } catch (error) {
     console.error(`Set examples mock response to cache error: ${error}`);
   }
 
-  return result;
+  return { code: 2, data };
 };
 
 export {

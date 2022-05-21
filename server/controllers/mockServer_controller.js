@@ -1,17 +1,25 @@
 import * as MockServerService from '../services/mockServer_service.js';
+import { generateResponse } from '../../utils/util.js';
 
 const getExample = async (req, res) => {
   const { docId } = req.params;
   const {
     path, method, statusCode, contentType,
   } = req.query;
-  const result = await MockServerService.getExample(docId, path, method, statusCode, contentType);
 
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  const { code, data } = await MockServerService.getExample(
+    docId,
+    path,
+    method,
+    statusCode,
+    contentType,
+  );
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
-  res.status(statusCode).send(result);
+  res.status(statusCode).send(data);
 };
 
 const getExampleFromExamples = async (req, res) => {
@@ -19,7 +27,7 @@ const getExampleFromExamples = async (req, res) => {
   const {
     path, method, statusCode, contentType, exampleName,
   } = req.query;
-  const result = await MockServerService.getExampleFromExamples(
+  const { code, data } = await MockServerService.getExampleFromExamples(
     docId,
     path,
     method,
@@ -27,12 +35,12 @@ const getExampleFromExamples = async (req, res) => {
     contentType,
     exampleName,
   );
-
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
-  res.status(statusCode).send(result);
+  res.status(statusCode).send(data);
 };
 
 export {

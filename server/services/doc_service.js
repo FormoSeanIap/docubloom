@@ -3,7 +3,7 @@ import * as UserModel from '../models/user_model.js';
 import Cache from '../../utils/cache.js';
 
 import { DOC_ROLE } from '../../utils/constants.js';
-import { generateResponse, convertMongoId } from '../../utils/util.js';
+import { convertMongoId } from '../../utils/util.js';
 
 // TODO: move getDBDocRole & getKeysBeValue to utils
 function getDBDocRole(role) {
