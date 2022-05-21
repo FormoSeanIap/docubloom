@@ -14,7 +14,7 @@ import docRoute from './server/routes/docs_route.js';
 import mockServerRoute from './server/routes/mockServer_route.js';
 
 // for page not found and internal server error message
-import { respondPageNotFound, respondServerErr } from './utils/util.js';
+import handleResponse from './utils/response_handler.js';
 
 const {
   NODE_ENV, PORT, PORT_TEST, API_VERSION,
@@ -39,11 +39,11 @@ app.use(`/api/${API_VERSION}/docs`, /* rateLimiterRoute, */ [docRoute]);
 app.use(`/api/${API_VERSION}/mock-server`, /* rateLimiterRoute, */ [mockServerRoute]);
 
 // Page not found
-app.use((req, res) => respondPageNotFound(res));
+app.use((req, res) => handleResponse(10001, res));
 
 // Error handling
 // eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => respondServerErr(err, res));
+app.use((err, req, res, next) => handleResponse(10002, res));
 
 server.listen(port, () => console.log(`Listening on port ${port} in ${NODE_ENV} mode`));
 

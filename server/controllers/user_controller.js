@@ -1,6 +1,6 @@
 import * as DocService from '../services/doc_service.js';
 import * as UserService from '../services/user_service.js';
-import { generateResponse } from '../../utils/util.js';
+import handleResponse from '../../utils/response_handler.js';
 
 const signUp = async (req, res) => {
   const { name, email, password } = req.body;
@@ -9,8 +9,7 @@ const signUp = async (req, res) => {
 
   const { code, user } = result;
   if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
+    handleResponse(code, res);
     return;
   }
 
@@ -34,9 +33,7 @@ const signIn = async (req, res) => {
 
   const { code, user } = result;
   if (code > 9999) {
-    const response = generateResponse(code);
-    // TODO: make it { error: response.message }
-    res.status(response.status).send({ error: response.error });
+    handleResponse(code, res);
     return;
   }
 
@@ -59,8 +56,7 @@ const signIn = async (req, res) => {
 const getProfile = async (req, res) => {
   const { code, docs } = await UserService.getDocs(req.user.id);
   if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
+    handleResponse(code, res);
     return;
   }
 
@@ -80,13 +76,7 @@ const leaveDoc = async (req, res) => {
   const { docId } = req.params;
 
   const { code } = await DocService.deleteUser(docId, userId);
-  if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
-    return;
-  }
-  const response = generateResponse(code);
-  res.status(response.status).send({ message: response.message });
+  handleResponse(code, res);
 };
 
 export {

@@ -9,7 +9,7 @@ import * as UserModel from '../server/models/user_model.js';
 import * as DocModel from '../server/models/doc_model.js';
 
 import { DOC_ROLE } from './constants.js';
-import ResMap from './responses.js';
+import handleResponse from './response_handler.js';
 
 const { TOKEN_SECRET, TOKEN_EXPIRE } = process.env;
 
@@ -35,56 +35,13 @@ function convertMongoId(obj) {
   return newObj;
 }
 
-function generateResponse(code) {
-  const contents = ResMap[code];
-  return {
-    status: contents.status,
-    [contents.type]: {
-      code,
-      title: contents.title,
-      message: contents.message,
-    },
-  };
-}
-
-function respondPageNotFound(res) {
-  const response = generateResponse(10001);
-  const { status, error } = response;
-  res.status(status).send({ error });
-}
-
-function respondServerErr(err, res) {
-  console.error(err);
-  const response = generateResponse(10002);
-  const { status, error } = response;
-  res.status(status).send({ error });
-}
-
-function respondQueryErr(res) {
-  const response = generateResponse(10003);
-  const { status, error } = response;
-  res.status(status).send({ error });
-}
-
-function respondUnauthorized(res) {
-  const response = generateResponse(20001);
-  const { status, error } = response;
-  res.status(status).send({ error });
-}
-
-function respondForbidden(res) {
-  const response = generateResponse(20002);
-  const { status, error } = response;
-  res.status(status).send({ error });
-}
-
 function handleViewerAuth(userRole, res, next) {
   next();
 }
 
 function handleEditorAuth(userRole, res, next) {
   if (userRole === DOC_ROLE.VIEWER) {
-    respondForbidden(res);
+    handleResponse(20002, res);
   } else {
     next();
   }
@@ -92,7 +49,7 @@ function handleEditorAuth(userRole, res, next) {
 
 function handleOwnerAuth(userRole, res, next) {
   if (userRole !== DOC_ROLE.OWNER) {
-    respondForbidden(res);
+    handleResponse(20002, res);
   } else {
     next();
   }
@@ -108,13 +65,13 @@ function userAuthentication() {
   return async (req, res, next) => {
     let accessToken = req.get('Authorization');
     if (!accessToken) {
-      respondUnauthorized(res);
+      handleResponse(20001, res);
       return;
     }
 
     accessToken = accessToken.replace('Bearer ', '');
     if (accessToken === 'null') {
-      respondUnauthorized(res);
+      handleResponse(20001, res);
       return;
     }
 
@@ -123,17 +80,17 @@ function userAuthentication() {
     try {
       user = await promisify(jwt.verify)(accessToken, TOKEN_SECRET);
     } catch (err) {
-      respondForbidden(res);
+      handleResponse(20002, res);
       return;
     }
 
     const userDetailResult = await UserModel.getUserDetail(user.email);
     if (userDetailResult === null) {
-      respondForbidden(res);
+      handleResponse(20002, res);
       return;
     }
     if (userDetailResult.error) {
-      respondQueryErr(res);
+      handleResponse(10003, res);
       return;
     }
 
@@ -150,24 +107,23 @@ function docAuthorization(roleType) {
   return async (req, res, next) => {
     const { docId } = req.params;
     if (!docId) {
-      const response = generateResponse(50005);
-      const { status, error } = response;
-      res.status(status).send({ error });
+      handleResponse(50005, res);
       return;
     }
 
     const userId = req.user.id;
     const userRoleResult = await DocModel.getDocRole(userId, docId);
-    if (userRoleResult.error) generateResponse(10003);
+    if (userRoleResult.error) {
+      handleResponse(10003, res);
+      return;
+    }
 
     const userRole = userRoleResult.users[userId];
     req.user.role = userRole;
 
     const authFunc = authMap[roleType];
     if (!authFunc) {
-      const response = generateResponse(50003);
-      const { status, error } = response;
-      res.status(status).send({ error });
+      handleResponse(50003, res);
       return;
     }
     authFunc(userRole, res, next);
@@ -209,9 +165,6 @@ export {
   getCurrentTime,
   asyncHandler,
   convertMongoId,
-  generateResponse,
-  respondPageNotFound,
-  respondServerErr,
   userAuthentication,
   docAuthorization,
   generateAccessToken,

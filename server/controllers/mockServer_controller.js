@@ -1,5 +1,5 @@
 import * as MockServerService from '../services/mockServer_service.js';
-import { generateResponse } from '../../utils/util.js';
+import handleResponse from '../../utils/response_handler.js';
 
 const getExample = async (req, res) => {
   const { docId } = req.params;
@@ -15,8 +15,7 @@ const getExample = async (req, res) => {
     contentType,
   );
   if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
+    handleResponse(code, res);
     return;
   }
   res.status(statusCode).send(data);
@@ -36,8 +35,7 @@ const getExampleFromExamples = async (req, res) => {
     exampleName,
   );
   if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
+    handleResponse(code, res);
     return;
   }
   res.status(statusCode).send(data);

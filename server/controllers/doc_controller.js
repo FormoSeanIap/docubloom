@@ -1,13 +1,12 @@
 import * as DocService from '../services/doc_service.js';
 import * as UserService from '../services/user_service.js';
-import { generateResponse } from '../../utils/util.js';
+import handleResponse from '../../utils/response_handler.js';
 
 const getUsers = async (req, res) => {
   const { docId } = req.params;
   const { code, users } = await DocService.getUsers(docId);
   if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
+    handleResponse(code, res);
     return;
   }
 
@@ -28,15 +27,13 @@ const addUser = async (req, res) => {
     userRole,
   );
   if (addUserResult.code > 9999) {
-    const response = generateResponse(addUserResult.code);
-    res.status(response.status).send({ error: response.error });
+    handleResponse(addUserResult.code, res);
     return;
   }
 
   const { code, userDetail: collaborator } = await UserService.getUserDetail(collaboratorEmail);
   if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
+    handleResponse(code, res);
   }
 
   res.status(200).send({
@@ -58,27 +55,14 @@ const updateUser = async (req, res) => {
   const { role: userRole } = req.user;
 
   const { code } = await DocService.updateUser(docId, userId, collaboratorRole, userRole);
-  if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
-    return;
-  }
-
-  const response = generateResponse(code);
-  res.status(response.status).send({ message: response.message });
+  handleResponse(code, res);
 };
 
 const deleteUser = async (req, res) => {
   const { docId, userId } = req.params;
 
   const { code } = await DocService.deleteUser(docId, userId);
-  if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
-    return;
-  }
-  const response = generateResponse(code);
-  res.status(response.status).send({ message: response.message });
+  handleResponse(code, res);
 };
 
 const getDoc = async (req, res) => {
@@ -86,8 +70,7 @@ const getDoc = async (req, res) => {
 
   const { code, doc } = await DocService.getDoc(docId);
   if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
+    handleResponse(code, res);
     return;
   }
   res.status(200).send({
@@ -99,13 +82,7 @@ const createDoc = async (req, res) => {
   const doc = req.body.data;
 
   const { code } = await DocService.createDoc(req.user.id, doc);
-  if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
-    return;
-  }
-  const response = generateResponse(code);
-  res.status(response.status).send({ message: response.message });
+  handleResponse(code, res);
 };
 
 const editDoc = async (req, res) => {
@@ -113,26 +90,14 @@ const editDoc = async (req, res) => {
   const doc = req.body.data;
 
   const { code } = await DocService.editDoc(docId, doc);
-  if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
-    return;
-  }
-  const response = generateResponse(code);
-  res.status(response.status).send({ message: response.message });
+  handleResponse(code, res);
 };
 
 const deleteDoc = async (req, res) => {
   const { docId } = req.params;
 
   const { code } = await DocService.deleteDoc(docId);
-  if (code > 9999) {
-    const response = generateResponse(code);
-    res.status(response.status).send({ error: response.error });
-    return;
-  }
-  const response = generateResponse(code);
-  res.status(response.status).send({ message: response.message });
+  handleResponse(code, res);
 };
 
 export {
