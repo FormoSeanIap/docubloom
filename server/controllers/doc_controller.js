@@ -10,8 +10,28 @@ const getUsers = async (req, res) => {
     return;
   }
 
+  function generateUserToRespond(user) {
+    return {
+      id: user._id.toHexString(),
+      email: user.email,
+      name: user.name,
+    };
+  }
+
+  function generateMultiUsersToRespond(usersArr) {
+    return usersArr.map(generateUserToRespond);
+  }
+
+  const ownersToRespond = generateMultiUsersToRespond(users.owners);
+  const editorsToRespond = generateMultiUsersToRespond(users.editors);
+  const viewersToRespond = generateMultiUsersToRespond(users.viewers);
+
   res.status(200).send({
-    data: users,
+    data: {
+      owners: ownersToRespond,
+      editors: editorsToRespond,
+      viewers: viewersToRespond,
+    },
   });
 };
 
@@ -34,6 +54,7 @@ const addUser = async (req, res) => {
   const { code, userDetail: collaborator } = await UserService.getUserDetail(collaboratorEmail);
   if (code > 9999) {
     handleResponse(code, res);
+    return;
   }
 
   res.status(200).send({
