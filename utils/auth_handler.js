@@ -51,7 +51,7 @@ function userAuthentication() {
       return;
     }
 
-    const userDetailResult = await UserModel.getUserDetail(user.email);
+    const userDetailResult = await UserModel.getUserDetailByEmail(user.email);
     if (userDetailResult === null) {
       handleResponse(20002, res);
       return;

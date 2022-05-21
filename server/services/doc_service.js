@@ -36,7 +36,7 @@ const addUser = async (docId, collaboratorEmail, collaboratorRole, userRole) => 
   if (!collaboratorEmail) return { code: 52001 };
   if (!collaboratorRole) return { code: 50002 };
 
-  const collaboratorResult = await UserModel.getUserDetail(collaboratorEmail);
+  const collaboratorResult = await UserModel.getUserDetailByEmail(collaboratorEmail);
   if (collaboratorResult === null) return { code: 52002 };
   if (collaboratorResult.error) return { code: 10003 };
 

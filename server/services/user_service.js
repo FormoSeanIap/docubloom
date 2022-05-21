@@ -13,7 +13,7 @@ const nativeSignIn = async (reqBody) => {
 
   if (!email || !password) return { code: 32201 };
 
-  const userRaw = await UserModel.getUserDetail(email);
+  const userRaw = await UserModel.getUserDetailByEmail(email);
   if (userRaw === null) return { code: 32202 };
   if (userRaw.error) return { code: 10003 };
   const user = convertMongoId(userRaw);
@@ -65,7 +65,7 @@ const signUp = async (name, email, password) => {
     return { code: 31001 };
   }
 
-  const userResult = await UserModel.getUserDetail(email);
+  const userResult = await UserModel.getUserDetailByEmail(email);
   if (userResult !== null) return { code: 31002 };
   if (userResult && userResult.error) return { code: 10003 };
 
@@ -141,7 +141,7 @@ const getDocs = async (userId) => {
 };
 
 const getUserDetail = async (email) => {
-  const userResult = await UserModel.getUserDetail(email);
+  const userResult = await UserModel.getUserDetailByEmail(email);
   if (userResult.error) return { code: 10003 };
 
   const userDetail = convertMongoId(userResult);

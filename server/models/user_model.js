@@ -28,21 +28,11 @@ const nativeSignIn = async (user, loginAt, updatedDt) => {
   }
 };
 
-// TODO: get user detail by email
-const getUserDetail = async (email) => {
+const getUserDetailByEmail = async (email) => {
   try {
     return await userCollection.findOne({ email });
   } catch (err) {
     console.error('get user detail error:', err);
-    return { error: err };
-  }
-};
-
-const getUserDetailById = async (userId) => {
-  try {
-    return await userCollection.findOne({ _id: ObjectId(userId) });
-  } catch (err) {
-    console.error('get user detail by Id error:', err);
     return { error: err };
   }
 };
@@ -71,8 +61,7 @@ const getUserDocs = async (userId) => {
 export {
   signUp,
   nativeSignIn,
-  getUserDetail,
-  getUserDetailById,
+  getUserDetailByEmail,
   getMultiUsersDetailsById,
   getUserDocs,
 };
