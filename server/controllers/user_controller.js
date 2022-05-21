@@ -1,6 +1,7 @@
 import * as DocService from '../services/doc_service.js';
 import * as UserService from '../services/user_service.js';
 import handleResponse from '../../utils/response_handler.js';
+import { generateAccessToken } from '../../utils/util.js';
 
 const signUp = async (req, res) => {
   const { name, email, password } = req.body;
@@ -13,11 +14,16 @@ const signUp = async (req, res) => {
     return;
   }
 
-  // TODO: wrap res obj here instead of service layer
+  const { accessToken, accTokenExp } = await generateAccessToken({
+    provider: 'native',
+    name: user.name,
+    email: user.email,
+  });
+
   res.status(200).send({
     data: {
-      access_token: user.access_token,
-      access_expired: user.access_expired,
+      access_token: accessToken,
+      access_expired: accTokenExp,
       login_at: user.last_login_at,
       user: {
         id: user.id,
@@ -37,11 +43,16 @@ const signIn = async (req, res) => {
     return;
   }
 
-  // TODO: wrap res obj here instead of service layer
+  const { accessToken, accTokenExp } = await generateAccessToken({
+    provider: req.body.provider,
+    name: user.name,
+    email: user.email,
+  });
+
   res.status(200).send({
     data: {
-      access_token: user.access_token,
-      access_expired: user.access_expired,
+      access_token: accessToken,
+      access_expired: accTokenExp,
       login_at: user.login_at,
       user: {
         id: user.id,

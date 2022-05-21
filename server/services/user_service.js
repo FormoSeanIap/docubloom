@@ -4,7 +4,6 @@ import {
   hashPassword,
   checkPassword,
   convertMongoId,
-  generateAccessToken,
   getCurrentTime,
 } from '../../utils/util.js';
 import { DOC_ROLE } from '../../utils/constants.js';
@@ -28,23 +27,13 @@ const nativeSignIn = async (reqBody) => {
   const signInResult = await UserModel.nativeSignIn(userRaw, loginAt, updateDt);
   if (signInResult.error) return { code: 10003 };
 
-  const { accessToken, accTokenExp } = await generateAccessToken({
-    provider: 'native',
-    name: user.name,
-    email: user.email,
-  });
-
-  const result = {
+  return {
     code: 11,
     user: {
       ...user,
-      access_token: accessToken,
-      access_expired: accTokenExp,
       login_at: loginAt,
     },
   };
-
-  return result;
 };
 
 const facebookSignIn = async (reqBody) => {
@@ -99,17 +88,13 @@ const signUp = async (name, email, password) => {
   const result = await UserModel.signUp(user);
   if (result.error) return { code: 10003 };
 
-  const { accessToken, accTokenExp } = await generateAccessToken({
-    provider: 'native',
-    name: user.name,
-    email: user.email,
-  });
-
-  user.access_token = accessToken;
-  user.access_expired = accTokenExp;
-  user.id = result.insertedId.toHexString();
-
-  return { code: 10, user };
+  return {
+    code: 10,
+    user: {
+      ...user,
+      id: result.insertedId.toHexString(),
+    },
+  };
 };
 
 const signIn = async (reqBody) => {
