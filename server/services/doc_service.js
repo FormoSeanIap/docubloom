@@ -9,42 +9,6 @@ function getDBDocRole(role) {
   return DOC_ROLE[role.toUpperCase()];
 }
 
-const getOwners = async (ownerIds) => {
-  const owners = await Promise.all(ownerIds.map(async (id) => {
-    const owner = await DocModel.getOwner(id);
-    if (owner.error) return 'error';
-    owner.id = id;
-    return owner;
-  }));
-  if (owners.includes('error')) return false;
-
-  return owners;
-};
-
-const getEditors = async (editorIds) => {
-  const editors = await Promise.all(editorIds.map(async (id) => {
-    const editor = await DocModel.getEditor(id);
-    if (editor.error) return 'error';
-    editor.id = id;
-    return editor;
-  }));
-  if (editors.includes('error')) return false;
-
-  return editors;
-};
-
-const getViewers = async (viewerIds) => {
-  const viewers = await Promise.all(viewerIds.map(async (id) => {
-    const viewer = await DocModel.getViewer(id);
-    if (viewer.error) return 'error';
-    viewer.id = id;
-    return viewer;
-  }));
-  if (viewers.includes('error')) return false;
-
-  return viewers;
-};
-
 const getUsers = async (docId) => {
   const usersResult = await DocModel.getUsers(docId);
   if (usersResult === null || usersResult.error) return { code: 10003 };
@@ -54,10 +18,10 @@ const getUsers = async (docId) => {
   const editorIds = getKeysByValue(users, DOC_ROLE.EDITOR);
   const viewerIds = getKeysByValue(users, DOC_ROLE.VIEWER);
 
-  const owners = await getOwners(ownerIds);
-  const editors = await getEditors(editorIds);
-  const viewers = await getViewers(viewerIds);
-  if (!owners || !editors || !viewers) return { code: 10003 };
+  const owners = await UserModel.getMultiUsersDetailsById(ownerIds);
+  const editors = await UserModel.getMultiUsersDetailsById(editorIds);
+  const viewers = await UserModel.getMultiUsersDetailsById(viewerIds);
+  if (owners.error || editors.error || viewers.error) return { code: 10003 };
 
   return {
     users: {

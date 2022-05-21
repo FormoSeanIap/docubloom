@@ -1,6 +1,6 @@
 import 'dotenv/config.js';
 import { ObjectId } from 'mongodb';
-import { docCollection, userCollection } from './mongodb.js';
+import { docCollection } from './mongodb.js';
 import { DOC_ROLE } from '../../utils/constants.js';
 
 const getUser = async (docId, userId) => {
@@ -28,42 +28,6 @@ const getUsers = async (docId) => {
     );
   } catch (err) {
     console.error('get users error:', err);
-    return { error: err };
-  }
-};
-
-const getOwner = async (ownerId) => {
-  try {
-    return await userCollection.findOne(
-      { _id: ObjectId(ownerId) },
-      { projection: { _id: 0, name: 1, email: 1 } },
-    );
-  } catch (err) {
-    console.error('get owner error:', err);
-    return { error: err };
-  }
-};
-
-const getEditor = async (editorId) => {
-  try {
-    return await userCollection.findOne(
-      { _id: ObjectId(editorId) },
-      { projection: { name: 1, email: 1, _id: 0 } },
-    );
-  } catch (err) {
-    console.error('get editor error:', err);
-    return { error: err };
-  }
-};
-
-const getViewer = async (viewerId) => {
-  try {
-    return await userCollection.findOne(
-      { _id: ObjectId(viewerId) },
-      { projection: { name: 1, email: 1, _id: 0 } },
-    );
-  } catch (err) {
-    console.error('get viewer error:', err);
     return { error: err };
   }
 };
@@ -176,7 +140,4 @@ export {
   getUsers,
   addUser,
   deleteUser,
-  getOwner,
-  getEditor,
-  getViewer,
 };

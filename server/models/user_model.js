@@ -1,4 +1,5 @@
 import 'dotenv/config.js';
+import { ObjectId } from 'mongodb';
 import { docCollection, userCollection } from './mongodb.js';
 
 const signUp = async (user) => {
@@ -27,11 +28,30 @@ const nativeSignIn = async (user, loginAt, updatedDt) => {
   }
 };
 
+// TODO: get user detail by email
 const getUserDetail = async (email) => {
   try {
     return await userCollection.findOne({ email });
   } catch (err) {
     console.error('get user detail error:', err);
+    return { error: err };
+  }
+};
+
+const getUserDetailById = async (userId) => {
+  try {
+    return await userCollection.findOne({ _id: ObjectId(userId) });
+  } catch (err) {
+    console.error('get user detail by Id error:', err);
+    return { error: err };
+  }
+};
+
+const getMultiUsersDetailsById = async (userIds) => {
+  try {
+    return await userCollection.find({ _id: { $in: userIds.map((id) => ObjectId(id)) } }).toArray();
+  } catch (err) {
+    console.error('get multi users details by Id error:', err);
     return { error: err };
   }
 };
@@ -52,5 +72,7 @@ export {
   signUp,
   nativeSignIn,
   getUserDetail,
+  getUserDetailById,
+  getMultiUsersDetailsById,
   getUserDocs,
 };
