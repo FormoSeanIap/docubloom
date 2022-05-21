@@ -19,7 +19,3 @@ function handleResponse(code, res) {
 }
 
 export default handleResponse;
-
-// export {
-//   handleResponse,
-// };

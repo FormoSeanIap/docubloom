@@ -6,7 +6,6 @@ import {
   convertMongoId,
   getCurrentTime,
 } from '../../utils/util.js';
-import { DOC_ROLE } from '../../utils/constants.js';
 
 const nativeSignIn = async (reqBody) => {
   const { email, password } = reqBody;
@@ -106,36 +105,8 @@ const signIn = async (reqBody) => {
 };
 
 const getDocs = async (userId) => {
-  const rawDocs = await UserModel.getUserDocs(userId);
-  if (!rawDocs || rawDocs.error) return { code: 10003 };
-
-  // TODO: move this function out of here
-  const docs = rawDocs.map((info) => {
-    const newInfo = { ...info };
-
-    newInfo.id = info._id.toHexString();
-    delete newInfo._id;
-
-    newInfo.role = Object.keys(DOC_ROLE)
-      .find((key) => DOC_ROLE[key] === info.users[userId])
-      .toLowerCase();
-    delete newInfo.users;
-
-    if (info.data && info.data.info) {
-      newInfo.info = info.data.info;
-    } else {
-      newInfo.info = '';
-    }
-
-    if (info.data && info.data.openapi) {
-      newInfo.openapi = info.data.openapi;
-    } else {
-      newInfo.openapi = '';
-    }
-    delete newInfo.data;
-
-    return newInfo;
-  });
+  const docs = await UserModel.getUserDocs(userId);
+  if (!docs || docs.error) return { code: 10003 };
 
   return { code: 2, docs };
 };

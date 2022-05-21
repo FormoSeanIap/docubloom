@@ -1,7 +1,8 @@
 import * as DocService from '../services/doc_service.js';
 import * as UserService from '../services/user_service.js';
 import handleResponse from '../../utils/response_handler.js';
-import { generateAccessToken } from '../../utils/util.js';
+import { generateAccessToken, convertMongoId } from '../../utils/util.js';
+import { DOC_ROLE } from '../../utils/constants.js';
 
 const signUp = async (req, res) => {
   const { name, email, password } = req.body;
@@ -71,13 +72,55 @@ const getProfile = async (req, res) => {
     return;
   }
 
+  function addRole(doc) {
+    const newDoc = { ...doc };
+    newDoc.role = Object.keys(DOC_ROLE)
+      .find((key) => DOC_ROLE[key] === doc.users[req.user.id])
+      .toLowerCase();
+    return newDoc;
+  }
+
+  function addInfo(doc) {
+    const newDoc = { ...doc };
+    if (doc.data && doc.data.info) {
+      newDoc.info = doc.data.info;
+    } else {
+      newDoc.info = '';
+    }
+    return newDoc;
+  }
+
+  function addOpenAPI(doc) {
+    const newDoc = { ...doc };
+    if (doc.data && doc.data.openapi) {
+      newDoc.openapi = doc.data.openapi;
+    } else {
+      newDoc.openapi = '';
+    }
+    return newDoc;
+  }
+
+  const docsToRespond = docs.map((doc) => {
+    const docWithId = convertMongoId(doc);
+
+    const docWithRole = addRole(docWithId);
+    delete docWithRole.users;
+
+    const docWithInfo = addInfo(docWithRole);
+
+    const docWithOpenAPI = addOpenAPI(docWithInfo);
+    delete docWithOpenAPI.data;
+
+    return docWithOpenAPI;
+  });
+
   res.status(200).send({
     data: {
       id: req.user.id,
       provider: req.user.provider,
       name: req.user.name,
       email: req.user.email,
-      docs,
+      docs: docsToRespond,
     },
   });
 };
