@@ -28,16 +28,6 @@ function asyncHandler(cb) {
   };
 }
 
-async function modelWrapper(modelFunc, content) {
-  try {
-    const result = await modelFunc(content);
-    return result;
-  } catch (err) {
-    console.error('error', err);
-    return { error: err };
-  }
-}
-
 function convertMongoId(obj) {
   const newObj = obj;
   newObj.id = obj._id.toHexString();

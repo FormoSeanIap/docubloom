@@ -1,4 +1,42 @@
 const resMap = {
+  /* ============ crud success ============ */
+  1: {
+    type: 'success',
+    status: 200,
+    title: 'create success',
+    message: 'create success',
+  },
+  2: {
+    type: 'success',
+    status: 200,
+    title: 'read success',
+    message: 'read success',
+  },
+  3: {
+    type: 'success',
+    status: 200,
+    title: 'update success',
+    message: 'update success',
+  },
+  4: {
+    type: 'success',
+    status: 200,
+    title: 'delete success',
+    message: 'delete success',
+  },
+  /* ============ user success ============ */
+  10: {
+    type: 'success',
+    status: 200,
+    title: 'sign up success',
+    message: 'sign up success',
+  },
+  11: {
+    type: 'success',
+    status: 200,
+    title: 'sign in success',
+    message: 'sign in success',
+  },
   /*= =========== general error ============ */
   10001: {
     type: 'error',

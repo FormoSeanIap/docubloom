@@ -1,5 +1,6 @@
 import * as DocService from '../services/doc_service.js';
 import * as UserService from '../services/user_service.js';
+import { generateResponse } from '../../utils/util.js';
 
 const getUsers = async (req, res) => {
   const { docId } = req.params;
@@ -26,10 +27,10 @@ const addUser = async (req, res) => {
     return;
   }
 
-  const collaborator = await UserService.getUserDetail(collaboratorEmail);
-  if (collaborator.error) {
-    res.status(result.status).send({ error: collaborator.error });
-    return;
+  const { code, userDetail: collaborator } = await UserService.getUserDetail(collaboratorEmail);
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
   }
 
   res.status(200).send({

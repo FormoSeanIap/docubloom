@@ -1,16 +1,20 @@
 import * as DocService from '../services/doc_service.js';
 import * as UserService from '../services/user_service.js';
+import { generateResponse } from '../../utils/util.js';
 
 const signUp = async (req, res) => {
   const { name, email, password } = req.body;
 
   const result = await UserService.signUp(name, email, password);
 
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  const { code, user } = result;
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
-  const { user } = result;
+
+  // TODO: wrap res obj here instead of service layer
   res.status(200).send({
     data: {
       access_token: user.access_token,
@@ -28,13 +32,15 @@ const signUp = async (req, res) => {
 const signIn = async (req, res) => {
   const result = await UserService.signIn(req.body);
 
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  const { code, user } = result;
+  if (code > 9999) {
+    const response = generateResponse(code);
+    // TODO: make it { error: response.message }
+    res.status(response.status).send({ error: response.error });
     return;
   }
 
-  const { user } = result;
-
+  // TODO: wrap res obj here instead of service layer
   res.status(200).send({
     data: {
       access_token: user.access_token,
@@ -51,10 +57,10 @@ const signIn = async (req, res) => {
 };
 
 const getProfile = async (req, res) => {
-  const userDocs = await UserService.getDocs(req.user.id);
-
-  if (userDocs.error) {
-    res.status(userDocs.status).send({ error: userDocs.error });
+  const { code, docs } = await UserService.getDocs(req.user.id);
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
 
@@ -64,7 +70,7 @@ const getProfile = async (req, res) => {
       provider: req.user.provider,
       name: req.user.name,
       email: req.user.email,
-      docs: userDocs,
+      docs,
     },
   });
 };

@@ -3,7 +3,6 @@ import {
   signUpSchema,
   hashPassword,
   checkPassword,
-  generateResponse,
   convertMongoId,
   generateAccessToken,
   getCurrentTime,
@@ -13,21 +12,21 @@ import { DOC_ROLE } from '../../utils/constants.js';
 const nativeSignIn = async (reqBody) => {
   const { email, password } = reqBody;
 
-  if (!email || !password) return generateResponse(32201);
+  if (!email || !password) return { code: 32201 };
 
   const userRaw = await UserModel.getUserDetail(email);
-  if (userRaw === null) return generateResponse(32202);
-  if (userRaw.error) return generateResponse(10003);
+  if (userRaw === null) return { code: 32202 };
+  if (userRaw.error) return { code: 10003 };
   const user = convertMongoId(userRaw);
 
   const isPasswordCorrect = await checkPassword(password, user.password);
-  if (!isPasswordCorrect) return generateResponse(32202);
+  if (!isPasswordCorrect) return { code: 32202 };
 
   const loginAt = getCurrentTime();
   const updateDt = getCurrentTime();
 
   const signInResult = await UserModel.nativeSignIn(userRaw, loginAt, updateDt);
-  if (signInResult.error) return generateResponse(10003);
+  if (signInResult.error) return { code: 10003 };
 
   const { accessToken, accTokenExp } = await generateAccessToken({
     provider: 'native',
@@ -35,7 +34,8 @@ const nativeSignIn = async (reqBody) => {
     email: user.email,
   });
 
-  const signedInUser = {
+  const result = {
+    code: 11,
     user: {
       ...user,
       access_token: accessToken,
@@ -44,21 +44,21 @@ const nativeSignIn = async (reqBody) => {
     },
   };
 
-  return signedInUser;
+  return result;
 };
 
 const facebookSignIn = async (reqBody) => {
   // eslint-disable-next-line no-unused-vars
   const { access_token: accessToken } = reqBody;
 
-  return generateResponse(32301);
+  return { code: 32301 };
 };
 
 const googleSignIn = async (reqBody) => {
   // eslint-disable-next-line no-unused-vars
   const { access_token: accessToken } = reqBody;
 
-  return generateResponse(32301);
+  return { code: 32301 };
 };
 
 const signInMap = {
@@ -68,17 +68,17 @@ const signInMap = {
 };
 
 const signUp = async (name, email, password) => {
-  if (!name || !email || !password) return generateResponse(31003);
+  if (!name || !email || !password) return { code: 31003 };
 
   try {
     await signUpSchema.validateAsync({ name, email, password });
   } catch (err) {
-    return generateResponse(31001);
+    return { code: 31001 };
   }
 
   const userResult = await UserModel.getUserDetail(email);
-  if (userResult !== null) return generateResponse(31002);
-  if (userResult && userResult.error) return generateResponse(10003);
+  if (userResult !== null) return { code: 31002 };
+  if (userResult && userResult.error) return { code: 10003 };
 
   const hashedPassword = await hashPassword(password);
 
@@ -97,7 +97,7 @@ const signUp = async (name, email, password) => {
   };
 
   const result = await UserModel.signUp(user);
-  if (result.error) return generateResponse(10003);
+  if (result.error) return { code: 10003 };
 
   const { accessToken, accTokenExp } = await generateAccessToken({
     provider: 'native',
@@ -109,12 +109,12 @@ const signUp = async (name, email, password) => {
   user.access_expired = accTokenExp;
   user.id = result.insertedId.toHexString();
 
-  return { user };
+  return { code: 10, user };
 };
 
 const signIn = async (reqBody) => {
   const signInFunc = signInMap[reqBody.provider];
-  if (!signInFunc) return generateResponse(32101);
+  if (!signInFunc) return { code: 32101 };
 
   const signInResult = await signInFunc(reqBody);
   return signInResult;
@@ -122,8 +122,9 @@ const signIn = async (reqBody) => {
 
 const getDocs = async (userId) => {
   const rawDocs = await UserModel.getUserDocs(userId);
-  if (!rawDocs || rawDocs.error) return generateResponse(10003);
+  if (!rawDocs || rawDocs.error) return { code: 10003 };
 
+  // TODO: move this function out of here
   const docs = rawDocs.map((info) => {
     const newInfo = { ...info };
 
@@ -151,14 +152,15 @@ const getDocs = async (userId) => {
     return newInfo;
   });
 
-  return docs;
+  return { code: 2, docs };
 };
 
 const getUserDetail = async (email) => {
   const userResult = await UserModel.getUserDetail(email);
-  if (userResult.error) return generateResponse(10003);
+  if (userResult.error) return { code: 10003 };
+
   const userDetail = convertMongoId(userResult);
-  return userDetail;
+  return { code: 2, userDetail };
 };
 
 export {
