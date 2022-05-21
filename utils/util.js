@@ -29,6 +29,10 @@ function convertMongoId(obj) {
   return newObj;
 }
 
+function getKeysByValue(object, value) {
+  return Object.keys(object).filter((key) => object[key] === value);
+}
+
 async function generateAccessToken(user) {
   const accessToken = await promisify(jwt.sign)(
     user,
@@ -71,6 +75,7 @@ const signUpSchema = Joi.object({
 export {
   getCurrentTime,
   asyncHandler,
+  getKeysByValue,
   convertMongoId,
   generateAccessToken,
   checkAccessToken,
