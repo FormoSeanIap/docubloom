@@ -79,19 +79,14 @@ const leaveDoc = async (req, res) => {
   const userId = req.user.id;
   const { docId } = req.params;
 
-  const result = await DocService.deleteUser(docId, userId);
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  const { code } = await DocService.deleteUser(docId, userId);
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
-
-  res.status(200).send({
-    message: 'Successfully left the document',
-    data: {
-      userId,
-      docId,
-    },
-  });
+  const response = generateResponse(code);
+  res.status(response.status).send({ message: response.message });
 };
 
 export {

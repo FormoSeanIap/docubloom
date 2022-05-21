@@ -4,15 +4,15 @@ import { generateResponse } from '../../utils/util.js';
 
 const getUsers = async (req, res) => {
   const { docId } = req.params;
-  const result = await DocService.getUsers(docId);
-
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  const { code, users } = await DocService.getUsers(docId);
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
 
   res.status(200).send({
-    data: result,
+    data: users,
   });
 };
 
@@ -21,9 +21,15 @@ const addUser = async (req, res) => {
   const { email: collaboratorEmail, role: collaboratorRole } = req.body;
   const userRole = req.user.role;
 
-  const result = await DocService.addUser(docId, collaboratorEmail, collaboratorRole, userRole);
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  const addUserResult = await DocService.addUser(
+    docId,
+    collaboratorEmail,
+    collaboratorRole,
+    userRole,
+  );
+  if (addUserResult.code > 9999) {
+    const response = generateResponse(addUserResult.code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
 
@@ -51,95 +57,82 @@ const updateUser = async (req, res) => {
   const { role: collaboratorRole } = req.body;
   const { role: userRole } = req.user;
 
-  const result = await DocService.updateUser(docId, userId, collaboratorRole, userRole);
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  const { code } = await DocService.updateUser(docId, userId, collaboratorRole, userRole);
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
 
-  res.status(200).send({
-    message: 'update success',
-    data: {
-      docId,
-      userId,
-      userRole: collaboratorRole,
-    },
-  });
+  const response = generateResponse(code);
+  res.status(response.status).send({ message: response.message });
 };
 
 const deleteUser = async (req, res) => {
   const { docId, userId } = req.params;
 
-  const result = await DocService.deleteUser(docId, userId);
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  const { code } = await DocService.deleteUser(docId, userId);
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
-
-  res.status(200).send({
-    message: 'delete success',
-    data: {
-      docId,
-      userId,
-    },
-  });
+  const response = generateResponse(code);
+  res.status(response.status).send({ message: response.message });
 };
 
 const getDoc = async (req, res) => {
   const { docId } = req.params;
 
-  const result = await DocService.getDoc(docId);
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  const { code, doc } = await DocService.getDoc(docId);
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
-  const doc = result.data;
   res.status(200).send({
-    data: doc,
+    data: doc.data,
   });
 };
 
 const createDoc = async (req, res) => {
   const doc = req.body.data;
 
-  const result = await DocService.createDoc(req.user.id, doc);
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  const { code } = await DocService.createDoc(req.user.id, doc);
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
-
-  const docId = result.insertedId.toString();
-
-  res.status(200).send({
-    data: {
-      id: docId,
-    },
-  });
+  const response = generateResponse(code);
+  res.status(response.status).send({ message: response.message });
 };
 
 const editDoc = async (req, res) => {
   const { docId } = req.params;
   const doc = req.body.data;
 
-  const result = await DocService.editDoc(docId, doc);
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  const { code } = await DocService.editDoc(docId, doc);
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
-
-  res.status(200).send({ message: 'update success' });
+  const response = generateResponse(code);
+  res.status(response.status).send({ message: response.message });
 };
 
 const deleteDoc = async (req, res) => {
   const { docId } = req.params;
 
-  const result = await DocService.deleteDoc(docId);
-  if (result.error) {
-    res.status(result.status).send({ error: result.error });
+  const { code } = await DocService.deleteDoc(docId);
+  if (code > 9999) {
+    const response = generateResponse(code);
+    res.status(response.status).send({ error: response.error });
     return;
   }
-
-  res.status(200).send({ message: 'delete success' });
+  const response = generateResponse(code);
+  res.status(response.status).send({ message: response.message });
 };
 
 export {
