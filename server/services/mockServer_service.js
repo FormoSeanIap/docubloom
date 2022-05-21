@@ -1,5 +1,4 @@
 import * as DocModel from '../models/doc_model.js';
-import { generateResponse } from '../../utils/util.js';
 import Cache from '../../utils/cache.js';
 
 const { CACHE_MOCK_RESPONSE_EXPIRE } = process.env;
@@ -103,7 +102,7 @@ const getExampleFromExamples = async (
   }
 
   const targetExamplesData = targetContentTypeData.examples;
-  if (!targetExamplesData) return generateResponse(61001);
+  if (!targetExamplesData) return { code: 61001 };
 
   const data = targetExamplesData[exampleName];
   if (!data) return { code: 60006 };
