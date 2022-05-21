@@ -1,6 +1,7 @@
 import express from 'express';
 
-import { asyncHandler, userAuthentication, docAuthorization } from '../../utils/util.js';
+import { asyncHandler } from '../../utils/util.js';
+import { userAuthentication, docAuthorization } from '../../utils/auth_handler.js';
 import { DOC_ROLE } from '../../utils/constants.js';
 
 import {
