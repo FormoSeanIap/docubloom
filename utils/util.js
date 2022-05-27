@@ -5,12 +5,6 @@ import Joi from 'joi';
 import dayjs from 'dayjs';
 import { promisify } from 'util';
 
-import * as User from '../server/models/user_model.js';
-import * as Doc from '../server/models/doc_model.js';
-
-import { DOC_ROLE } from './constants.js';
-import ResMap from './responses.js';
-
 const { TOKEN_SECRET, TOKEN_EXPIRE } = process.env;
 
 function getCurrentTime() {
@@ -21,21 +15,11 @@ function asyncHandler(cb) {
   return async (req, res, next) => {
     try {
       await cb(req, res, next);
-    } catch (error) {
-      console.error(error);
-      next(error);
+    } catch (err) {
+      console.error(err);
+      next(err);
     }
   };
-}
-
-async function modelWrapper(modelFunc, content) {
-  try {
-    const result = await modelFunc(content);
-    return result;
-  } catch (err) {
-    console.error('error', err);
-    return { error: err };
-  }
 }
 
 function convertMongoId(obj) {
@@ -45,144 +29,8 @@ function convertMongoId(obj) {
   return newObj;
 }
 
-function generateResponse(code) {
-  const contents = ResMap[code];
-  return {
-    status: contents.status,
-    [contents.type]: {
-      code,
-      title: contents.title,
-      message: contents.message,
-    },
-  };
-}
-
-// TODO: handle duplicate format
-function respondPageNotFound(res) {
-  const response = generateResponse(10001);
-  const { status, error } = response;
-  res.status(status).send({ error });
-}
-
-function respondServerErr(err, res) {
-  console.error(err);
-  const response = generateResponse(10002);
-  const { status, error } = response;
-  res.status(status).send({ error });
-}
-
-function respondQueryErr(res) {
-  const response = generateResponse(10003);
-  const { status, error } = response;
-  res.status(status).send({ error });
-}
-
-function respondUnauthorized(res) {
-  const response = generateResponse(20001);
-  const { status, error } = response;
-  res.status(status).send({ error });
-}
-
-function respondForbidden(res) {
-  const response = generateResponse(20002);
-  const { status, error } = response;
-  res.status(status).send({ error });
-}
-
-function handleViewerAuth(userRole, res, next) {
-  next();
-}
-
-function handleEditorAuth(userRole, res, next) {
-  if (userRole === DOC_ROLE.VIEWER) {
-    respondForbidden(res);
-  } else {
-    next();
-  }
-}
-
-function handleOwnerAuth(userRole, res, next) {
-  if (userRole !== DOC_ROLE.OWNER) {
-    respondForbidden(res);
-  } else {
-    next();
-  }
-}
-
-const authMap = {
-  [DOC_ROLE.VIEWER]: handleViewerAuth,
-  [DOC_ROLE.EDITOR]: handleEditorAuth,
-  [DOC_ROLE.OWNER]: handleOwnerAuth,
-};
-
-function userAuthentication() {
-  return async (req, res, next) => {
-    let accessToken = req.get('Authorization');
-    if (!accessToken) {
-      respondUnauthorized(res);
-      return;
-    }
-
-    accessToken = accessToken.replace('Bearer ', '');
-    if (accessToken === 'null') {
-      respondUnauthorized(res);
-      return;
-    }
-
-    let user;
-
-    try {
-      user = await promisify(jwt.verify)(accessToken, TOKEN_SECRET);
-    } catch (err) {
-      respondForbidden(res);
-      return;
-    }
-
-    const userDetailResult = await User.getUserDetail(user.email);
-    if (userDetailResult === null) {
-      respondForbidden(res);
-      return;
-    }
-    if (userDetailResult.error) {
-      respondQueryErr(res);
-      return;
-    }
-
-    const userDetail = convertMongoId(userDetailResult);
-
-    req.user = user;
-    req.user.id = userDetail.id;
-    req.user.role_id = userDetail.role_id;
-    next();
-  };
-}
-
-function docAuthorization(roleType) {
-  return async (req, res, next) => {
-    const { docId } = req.params;
-    if (!docId) {
-      const response = generateResponse(50005);
-      const { status, error } = response;
-      res.status(status).send({ error });
-      return;
-    }
-
-    const userId = req.user.id;
-    const userRoleCheck = await Doc.getDocRole(userId, docId);
-    if (userRoleCheck.error) generateResponse(10003);
-
-    const userRole = userRoleCheck.users[userId];
-    req.user.role = userRole;
-
-    const authFunc = authMap[roleType];
-    if (!authFunc) {
-      const response = generateResponse(50003);
-      const { status, error } = response;
-      res.status(status).send({ error });
-      return;
-    }
-    authFunc(userRole, res, next);
-  };
+function getKeysByValue(object, value) {
+  return Object.keys(object).filter((key) => object[key] === value);
 }
 
 async function generateAccessToken(user) {
@@ -197,16 +45,13 @@ async function generateAccessToken(user) {
   };
 }
 
-// TODO: move this to util
-// const accessToken = jwt.sign(
-//   {
-//     provider: user.provider,
-//     name: user.name,
-//     email: user.email,
-//   },
-//   TOKEN_SECRET,
-//   { expiresIn: TOKEN_EXPIRE },
-// );
+async function checkAccessToken(token) {
+  try {
+    return await promisify(jwt.verify)(token, TOKEN_SECRET);
+  } catch (err) {
+    return false;
+  }
+}
 
 async function hashPassword(password) {
   const hashResult = await argon2.hash(password);
@@ -230,13 +75,10 @@ const signUpSchema = Joi.object({
 export {
   getCurrentTime,
   asyncHandler,
+  getKeysByValue,
   convertMongoId,
-  generateResponse,
-  respondPageNotFound,
-  respondServerErr,
-  userAuthentication,
-  docAuthorization,
   generateAccessToken,
+  checkAccessToken,
   hashPassword,
   checkPassword,
   signUpSchema,

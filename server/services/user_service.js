@@ -1,64 +1,52 @@
-import * as User from '../models/user_model.js';
+import * as UserModel from '../models/user_model.js';
 import {
   signUpSchema,
   hashPassword,
   checkPassword,
-  generateResponse,
   convertMongoId,
-  generateAccessToken,
   getCurrentTime,
 } from '../../utils/util.js';
-import { DOC_ROLE } from '../../utils/constants.js';
 
 const nativeSignIn = async (reqBody) => {
   const { email, password } = reqBody;
 
-  if (!email || !password) return generateResponse(32201);
+  if (!email || !password) return { code: 32201 };
 
-  const userRaw = await User.getUserDetail(email);
-  if (userRaw === null) return generateResponse(32202);
-  if (userRaw.error) return generateResponse(10003);
+  const userRaw = await UserModel.getUserDetailByEmail(email);
+  if (userRaw === null) return { code: 32202 };
+  if (userRaw.error) return { code: 10003 };
   const user = convertMongoId(userRaw);
 
   const isPasswordCorrect = await checkPassword(password, user.password);
-  if (!isPasswordCorrect) return generateResponse(32202);
+  if (!isPasswordCorrect) return { code: 32202 };
 
   const loginAt = getCurrentTime();
   const updateDt = getCurrentTime();
 
-  const signInResult = await User.nativeSignIn(userRaw, loginAt, updateDt);
-  if (signInResult.error) return generateResponse(10003);
+  const signInResult = await UserModel.nativeSignIn(userRaw, loginAt, updateDt);
+  if (signInResult.error) return { code: 10003 };
 
-  const { accessToken, accTokenExp } = await generateAccessToken({
-    provider: 'native',
-    name: user.name,
-    email: user.email,
-  });
-
-  const signedInUser = {
+  return {
+    code: 11,
     user: {
       ...user,
-      access_token: accessToken,
-      access_expired: accTokenExp,
       login_at: loginAt,
     },
   };
-
-  return signedInUser;
 };
 
 const facebookSignIn = async (reqBody) => {
   // eslint-disable-next-line no-unused-vars
   const { access_token: accessToken } = reqBody;
 
-  return generateResponse(32301);
+  return { code: 32301 };
 };
 
 const googleSignIn = async (reqBody) => {
   // eslint-disable-next-line no-unused-vars
   const { access_token: accessToken } = reqBody;
 
-  return generateResponse(32301);
+  return { code: 32301 };
 };
 
 const signInMap = {
@@ -68,14 +56,17 @@ const signInMap = {
 };
 
 const signUp = async (name, email, password) => {
-  if (!name || !email || !password) return generateResponse(31003);
+  if (!name || !email || !password) return { code: 31003 };
 
-  const validation = signUpSchema.validate({ name, email, password });
-  if (validation.error) return generateResponse(31001);
+  try {
+    await signUpSchema.validateAsync({ name, email, password });
+  } catch (err) {
+    return { code: 31001 };
+  }
 
-  const userCheck = await User.getUserDetail(email);
-  if (userCheck !== null) return generateResponse(31002);
-  if (userCheck && userCheck.error) return generateResponse(10003);
+  const userResult = await UserModel.getUserDetailByEmail(email);
+  if (userResult !== null) return { code: 31002 };
+  if (userResult && userResult.error) return { code: 10003 };
 
   const hashedPassword = await hashPassword(password);
 
@@ -93,69 +84,39 @@ const signUp = async (name, email, password) => {
     updated_dt: updatedDt,
   };
 
-  const result = await User.signUp(user);
-  if (result.error) return generateResponse(10003);
+  const result = await UserModel.signUp(user);
+  if (result.error) return { code: 10003 };
 
-  const { accessToken, accTokenExp } = await generateAccessToken({
-    provider: 'native',
-    name: user.name,
-    email: user.email,
-  });
-
-  user.access_token = accessToken;
-  user.access_expired = accTokenExp;
-  user.id = result.insertedId.toHexString();
-
-  return { user };
+  return {
+    code: 10,
+    user: {
+      ...user,
+      id: result.insertedId.toHexString(),
+    },
+  };
 };
 
 const signIn = async (reqBody) => {
   const signInFunc = signInMap[reqBody.provider];
-  if (!signInFunc) return generateResponse(32101);
+  if (!signInFunc) return { code: 32101 };
 
   const signInResult = await signInFunc(reqBody);
   return signInResult;
 };
 
 const getDocs = async (userId) => {
-  const rawDocs = await User.getUserDocs(userId);
-  if (!rawDocs || rawDocs.error) return generateResponse(10003);
+  const docs = await UserModel.getUserDocs(userId);
+  if (!docs || docs.error) return { code: 10003 };
 
-  const docs = rawDocs.map((info) => {
-    const newInfo = { ...info };
-
-    newInfo.id = info._id.toHexString();
-    delete newInfo._id;
-
-    newInfo.role = Object.keys(DOC_ROLE)
-      .find((key) => DOC_ROLE[key] === info.users[userId])
-      .toLowerCase();
-    delete newInfo.users;
-
-    if (info.data && info.data.info) {
-      newInfo.info = info.data.info;
-    } else {
-      newInfo.info = '';
-    }
-
-    if (info.data && info.data.openapi) {
-      newInfo.openapi = info.data.openapi;
-    } else {
-      newInfo.openapi = '';
-    }
-    delete newInfo.data;
-
-    return newInfo;
-  });
-
-  return docs;
+  return { code: 2, docs };
 };
 
 const getUserDetail = async (email) => {
-  const userCheck = await User.getUserDetail(email);
-  if (userCheck.error) return generateResponse(10003);
-  const userDetail = convertMongoId(userCheck);
-  return userDetail;
+  const userResult = await UserModel.getUserDetailByEmail(email);
+  if (userResult.error) return { code: 10003 };
+
+  const userDetail = convertMongoId(userResult);
+  return { code: 2, userDetail };
 };
 
 export {

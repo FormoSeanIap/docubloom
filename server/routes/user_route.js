@@ -1,6 +1,7 @@
 import express from 'express';
 
-import { asyncHandler, userAuthentication } from '../../utils/util.js';
+import { asyncHandler } from '../../utils/util.js';
+import { userAuthentication } from '../../utils/auth_handler.js';
 
 import {
   signUp, signIn, getProfile, leaveDoc,
