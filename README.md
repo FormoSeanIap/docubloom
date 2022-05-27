@@ -210,7 +210,7 @@ To get a local copy up and running follow these simple example steps.
 ### Get Your First API Document
 
 - Simply [Enter the Website](https://www.vivaformosean.com/), click GET EXAMPLE, and click VIEW. Just that simple!
-<img class="#get-document" src="./readme/gifs/get-document.gif">
+<img src="./readme/gifs/get-document.gif">
 
 
 ### Sign In/Up to See your Profile
@@ -236,35 +236,37 @@ Let's dive in and enjoy these cool DocuBloom features together!
 2. Document Contents
 - Following the last part, you can see the contents of document including the parameter, request, response of an API.
 
-<img src="" width="50%">
+<img src="./readme/imgs/document-contents-i.png" width="50%">
 
-<img src="" width="50%">
+<img src="./readme/imgs/document-contents-ii.png" width="50%">
+
+<img src="./readme/imgs/document-contents-iii.png" width="50%">
 
 3. Mistype Hint
 - You'll be given a clear hint for any mistyping. Tired of a never-ending stream of minor blunders? No worries in DocuBloom!
 
-<img src="" width="50%">
+<img src="./readme/imgs/mistype-hint.png" width="50%">
 
 ### API Management
 1. API Tests
 - You can test your API and see if it is working as expected. The API document is actually alive!
 
-<img src=".gif"/>
+<img src="./readme/gifs/test-apis-i.gif"/>
 
-<img src=".gif"/>
+<img src="./readme/gifs/test-apis-ii.gif"/>
 
 ### Document Management
 1. Create a Document
 
-<img src=".gif"/>
+<img src="./readme/gifs/create-a-document.gif"/>
 
 2. Edit a Document
 
-<img src=".gif"/>
+<img src="./readme/gifs/edit-a-document.gif"/>
 
 3. Delete a Document
 
-<img src=".gif"/>
+<img src="./readme/gifs/delete-a-document.gif"/>
 
 ### Collaborator Management
 - There are owner, editor, and viewer roles in DocuBloom. Collaborator management depends on these three roles. Just give it a try on the site if you don't want to read these complicated rules XD.
@@ -287,24 +289,24 @@ Let's dive in and enjoy these cool DocuBloom features together!
 
 1. Add a Collaborator
 
-<img src=".gif"/>
+<img src="./readme/gifs/add-a-collaborator-i.gif"/>
 
-<img src=".gif"/>
+<img src="./readme/gifs/add-a-collaborator-ii.gif"/>
 
 2. Update a Collaborator’s Role
 
-<img src=".gif"/>
+<img src="./readme/gifs/update-a-collaborator's-role.gif"/>
 
 3. Remove a Collaborator
 
-<img src=".gif"/>
+<img src="./readme/gifs/remove-a-collaborator-i.gif"/>
 
-<img src=".gif"/>
+<img src="./readme/gifs/remove-a-collaborator-ii.gif"/>
 
 4. Leave a Document
 
-<img src=".gif"/>
+<img src="./readme/gifs/leave-a-document-i.gif"/>
 
-<img src=".gif"/>
+<img src="./readme/gifs/leave-a-document-ii.gif"/>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
