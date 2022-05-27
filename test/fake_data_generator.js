@@ -23,11 +23,6 @@ async function hashPassword(password) {
   return hash;
 }
 
-async function checkPassword(password, hash) {
-  const isPwdCorrect = await argon2.verify(hash, password);
-  return isPwdCorrect;
-}
-
 async function createFakeUsers() {
   const usersToInsert = await Promise.all(users.map(async (user) => {
     const {
@@ -46,8 +41,8 @@ async function createFakeUsers() {
   try {
     await userCollection.insertMany(usersToInsert);
     console.log('createFakeUsers success');
-  } catch (e) {
-    console.error('createFakeUsers error', e);
+  } catch (err) {
+    console.error('createFakeUsers error', err);
   }
 }
 
@@ -92,8 +87,8 @@ async function createFakeDocs() {
   try {
     await docCollection.insertMany(docsToInsert);
     console.log('createFakeDocs success');
-  } catch (e) {
-    console.error('createFakeDocs error', e);
+  } catch (err) {
+    console.error('createFakeDocs error', err);
   }
 }
 
@@ -115,14 +110,14 @@ async function truncateFakeData() {
   try {
     await userCollection.deleteMany({});
     console.log('truncate fake users success');
-  } catch (e) {
-    console.error('truncate fake users error', e);
+  } catch (err) {
+    console.error('truncate fake users error', err);
   }
   try {
     await docCollection.deleteMany({});
     console.log('truncate fake docs success');
-  } catch (e) {
-    console.error('truncate fake docs error', e);
+  } catch (err) {
+    console.error('truncate fake docs error', err);
   }
   console.log('truncate fake data finished');
 }

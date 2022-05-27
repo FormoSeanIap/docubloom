@@ -1,18 +1,37 @@
 import * as DocService from '../services/doc_service.js';
 import * as UserService from '../services/user_service.js';
+import handleResponse from '../../utils/response_handler.js';
 
 const getUsers = async (req, res) => {
   const { docId } = req.params;
-  const result = await DocService.getUsers(docId);
-
-  if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+  const { code, users } = await DocService.getUsers(docId);
+  if (code > 9999) {
+    handleResponse(code, res);
     return;
   }
 
+  function generateUserToRespond(user) {
+    return {
+      id: user._id.toHexString(),
+      email: user.email,
+      name: user.name,
+    };
+  }
+
+  function generateMultiUsersToRespond(usersArr) {
+    return usersArr.map(generateUserToRespond);
+  }
+
+  const ownersToRespond = generateMultiUsersToRespond(users.owners);
+  const editorsToRespond = generateMultiUsersToRespond(users.editors);
+  const viewersToRespond = generateMultiUsersToRespond(users.viewers);
+
   res.status(200).send({
-    data: result,
+    data: {
+      owners: ownersToRespond,
+      editors: editorsToRespond,
+      viewers: viewersToRespond,
+    },
   });
 };
 
@@ -21,17 +40,20 @@ const addUser = async (req, res) => {
   const { email: collaboratorEmail, role: collaboratorRole } = req.body;
   const userRole = req.user.role;
 
-  const result = await DocService.addUser(docId, collaboratorEmail, collaboratorRole, userRole);
-  if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+  const addUserResult = await DocService.addUser(
+    docId,
+    collaboratorEmail,
+    collaboratorRole,
+    userRole,
+  );
+  if (addUserResult.code > 9999) {
+    handleResponse(addUserResult.code, res);
     return;
   }
 
-  const collaborator = await UserService.getUserDetail(collaboratorEmail);
-  if (collaborator.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: collaborator.error });
+  const { code, userDetail: collaborator } = await UserService.getUserDetail(collaboratorEmail);
+  if (code > 9999) {
+    handleResponse(code, res);
     return;
   }
 
@@ -53,102 +75,50 @@ const updateUser = async (req, res) => {
   const { role: collaboratorRole } = req.body;
   const { role: userRole } = req.user;
 
-  const result = await DocService.updateUser(docId, userId, collaboratorRole, userRole);
-  if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
-    return;
-  }
-
-  res.status(200).send({
-    message: 'update success',
-    data: {
-      docId,
-      userId,
-      userRole: collaboratorRole,
-    },
-  });
+  const { code } = await DocService.updateUser(docId, userId, collaboratorRole, userRole);
+  handleResponse(code, res);
 };
 
 const deleteUser = async (req, res) => {
   const { docId, userId } = req.params;
 
-  const result = await DocService.deleteUser(docId, userId);
-  if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
-    return;
-  }
-
-  res.status(200).send({
-    message: 'delete success',
-    data: {
-      docId,
-      userId,
-    },
-  });
+  const { code } = await DocService.deleteUser(docId, userId);
+  handleResponse(code, res);
 };
 
 const getDoc = async (req, res) => {
   const { docId } = req.params;
 
-  const result = await DocService.getDoc(docId);
-  if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
+  const { code, doc } = await DocService.getDoc(docId);
+  if (code > 9999) {
+    handleResponse(code, res);
     return;
   }
-  const doc = result.data;
   res.status(200).send({
-    data: doc,
+    data: doc.data,
   });
 };
 
 const createDoc = async (req, res) => {
   const doc = req.body.data;
 
-  const result = await DocService.createDoc(req.user.id, doc);
-  if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
-    return;
-  }
-
-  const docId = result.insertedId.toString();
-
-  res.status(200).send({
-    data: {
-      id: docId,
-    },
-  });
+  const { code } = await DocService.createDoc(req.user.id, doc);
+  handleResponse(code, res);
 };
 
 const editDoc = async (req, res) => {
   const { docId } = req.params;
   const doc = req.body.data;
 
-  const result = await DocService.editDoc(docId, doc);
-  if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
-    return;
-  }
-
-  res.status(200).send({ message: 'update success' });
+  const { code } = await DocService.editDoc(docId, doc);
+  handleResponse(code, res);
 };
 
 const deleteDoc = async (req, res) => {
   const { docId } = req.params;
-  // const userId = req.user.id;
 
-  const result = await DocService.deleteDoc(docId);
-  if (result.error) {
-    const statusCode = result.status ? result.status : 403;
-    res.status(statusCode).send({ error: result.error });
-    return;
-  }
-
-  res.status(200).send({ message: 'delete success' });
+  const { code } = await DocService.deleteDoc(docId);
+  handleResponse(code, res);
 };
 
 export {
