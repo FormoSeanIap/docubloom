@@ -210,7 +210,7 @@ To get a local copy up and running follow these simple example steps.
 ### Get Your First API Document
 
 - Simply [Enter the Website](https://www.vivaformosean.com/), click GET EXAMPLE, and click VIEW. Just that simple!
-[get document]()
+<img class="#get-document" src="./readme/gifs/get-document.gif">
 
 
 ### Sign In/Up to See your Profile
