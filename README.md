@@ -120,7 +120,7 @@
 <details>
   <summary>Gifs</summary>
   <ol>
-    <li><a href="#get-document">Get Document</a></li>
+    <li><a href="#get-document2">Get Document</a></li>
     <li><a href="#sign-in/up">Sign In/Up</a></li>
     <li><a href="#see-doc-contents">See Doc Contents</a></li>
     <li><a href="#test-apis-i">Test APIs I</a></li>
