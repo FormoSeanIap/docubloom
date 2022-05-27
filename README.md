@@ -69,6 +69,7 @@
         </li>
       </ol>
     </li>
+    <li><a href="#structure">Structure</a></li>
     <li>
       <a href="#budget-prediction">Budget Prediction</a>
       <ul>
@@ -77,7 +78,6 @@
         <li><a href="#conclusion">Conclusion</a></li>
       </ul>
     </li>
-    <li><a href="#architecture">Architecture</a></li>
     <li><a href="#error-handling-method">Error Handling Method</a></li>
     <li><a href="#mvcs-structure">MVCS Structure</a></li>
     <li><a href="#api-reference">API Reference</a></li>
@@ -148,6 +148,10 @@ DocuBloom allows you to
 * Share documents with collaborators and manage their role
 * Receive mock response even if your own server went down
 
+This can be concluded as the following figure
+
+<img src="./readme/imgs/feature.png">
+
 <a href="http://www.vivaformosean.com/"><strong>Try it now</strong></a><br />
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -195,6 +199,8 @@ DocuBloom allows you to
       <li><a href="https://swagger.io/tools/swaggerhub/">Swagger</a></li>
       <li><a href="https://k6.io/">K6</a></li>
       <li><a href="https://www.postman.com/">Postman</a></li>
+      <li><a href="https://mochajs.org/">Mocha</a></li>
+      <li><a href="https://www.chaijs.com/">Chai</a></li>
     </ul>
   </li>
 </ul>
@@ -309,3 +315,14 @@ Let's dive in and enjoy these cool DocuBloom features together!
 <img src="./readme/gifs/leave-a-document-ii.gif"/>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+<!-- Structure -->
+## Structure
+
+<img src="./readme/imgs/structure.png">
+
+The structure consists of four parts
+- The static files are deployed on Amazon S3 to enhance data fetching speed with CDN services.
+- The server is deployed on Amazon EC2, and is deployed together with Nginx by applying Docker Compose.
+- Data is stored in MongoDB, with Redis in ElastiCache to boost data fetching efficiency. (the server is stateless)
+- Elastic Load Balancing is applied with AWS Auto Scaling to enhance site availability. 
