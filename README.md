@@ -138,7 +138,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+<img src="./readme/imgs/about.png">
 
 It has never been easier to build and manage API documents with DocuBloom!
 
@@ -216,7 +216,6 @@ To get a local copy up and running follow these simple example steps.
 ### Sign In/Up to See your Profile
 
 - Sign in/up to see all of your documents
-[![Sign-In/Up][sign-in/up]]()
 - The default accout/password is
 
 Account       | Password| 
@@ -236,16 +235,16 @@ Let's dive in and enjoy these cool DocuBloom features together!
 2. Document Contents
 - Following the last part, you can see the contents of document including the parameter, request, response of an API.
 
-<img src="./readme/imgs/document-contents-i.png" width="50%">
+<img src="./readme/imgs/document-contents-i.png">
 
-<img src="./readme/imgs/document-contents-ii.png" width="50%">
+<img src="./readme/imgs/document-contents-ii.png">
 
-<img src="./readme/imgs/document-contents-iii.png" width="50%">
+<img src="./readme/imgs/document-contents-iii.png">
 
 3. Mistype Hint
 - You'll be given a clear hint for any mistyping. Tired of a never-ending stream of minor blunders? No worries in DocuBloom!
 
-<img src="./readme/imgs/mistype-hint.png" width="50%">
+<img src="./readme/imgs/mistype-hint.png">
 
 ### API Management
 1. API Tests
