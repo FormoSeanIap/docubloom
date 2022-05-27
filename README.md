@@ -120,7 +120,7 @@
 <details>
   <summary>Gifs</summary>
   <ol>
-    <li><a href="#get-document">Get Document</a></li>
+    <li><a href="#get-document2">Get Document</a></li>
     <li><a href="#sign-in/up">Sign In/Up</a></li>
     <li><a href="#see-doc-contents">See Doc Contents</a></li>
     <li><a href="#test-apis-i">Test APIs I</a></li>
@@ -210,7 +210,7 @@ To get a local copy up and running follow these simple example steps.
 ### Get Your First API Document
 
 - Simply [Enter the Website](https://www.vivaformosean.com/), click GET EXAMPLE, and click VIEW. Just that simple!
-<img class="#get-document" src="./readme/gifs/get-document.gif">
+<img id="get-document2" src="./readme/gifs/get-document.gif">
 
 
 ### Sign In/Up to See your Profile
