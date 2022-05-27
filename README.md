@@ -4,7 +4,7 @@
 <br />
 <div align="center">
   <a href="http://www.vivaformosean.com/">
-    <img src="https://github.com/FormoSeanIap/project2-frontend/blob/develop/public/logo.png" alt="Logo" width="80" height="80">
+    <img src="./readme/imgs/logo.png" alt="Logo" width="80" height="80">
   </a>
 
   <h3 align="center">DocuBloom</h3>
