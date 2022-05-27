@@ -2,19 +2,13 @@
 
 <!-- PROJECT LOGO -->
 <br />
-<div align="center">
-  <a href="http://www.vivaformosean.com/">
-    <img src="./readme/imgs/logo.png" alt="Logo" width="80" height="80">
-  </a>
+<h1 align="left">DocuBloom</h1>
+<img src="./readme/imgs/about.png">
 
-  <h3 align="center">DocuBloom</h3>
+## [About The Project](#about-the-project) | [Getting Started](#getting-started) | [Features](#features) | [Structure](#structure) | [Budget](#budget) 
 
-  <p align="center">
-    A website for developers to build readable, shareable, and testable API documents, with an amazing mock response functionality.<br /> 
-    <a href="http://www.vivaformosean.com/"><strong>Explore the website »</strong></a><br />
-  </p>
-</div>
 
+<!-- TODO: delete this part -->
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
@@ -88,76 +82,98 @@
   </ol>
 </details>
 
-<!-- Figures -->
-<details>
-  <summary>Figures</summary>
-  <ol>
-    <li><a href="#about-the=project">About the Project</a></li>
-    <li><a href="#document-contents-i">Document Contents I</a></li>
-    <li><a href="#document-contents-ii">Document Contents II</a></li>
-    <li><a href="#document-contents-iii">Document Contents III</a></li>
-    <li><a href="#mistype-hint">Mistype Hint</a></li>
-    <li><a href="#performance-tests-result-i">Performance Tests Result I</a></li>
-    <li><a href="#performance-tests-result-ii">Performance Tests Result II</a></li>
-    <li><a href="#error-hint">Error Hint</a></li>
-    <li><a href="#cloud-structure">Cloud Structure</a></li>
-    <li><a href="#error-handling-method">Error Handling Method</a></li>
-    <li><a href="#mvcs-structure">MVCS Structure</a></li>
-  </ol>
-</details>
-
-
-<!-- Tables -->
-<details>
-  <summary>Tables</summary>
-  <ol>
-    <li><a href="#account-password">Account Password</a></li>
-    <li><a href="#current-equipment">Current Equipment</a></li>
-  </ol>
-</details>
-
-<!-- Gifs -->
-<details>
-  <summary>Gifs</summary>
-  <ol>
-    <li><a href="#get-document2">Get Document</a></li>
-    <li><a href="#sign-in/up">Sign In/Up</a></li>
-    <li><a href="#see-doc-contents">See Doc Contents</a></li>
-    <li><a href="#test-apis-i">Test APIs I</a></li>
-    <li><a href="#test-apis-ii">Test APIs II</a></li>
-    <li><a href="#mock-response">Mock Response</a></li>
-    <li><a href="#create-a-document">Create a Document</a></li>
-    <li><a href="#edit-a-document">Edit a Document</a></li>
-    <li><a href="#delete-a-document">Delete a Document</a></li>
-    <li><a href="#add-a-collaborator">Add a Collaborator</a></li>
-    <li><a href="#update-a-collaborator’s-role">Update a Collaborator’s Role</a></li>
-    <li><a href="#remove-a-collaborator">Remove a Collaborator</a></li>
-  </ol>
-</details>
-
 <!-- ABOUT THE PROJECT -->
-## About The Project
+<br />
 
-<img src="./readme/imgs/about.png">
+## About The Project
+---
 
 It has never been easier to build and manage API documents with DocuBloom!
 
 DocuBloom allows you to
-* Build readable API documents
-* Test if API is wokring properly with the document you built
-* Share documents with collaborators and manage their role
+* Build readable, sharable, and testable API documents
 * Receive mock response even if your own server went down
-
-This can be concluded as the following figure
 
 <img src="./readme/imgs/feature.png">
 
-<a href="http://www.vivaformosean.com/"><strong>Try it now</strong></a><br />
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+<!-- Getting Started -->
+## Getting Started
+---
+
+- Get Your First API Document
+<img src="./readme/gifs/get-document.gif">
+
+- Sign In/Up to See your Profile
+
+  Account       | Password | 
+  :-------------|:---------|
+  sean@sean.com | sean     |
+
+  <img src="./readme/gifs/sign-in-up.gif">
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-### Built With
+<!-- Features -->
+## Features
+---
 
+- Mistype Hint
+
+  <img src="./readme/imgs/mistype-hint.png">
+
+- API Tests
+
+  <img src="./readme/gifs/api-test.gif"/>
+
+- Collaborator Management
+  <p float="left">
+    <img src="./readme/imgs/collab-management-1.jpg" width="49%"/>
+    <img src="./readme/imgs/collab-management-2.jpg" width="49%"/>
+  </p>
+  
+  <img src="./readme/gifs/update-a-collaborator's-role.gif"/>
+
+  [Details](#collaborator-management-rules)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+<!-- Structure -->
+## Structure
+---
+
+- Structure
+
+  <img src="./readme/imgs/structure.png">
+
+- Error Handling Method
+
+  <img src="./readme/imgs/error-handling-method.png">
+
+<!-- Budget -->
+## Budget
+---
+<img src="./readme/imgs/performance-test.png">
+
+<br />
+
+### Site Traffic
+
+- Swagger
+  Visits     | Bounce rate | Requests | Peak Requests |
+  :---------:|:-----------:|:--------:|:-------------:|
+  1.4M/month | 61.66%      | 0.08/sec | 8/sec         |
+
+  <img src="./readme/imgs/swagger-traffic.png">
+
+- With the existing budget, equipment can handle 500 requests per second.
+- The server will automatically scale out in case the CPU usage is greater than 50%.
+
+
+
+### Built With
+---
 <ul>
   <li>
     Back-End
@@ -205,90 +221,23 @@ This can be concluded as the following figure
   </li>
 </ul>
 
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-<!-- Getting Started -->
-## Getting Started
-
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
-
-### Get Your First API Document
-
-- Simply [Enter the Website](https://www.vivaformosean.com/), click GET EXAMPLE, and click VIEW. Just that simple!
-<img src="./readme/gifs/get-document.gif">
-
-
-### Sign In/Up to See your Profile
-
-- Sign in/up to see all of your documents
-- The default accout/password is
-
-Account       | Password| 
---------------|:-------:|
-sean@sean.com | sean    |
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-<!-- Features -->
-## Features
-
-Let's dive in and enjoy these cool DocuBloom features together!
-
-### Documentation
-1. Get Document
-- This has been mentioned in the Getting Started Section. [Check it out!](#get-your-first-api-document)
-2. Document Contents
-- Following the last part, you can see the contents of document including the parameter, request, response of an API.
-
-<img src="./readme/imgs/document-contents-i.png">
-
-<img src="./readme/imgs/document-contents-ii.png">
-
-<img src="./readme/imgs/document-contents-iii.png">
-
-3. Mistype Hint
-- You'll be given a clear hint for any mistyping. Tired of a never-ending stream of minor blunders? No worries in DocuBloom!
-
-<img src="./readme/imgs/mistype-hint.png">
-
-### API Management
-1. API Tests
-- You can test your API and see if it is working as expected. The API document is actually alive!
-
-<img src="./readme/gifs/test-apis-i.gif"/>
-
-<img src="./readme/gifs/test-apis-ii.gif"/>
-
-### Document Management
-1. Create a Document
-
-<img src="./readme/gifs/create-a-document.gif"/>
-
-2. Edit a Document
-
-<img src="./readme/gifs/edit-a-document.gif"/>
-
-3. Delete a Document
-
-<img src="./readme/gifs/delete-a-document.gif"/>
-
-### Collaborator Management
+### Collaborator Management Rules
+---
 - There are owner, editor, and viewer roles in DocuBloom. Collaborator management depends on these three roles. Just give it a try on the site if you don't want to read these complicated rules XD.
 1. You will be the owner right after creating a new document.
 2. An owner can change others' role to an owner, editor, or viewer.
-3. An owner can see other collborators of the document.
+3. An owner can see other collaborators of the document.
 4. An owner can remove any collaborator instead of another owner.
 5. An owner can remove, edit, and view the document.
 6. An owner cannot leave a document or be removed by others.
-7. A document must haave at least one owner.
+7. A document must have at least one owner.
 8. An editor can change others' role to an editor, or viewer.
-9. An editor can see other collborators of the document.
+9. An editor can see other collaborators of the document.
 10. An editor can edit and view the document.
 11. An editor can leave the document.
 12. A viewer can view the document.
 13. A viewer can leave the document.
-14. A viewer can see other collborators of the document.
+14. A viewer can see other collaborators of the document.
 - If you are the owner of a document and you want to remove another owner. You will need to change his role to an editor or view, and then remove him.
 - If you are the owner of a document and you want to leave this document. You need make sure there is at least another one as an owner, change your own role to an editor or viewer, and then click the leave document button.
 
@@ -313,16 +262,3 @@ Let's dive in and enjoy these cool DocuBloom features together!
 <img src="./readme/gifs/leave-a-document-i.gif"/>
 
 <img src="./readme/gifs/leave-a-document-ii.gif"/>
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-<!-- Structure -->
-## Structure
-
-<img src="./readme/imgs/structure.png">
-
-The structure consists of four parts
-- The static files are deployed on Amazon S3 to enhance data fetching speed with CDN services.
-- The server is deployed on Amazon EC2, and is deployed together with Nginx by applying Docker Compose.
-- Data is stored in MongoDB, with Redis in ElastiCache to boost data fetching efficiency. (the server is stateless)
-- Elastic Load Balancing is applied with AWS Auto Scaling to enhance site availability. 
