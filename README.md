@@ -11,7 +11,6 @@
 
 <!-- ABOUT -->
 ## About
----
 
 A website for developers to build readable, sharable, and testable API documents, and to receive mock response even if the user's own server went down.
 
@@ -21,7 +20,6 @@ A website for developers to build readable, sharable, and testable API documents
 
 <!-- Getting Started -->
 ## Getting Started
----
 
 - Get Your First API Document
 <img src="./readme/gifs/get-document.gif">
@@ -38,7 +36,6 @@ A website for developers to build readable, sharable, and testable API documents
 
 <!-- Features -->
 ## Features
----
 
 - Mistype Hint
 
@@ -49,7 +46,8 @@ A website for developers to build readable, sharable, and testable API documents
   <img src="./readme/gifs/api-test.gif"/>
 
 - Collaborator Management
-  ![](readme%5Cimgs%5Ccollab-management.jpg)
+
+  ![](./readme/imgs/collab-management.jpg)
   
   <img src="./readme/gifs/update-a-collaborator's-role.gif"/>
 
@@ -59,7 +57,6 @@ A website for developers to build readable, sharable, and testable API documents
 
 <!-- Structure -->
 ## Structure
----
 
 - Structure
 
@@ -75,7 +72,6 @@ A website for developers to build readable, sharable, and testable API documents
 
 <!-- Budget -->
 ## Budget
----
 <img src="./readme/imgs/performance-test.png">
 
 - The current budget is less than 15 USD per month, with equipments able to handle 500 requests per second.
@@ -89,7 +85,6 @@ A website for developers to build readable, sharable, and testable API documents
 <p align="right"><a href="#top">back to top</a></p>
 
 ## Built With
----
 
 <table>
   <tbody>
