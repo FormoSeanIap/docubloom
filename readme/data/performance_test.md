@@ -1,9 +1,7 @@
 # Performace Test Results with K6
-## [Peak Situation](#peak-situation) | [Limit Situation](#limit-situation) | [Auto Scaling Test](#auto-scaling-test) 
-
-<br />
 
 ## Peak Situation
+---
 <details>
   <summary>K6 configuration</summary>
 
@@ -739,6 +737,7 @@
 <br />
 
 ## Limit Situation (CPU > 95%, with some reponses taking longer than 5 seconds)
+---
 <details>
   <summary>K6 configuration</summary>
 
@@ -2378,6 +2377,7 @@
 <br />
 
 ## Auto Scaling Test
+---
 <details>
   <summary>K6 configuration</summary>
 
