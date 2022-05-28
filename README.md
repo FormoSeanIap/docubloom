@@ -5,12 +5,12 @@
 <h1 align="left">DocuBloom</h1>
 <img src="./readme/imgs/about.png">
 
-## [About The Project](#about-the-project) | [Getting Started](#getting-started) | [Features](#features) | [Structure](#structure) | [Budget](#budget) | [Built With](#built-with)
+## [About](#about) | [Getting Started](#getting-started) | [Features](#features) | [Structure](#structure) | [Budget](#budget) | [Built With](#built-with)
 
 <br />
 
-<!-- ABOUT THE PROJECT -->
-## About The Project
+<!-- ABOUT -->
+## About
 ---
 
 A website for developers to build readable, sharable, and testable API documents, and to receive mock response even if the user's own server went down.
@@ -29,7 +29,7 @@ A website for developers to build readable, sharable, and testable API documents
 - Sign In/Up to See your Profile
 
   Account       | Password | 
-  :-------------|:---------|
+  :------------:|:--------:|
   sean@sean.com | sean     |
 
   <img src="./readme/gifs/sign-in-up.gif">
