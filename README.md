@@ -69,7 +69,7 @@ A website for developers to build readable, sharable, and testable API documents
 
   <img src="./readme/imgs/error-handling-method.png">
 
-  [Details](readme%5Cdata%5Cresponses.md)
+  [Details](./readme/data/responses.md)
 
 <p align="right"><a href="#top">back to top</a></p>
 

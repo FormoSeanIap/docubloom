@@ -2429,7 +2429,7 @@
 <details>
   <summary>rate 800, duration 5m (4 request senders)</summary>
 
-  ![](..%5Cimgs%5Cauto-scale-rate-800-duration-5m-4-request-senders.png)
+  ![](../imgs/auto-scale-rate-800-duration-5m-4-request-senders.png)
 
   ```json
   {
@@ -2659,7 +2659,7 @@
 <details>
   <summary>rate 800, duration 20m (4 request senders)</summary>
 
-  ![](..%5Cimgs%5Cauto-scale-rate-600-duration-20m-4-request-senders.png)
+  ![](../imgs/auto-scale-rate-800-duration-20m-4-request-senders.png)
 
   ```json
   {
@@ -2888,7 +2888,7 @@
 <details>
   <summary>rate 800, duration 40m (4 request senders)</summary>
 
-  ![](..%5Cimgs%5Cauto-scale-rate-800-duration-40m-4-request-senders.png)
+  ![](../imgs/auto-scale-rate-800-duration-40m-4-request-senders.png)
 
   ```json
   {
@@ -3117,7 +3117,7 @@
 <details>
   <summary>rate 2000, duration 20m (4 request senders)</summary>
 
-  ![](..%5Cimgs%5Cauto-scale-rate-2000-duration-20m-4-request-senders.png)
+  ![](../imgs/auto-scale-rate-2000-duration-20m-4-request-senders.png)
 
   ```json
   {
@@ -3346,7 +3346,7 @@
 <details>
   <summary>rate 2000, duration 40m (4 request senders)</summary>
 
-  ![](..%5Cimgs%5Cauto-scale-rate-2000-duration-40m-4-request-senders.png)
+  ![](../imgs/auto-scale-rate-2000-duration-40m-4-request-senders.png)
 
   ```json
   {
@@ -3575,7 +3575,7 @@
 <details>
   <summary>rate 600, duration 20m (4 request senders)</summary>
 
-  ![](..%5Cimgs%5Cauto-scale-rate-600-duration-20m-4-request-senders.png)
+  ![](../imgs/auto-scale-rate-600-duration-20m-4-request-senders.png)
 
   ```json
   {
@@ -3804,7 +3804,7 @@
 <details>
   <summary>rate 400, duration 20m (4 request senders)</summary>
 
-  ![](..%5Cimgs%5Cauto-scale-rate-400-duration-20m-4-request-senders.png)
+  ![](../imgs/auto-scale-rate-400-duration-20m-4-request-senders.png)
 
   ```json
   {
@@ -4033,7 +4033,7 @@
 <details>
   <summary>rate 500, duration 20m (4 request senders)</summary>
 
-  ![](..%5Cimgs%5Cauto-scale-rate-500-duration-20m-4-request-senders.png)
+  ![](../imgs/auto-scale-rate-500-duration-20m-4-request-senders.png)
 
   ```json
   {

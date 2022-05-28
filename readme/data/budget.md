@@ -4,15 +4,15 @@
 
 - EC2
 
-  ![](..%5Cimgs%5Cpricing-EC2.png)
+  ![](../imgs/pricing-EC2.png)
 
 - ElastiCache
 
-  ![](..%5Cimgs%5Cpricing-ElastiCache.png)
+  ![](../imgs/pricing-ElastiCache.png)
 
 - MongoDB
 
-  ![](..%5Cimgs%5Cpricing-MongoDB.png)
+  ![](../imgs/pricing-MongoDB.png)
 
 <br />
 
@@ -24,7 +24,7 @@ Visits     | Bounce rate | Requests | Peak Requests |
 
 - The data came from [Similarweb](https://www.similarweb.com/zh-tw/)
 
-  ![](..%5Cimgs%5Cswagger-traffic.png)
+  ![](../imgs/swagger-traffic.png)
 
 <br />
 

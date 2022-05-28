@@ -24,22 +24,22 @@
 ---
 - Add a Collaborator
 
-  ![](..%5Cgifs%5Cadd-a-collaborator-i.gif)
+  ![](../gifs/add-a-collaborator-i.gif)
 
-  ![](..%5Cgifs%5Cadd-a-collaborator-ii.gif)
+  ![](../gifs/add-a-collaborator-ii.gif)
 
 - Update a Collaborator’s Role
 
-  ![](..%5Cgifs%5Cupdate-a-collaborator's-role.gif)
+  ![](../gifs/update-a-collaborator's-role.gif)
 
 - Remove a Collaborator
 
-  ![](..%5Cgifs%5Cremove-a-collaborator-i.gif)
+  ![](../gifs/remove-a-collaborator-i.gif)
 
-  ![](..%5Cgifs%5Cremove-a-collaborator-ii.gif)
+  ![](../gifs/remove-a-collaborator-ii.gif)
 
 - Leave a Document
 
-  ![](..%5Cgifs%5Cleave-a-document-i.gif)
+  ![](../gifs/leave-a-document-i.gif)
 
-  ![](..%5Cgifs%5Cleave-a-document-ii.gif)
+  ![](../gifs/leave-a-document-ii.gif)
