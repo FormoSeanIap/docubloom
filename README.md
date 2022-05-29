@@ -45,6 +45,12 @@ A website for developers to build readable, sharable, and testable API documents
 
   <img src="./readme/gifs/api-test.gif"/>
 
+- Mock Response
+
+  If a developer's server went down, s/he can still fetch mock response and past the generated urls to their codes, and the development won't be interrupted.
+
+  <img src="./readme/gifs/mock-api.gif"/>
+
 - Collaborator Management
 
   ![](./readme/imgs/collab-management.jpg)
