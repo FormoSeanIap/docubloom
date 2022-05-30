@@ -53,7 +53,7 @@ Visits     | Bounce rate | Requests | Peak Requests |
 
   []()               | storage per group | can store |
   :----------------:|:-----------------:|:---------:|
-  3 people + 5 docu | 81kb              | 61728     |
+  3 people + 5 docs | 81kb              | 61728     |
 
 <br />
 
