@@ -5,7 +5,7 @@
 <h1 align="left">DocuBloom</h1>
 <img src="./readme/imgs/about.png">
 
-## [About](#about) | [Getting Started](#getting-started) | [Features](#features) | [Structure](#structure) | [Budget](#budget) | [Built With](#built-with)
+## [About](#about) | [Getting Started](#getting-started) | [Features](#features) | [Structure](#structure) | [Budget](#budget) | [Built With](#built-with) | [Contact](#contact)
 
 <br />
 
@@ -138,3 +138,8 @@ A website for developers to build readable, sharable, and testable API documents
 </table>
 
 <p align="right"><a href="#top">back to top</a></p>
+
+## Contact
+
+- Author: Sean Ia̍p (Iàp Sîng Gān) (葉承彥)
+- Email: iapsinggan@gmail.com
