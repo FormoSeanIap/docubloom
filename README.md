@@ -16,19 +16,21 @@ A website for developers to build readable, sharable, and testable API documents
 
 <img src="./readme/imgs/feature.png">
 
+- Test Account
+
+  |Account       | Password | 
+  |:------------:|:--------:|
+  |sean@sean.com | sean     |
+
 <p align="right"><a href="#top">back to top</a></p>
 
 <!-- Getting Started -->
 ## Getting Started
 
-- Get Your First API Example Document
+- Get your first example API document
 <img src="./readme/gifs/get-document.gif">
 
-- Sign In/Up to See your Profile
-
-  Account       | Password | 
-  :------------:|:--------:|
-  sean@sean.com | sean     |
+- Sign in/up to see your documents
 
   <img src="./readme/gifs/sign-in-up.gif">
 
