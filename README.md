@@ -21,7 +21,7 @@ A website for developers to build readable, sharable, and testable API documents
 <!-- Getting Started -->
 ## Getting Started
 
-- Get Your First API Document
+- Get Your First API Example Document
 <img src="./readme/gifs/get-document.gif">
 
 - Sign In/Up to See your Profile
@@ -57,7 +57,7 @@ A website for developers to build readable, sharable, and testable API documents
   
   <img src="./readme/gifs/update-a-collaborator's-role.gif"/>
 
-  [Details](./readme/data/doc_collaboration.md)
+  [See More](./readme/data/doc_collaboration.md)
 
 <p align="right"><a href="#top">back to top</a></p>
 
@@ -72,7 +72,7 @@ A website for developers to build readable, sharable, and testable API documents
 
   <img src="./readme/imgs/error-handling-method.png">
 
-  [Details](./readme/data/responses.md)
+  [See More](./readme/data/responses.md)
 
 <p align="right"><a href="#top">back to top</a></p>
 
@@ -86,7 +86,7 @@ A website for developers to build readable, sharable, and testable API documents
 
 - From the perspective of database, it requires more storage as the current usage grows about 3-4 times larger.
 
-  [Details](./readme/data/budget.md)
+  [See More](./readme/data/budget.md)
 
 <p align="right"><a href="#top">back to top</a></p>
 
