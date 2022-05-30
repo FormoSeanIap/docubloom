@@ -45,13 +45,13 @@ Visits     | Bounce rate | Requests | Peak Requests |
 - The MongoDB free plan provides 512MB to 5GB storage
 - The storage per document and per user is
 
-  -        | storage | 
+  <!-- --> | storage | 
   :-------:|:-------:|
   document | 15kb    |
   user info| 2kb    |
 - Consider 3 people with 5 documents a group
 
-  -                 | storage per group | can store |
+  <!-- -->          | storage per group | can store |
   :----------------:|:-----------------:|:---------:|
   3 people + 5 docu | 81kb              | 61728     |
 
