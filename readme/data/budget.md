@@ -1,20 +1,27 @@
 # Budget
 
-## Current Equiments Pricing
+## Current Equipments Pricing
 
-- EC2
+<details>
+  <summary>EC2</summary>
 
   ![](../imgs/pricing-EC2.png)
 
-- ElastiCache
+</details>
+
+<details>
+  <summary>ElastiCache</summary>
 
   ![](../imgs/pricing-ElastiCache.png)
 
-- MongoDB
+</details>
+
+<details>
+  <summary>MongoDB</summary>
 
   ![](../imgs/pricing-MongoDB.png)
 
-<br />
+</details>
 
 ## Site Traffic (in comparison with Swagger)
 
@@ -24,9 +31,11 @@ Visits     | Bounce rate | Requests | Peak Requests |
 
 - The data came from [Similarweb](https://www.similarweb.com/zh-tw/)
 
-  ![](../imgs/swagger-traffic.png)
+<details>
+  <summary>Data</summary>
 
-<br />
+  ![](../imgs/swagger-traffic.png)
+</details>
 
 ## Performance Test Result (with [k6](https://k6.io/) on the Mock Response API)
 
@@ -38,22 +47,18 @@ Visits     | Bounce rate | Requests | Peak Requests |
 
 - [Details](./performance_test.md)
 
-<br />
-
 ## Database Usage Calculation
 
 - The MongoDB free plan provides 512MB to 5GB storage
 - The storage per document and per user is
-  -        | storage | 
-  :-------:|:-------:|
-  document | 15kb    |
-  user info| 2kb    |
+  |         | storage | 
+  |:-------:|:-------:|
+  |document | 15kb    |
+  |user info| 2kb     |
 - Consider 3 people with 5 documents a group
-  -                 | storage per group | can store |
-  :----------------:|:-----------------:|:---------:|
-  3 people + 5 docu | 81kb              | 61728     |
-
-<br />
+  |                  | storage per group | can store |
+  |:----------------:|:-----------------:|:---------:|
+  |3 people + 5 docu | 81kb              | 61728     |
 
 ## Conclusion
 
