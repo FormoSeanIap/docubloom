@@ -2,24 +2,37 @@
 
 ## Current Equipments Pricing
 
+
+|              | level          | rate                |
+|:------------:|:--------------:|:-------------------:|
+|EC2           | t2.micro       | 6.282 USD per month |
+|MongoDB Atlas | Shared         | free                |
+|ElastiCache   | cache.t3.micro | 9.496 USD per month |
+
 <details>
   <summary>EC2</summary>
 
-  ![](../imgs/pricing-EC2.png)
+  - I chose Savings Plans (for 3 years) for a 43% saving over the on-demand plan.
+
+    ![](../imgs/pricing-EC2.png)
 
 </details>
 
 <details>
   <summary>ElastiCache</summary>
 
-  ![](../imgs/pricing-ElastiCache.png)
+  - I chose Reserved Nodes (for 3 years) for a 50% saving over the on-demand plan.
+
+    ![](../imgs/pricing-ElastiCache.png)
 
 </details>
 
 <details>
   <summary>MongoDB</summary>
 
-  ![](../imgs/pricing-MongoDB.png)
+  - I chose the free plan.
+
+    ![](../imgs/pricing-MongoDB.png)
 
 </details>
 
@@ -29,14 +42,17 @@ Visits     | Bounce rate | Requests | Peak Requests |
 :---------:|:-----------:|:--------:|:-------------:|
 1.4M/month | 61.66%      | 0.08/sec | 8/sec         |
 
-- The data came from [Similarweb](https://www.similarweb.com/zh-tw/)
+- The Peak Requests is estimated to be 100 times higher than the typical one, which must be checked on a regular basis in production. 
+
+- The site traffic data came from [Similarweb](https://www.similarweb.com/zh-tw/).
 
 <details>
-  <summary>Data</summary>
+  <summary>Data Details</summary>
 
-- The Peak Requests is estimated to be 100 times higher than the typical one. This must be checked on a regular basis in production. 
+  ![](../imgs/swagger-traffic.png)
 
-<br />
+</details>
+
 
 ## Performance Test Result (with [k6](https://k6.io/) on the Mock Response API)
 
