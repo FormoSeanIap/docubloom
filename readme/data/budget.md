@@ -34,8 +34,9 @@ Visits     | Bounce rate | Requests | Peak Requests |
 <details>
   <summary>Data</summary>
 
-  ![](../imgs/swagger-traffic.png)
-</details>
+- The Peak Requests is estimated to be 100 times higher than the typical one. This must be checked on a regular basis in production. 
+
+<br />
 
 ## Performance Test Result (with [k6](https://k6.io/) on the Mock Response API)
 
