@@ -88,7 +88,7 @@ A website for developers to build readable, sharable, and testable API documents
 
 - From the perspective of site traffic, it requires better equipments if the current usage grows 60-100 times larger.
 
-- From the perspective of database, it requires more storage as the current usage grows about 3-4 times larger.
+- From the perspective of database usage, it requires more storage as the current usage grows about 3-4 times larger.
 
   [See More](./readme/data/budget.md)
 
@@ -2579,6 +2579,8 @@ A website for developers to build readable, sharable, and testable API documents
   ```
 
   </details>
+
+<p align="right"><a href="#top">back to top</a></p>
 
 ## Built With
 
