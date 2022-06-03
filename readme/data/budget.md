@@ -6,8 +6,8 @@
 |              | level          | rate                |
 |:------------:|:--------------:|:-------------------:|
 |EC2           | t2.micro       | 6.282 USD per month |
-|MongoDB Atlas | Shared         | free                |
 |ElastiCache   | cache.t3.micro | 9.496 USD per month |
+|MongoDB Atlas | Shared         | free                |
 
 <details>
   <summary>EC2</summary>
