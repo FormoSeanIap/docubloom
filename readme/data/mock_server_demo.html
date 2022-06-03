@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mock-Server Demo Site</title>
+</head>
+<body>
+  <button id="fetch-mock-response">Fetch Mock Response</button>
+  <p id="status-code">Status Code</p>
+  <p id="res-content">Response Content</p>
+  <button id="reset">Reset</button>
+  <script>
+    const fetchRes = document.querySelector('#fetch-mock-response');
+    const statusCode = document.querySelector('#status-code');
+    const resContent = document.querySelector('#res-content');
+    const reset = document.querySelector('#reset');
+
+    const mockUrl = 'https://api.vivaformosean.com/api/1.0/mock-server/docs/628cf3032eae9856df75ed10/examples?path=/api/1.0/user/signin&method=post&statusCode=400&contentType=application/json&exampleName=no-required-content';
+
+    fetchRes.addEventListener('click', () => {
+      fetch(mockUrl)
+        .then(res => {
+          statusCode.innerHTML = res.status;
+          return res.json();
+        })
+        .then(data => {
+          resContent.innerHTML = JSON.stringify(data);
+        })
+    });
+
+    reset.addEventListener('click', () => {
+      statusCode.innerHTML = 'Status Code';
+      resContent.innerHTML = 'Response Content';
+    });
+  </script>
+</body>
+</html>
