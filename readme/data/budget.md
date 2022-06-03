@@ -12,7 +12,7 @@
 <details>
   <summary>EC2</summary>
 
-  - I chose Savings Plans (for 3 years) for a 43% saving over the on-demand plan.
+  - I chose the 3-year Savings Plan (a commitment for 3 years) for a 43% saving over the On-Demand Plan.
 
     ![](../imgs/pricing-EC2.png)
 
@@ -21,7 +21,7 @@
 <details>
   <summary>ElastiCache</summary>
 
-  - I chose Reserved Nodes (for 3 years) for a 50% saving over the on-demand plan.
+  - I chose the 3-year Reserved Node (a commitment for 3 years) for a 50% saving over the On-Demand Node.
 
     ![](../imgs/pricing-ElastiCache.png)
 
